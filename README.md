@@ -3,18 +3,20 @@ Transposome
 
 Annotation of transposable element families from unassembled sequence reads
 
-INSTALLATION
 
-============
+
+
+
+**INSTALLATION**
+
 To install this module, run the following commands:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-SUPPORT AND DOCUMENTATION
-=========================
+**SUPPORT AND DOCUMENTATION**
 
 After installing, you can find documentation for this module with the
 perldoc command.
@@ -36,8 +38,7 @@ You can also look for information at:
         http://search.cpan.org/dist/Transposome/
 
 
-LICENSE AND COPYRIGHT
-=====================
+**LICENSE AND COPYRIGHT**
 
 Copyright (C) 2013 S. Evan Staton
 
