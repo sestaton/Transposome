@@ -31,7 +31,14 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 annotate_clusters()
+=head2 annotate_clusters
+
+ Title   : annotation_clusters
+ Usage   : $trans_obj->annotate_clusters();
+           
+ Function: 
+ Returns : 
+ Args    : 
 
 =cut
 
@@ -129,7 +136,15 @@ sub annotate_clusters {
     return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
 }
 
-=head2 parse_blast_to_top_hit()
+=head2 parse_blast_to_top_hit
+
+ Title   : parse_blast_to_top_hit
+ Usage   : 
+           
+ Function: 
+ Returns : 
+ Args    : 
+           
 
 =cut
 
@@ -170,6 +185,13 @@ sub parse_blast_to_top_hit {
 }
 
 =head2 blast_to_annotation
+
+ Title   : blast_to_annotation
+ Usage   : 
+           
+ Function: 
+ Returns : 
+ Args    : 
 
 =cut
 
@@ -336,7 +358,15 @@ sub blast_to_annotation {
     return(\%top_hit_superfam, \%cluster_annot);
 }
 
-=head2 clusters_annotation_to_summary()
+=head2 clusters_annotation_to_summary
+
+ Title   : clusters_annotation_to_summary
+ Usage   : 
+           
+ Function: 
+ Returns : The current value of filename
+ Args    : 
+
 
 =cut
 
@@ -482,4 +512,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-1; # End of Transposome::Annotation
+#1; # End of Transposome::Annotation
+__PACKAGE__->meta->make_immutable;
