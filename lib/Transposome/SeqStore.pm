@@ -70,9 +70,15 @@ has 'in_memory' => (
 
 =head1 METHODS
 
-=head2 fas_to_hash()
+=head2 fas_to_hash
 
-    my ($seqs, $seq_ct) = $seq_store->fas_to_hash;
+ Title   : fas_to_hash
+ Usage   : my ($seqs, $seq_ct) = $seq_store->fas_to_hash;
+          
+ Function: 
+ Returns : 
+ Args    : 
+
 
 =cut
 
@@ -100,7 +106,14 @@ sub fas_to_hash {
     return(\%seqhash, $seqct);
 }
 
-=head2 _readfq() - private method
+=head2 _readfq 
+
+ Title   : _readfq
+ Usage   : 
+          
+ Function: 
+ Returns : 
+ Args    :
 
 =cut
 

@@ -27,7 +27,7 @@ our $VERSION = '0.01';
     my $types = Transposome::Types->new();
     ...
 
-=head1 ATTRIBUTES
+=Head1 ATTRIBUTES
 
 =cut
 

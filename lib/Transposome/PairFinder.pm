@@ -53,7 +53,15 @@ has 'file' => (
 
 =head1 SUBROUTINES/METHODS
 
-=head2 parse_blast()
+=head2 parse_blast
+
+ Title   : parse_blast
+ Usage   : 
+           
+ Function: 
+ Returns : 
+ Args    : 
+
 
 =cut
 
@@ -184,7 +192,7 @@ sub parse_blast {
 	unlink $dbm if -e $dbm;
 	unlink $dbi if -e $dbi;
 	
-	my $db = DBM::Deep->new( file      => $dbm,
+	my $db = DBM::Deep->new(  file      => $dbm,
 				  locking   => 1,
 				  autoflush => 1,
 				  type      => DBM::Deep::TYPE_HASH

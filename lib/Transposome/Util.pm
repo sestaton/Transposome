@@ -34,19 +34,40 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 mk_key()
+=head2 mk_key
+
+ Title   : mk_key
+ Usage   : 
+          
+ Function: 
+ Returns : 
+ Args    :
 
 =cut
 
 sub mk_key { join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_ }
 
-=head2 mk_vec()
+=head2 mk_vec
+
+ Title   : mk_vec
+ Usage   : 
+          
+ Function: 
+ Returns : 
+ Args    :
 
 =cut
 
 sub mk_vec { split "\N{INVISIBLE SEPARATOR}", shift }
 
-=head2 json_to_hash()
+=head2 json_to_hash
+
+ Title   : json_to_hash
+ Usage   : 
+          
+ Function: 
+ Returns : 
+ Args    :
 
 =cut
 
