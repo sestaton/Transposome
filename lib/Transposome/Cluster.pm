@@ -25,7 +25,7 @@ our $VERSION = '0.01';
 
     use Transposome::Cluster;
 
-    my $foo = Transposome::Cluster->new();
+    my $clus_obj = Transposome::Cluster->new();
     ...
 
 =head1 EXPORT
@@ -35,7 +35,14 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 louvain_method()
+=head2 louvain_method
+
+ Title   : louvain_method
+ Usage   : $self->louvain_method();
+
+ Function: 
+ Returns : 
+ Args    : 
 
 =cut
 
@@ -95,7 +102,14 @@ sub louvain_method {
     return \@comm;
 }
 
-=head2 find_pairs()
+=head2 find_pairs
+
+ Title   : find_pairs
+ Usage   : 
+           
+ Function: 
+ Returns : 
+ Args    : 
 
 =cut
 
@@ -184,7 +198,14 @@ sub find_pairs {
     return(\%read_pairs, \%vertex, \$uf);
 }
 
-=head2 make_clusters()
+=head2 make_clusters
+
+ Title   : make_clusters
+ Usage   : 
+ Function: 
+ Returns : 
+ Args    : 
+           
 
 =cut
 
@@ -248,7 +269,15 @@ sub make_clusters {
     return $cluster_file;
 }
 
-=head2 merge_clusters()
+=head2 merge_clusters
+
+ Title   : 
+ Usage   : 
+           
+ Function: 
+ Returns : 
+ Args    : 
+
 
 =cut
 
@@ -415,5 +444,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-#1; # End of Transposome::Cluster
 __PACKAGE__->meta->make_immutable;
