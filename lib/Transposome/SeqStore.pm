@@ -1,8 +1,7 @@
-package Transposome::SeqStore;
+package SeqStore;
 
 use 5.012;
-use Moose::Role;
-use MooseX::Types::Path::Class;
+use Moose;
 use namespace::autoclean;
 BEGIN {
   @AnyDBM_File::ISA = qw( DB_File SQLite_File )
@@ -11,8 +10,9 @@ BEGIN {
 use AnyDBM_File;                  
 use vars qw( $DB_BTREE &R_DUP );  
 use AnyDBM_File::Importer qw(:bdb);
-
-with 'Transposome::Types';
+use Carp;
+use SeqIO;
+with 'File','Types';
 
 =head1 NAME
 
@@ -41,39 +41,20 @@ our $VERSION = '0.01';
 
 =cut
 
-has 'file' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 1,
-      coerce   => 1,
-    );
-
 has 'in_memory' => (
     is         => 'ro',
     isa        => 'Bool',
-    predicate  => 'memory',
-    required   => 0,
+    predicate  => 'has_in_memory',
+    lazy       => 1,
     default    => 0,
     );
 
-#has 'counter' => (
-#      traits  => ['Counter'],
-#      is      => 'ro',
-#      isa     => 'Num',
-#      default => 0,
-#      handles => {
-#	  inc_counter   => 'inc',
-#          dec_counter   => 'dec',
-#          reset_counter => 'reset',
-#      },
-#    );
-
 =head1 METHODS
 
-=head2 fas_to_hash
+=head2 store_seq
 
- Title   : fas_to_hash
- Usage   : my ($seqs, $seq_ct) = $seq_store->fas_to_hash;
+ Title   : store_seqs
+ Usage   : my ($seqs, $seq_ct) = $seq_store->store_seq;
           
  Function: 
  Returns : 
@@ -82,11 +63,11 @@ has 'in_memory' => (
 
 =cut
 
-sub fas_to_hash {
+sub store_seq {
     my $self = shift;
  
     my %seqhash;
-    unless ($self->memory) {
+    unless ($self->has_in_memory) {
         $DB_BTREE->{cachesize} = 100000;
         $DB_BTREE->{flags} = R_DUP;
         my $seq_dbm = "transposome_seqstore.dbm";
@@ -96,78 +77,17 @@ sub fas_to_hash {
     }
 
     if (-e $self->file) {
-        my $fh = $self->file->openr or croak "\nERROR: Could not open file: ",$self->file->relative; ## need to test this
-        my ($name, $seq, $qual, @aux);
-        while (($name, $seq, $qual) = _readfq(\*$fh, \@aux)) {
-	    $self->inc_counter if defined $seq;;
-            $seqhash{$name} = $seq;
-        }
+	my $filename = $self->file->basename;
+	#say $name and exit;
+	my $seqio = SeqIO->new( file => $filename );
+	my $fh = $seqio->get_fh;
+	while (my $seq = $seqio->next_seq($fh)) {
+	    $self->inc_counter if $seq->has_seq;
+	    #say join "\n", ">".$seq->get_id, $seq->get_seq;
+	    $seqhash{$seq->get_id} = $seq->get_seq;
+	}
+	return(\%seqhash, $self->counter);
     }
-    return(\%seqhash, $seqct);
-}
-
-=head2 _readfq 
-
- Title   : _readfq
- Usage   : 
-          
- Function: 
- Returns : 
- Args    :
-
-=cut
-
-sub _readfq {
-    my ($fh, $aux) = @_;
-    @$aux = [undef, 0] if (!@$aux);
-    return if ($aux->[1]);
-    if (!defined($aux->[0])) {
-        while (<$fh>) {
-            chomp;
-            if (substr($_, 0, 1) eq '>' || substr($_, 0, 1) eq '@') {
-                $aux->[0] = $_;
-                last;
-            }
-        }
-        if (!defined($aux->[0])) {
-            $aux->[1] = 1;
-            return;
-        }
-    }
-    my $name;
-    if (/^.?(\S+)\s(\d)\S+/) {      # Illumina 1.8+
-        $name = $1."/".$2;
-    }
-    elsif (/^.?(\S+)/) {            # Illumina 1.3+
-        $name = $1;
-    } else {
-        $name = '';                 # ?
-    }
-    #my $name = /^.(\S+)/? $1 : ''; # Heng Li's original regex
-    my $seq = '';
-    my $c;
-    $aux->[0] = undef;
-    while (<$fh>) {
-        chomp;
-        $c = substr($_, 0, 1);
-        last if ($c eq '>' || $c eq '@' || $c eq '+');
-        $seq .= $_;
-    }
-    $aux->[0] = $_;
-    $aux->[1] = 1 if (!defined($aux->[0]));
-    return ($name, $seq) if ($c ne '+');
-    my $qual = '';
-    while (<$fh>) {
-        chomp;
-        $qual .= $_;
-        if (length($qual) >= length($seq)) {
-            $aux->[0] = undef;
-            return ($name, $seq, $qual);
-        }
-    }
-    $aux->[1] = 1;
-
-    return ($name, $seq);
 }
 
 =head1 AUTHOR
@@ -245,4 +165,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 #1; # End of Transposome::SeqStore
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
