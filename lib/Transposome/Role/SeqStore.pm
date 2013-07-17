@@ -245,4 +245,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 #1; # End of Transposome::SeqStore
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
