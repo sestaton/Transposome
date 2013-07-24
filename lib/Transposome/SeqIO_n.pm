@@ -25,14 +25,14 @@ has seq => (
     predicate => 'has_seq',
     );
 
-has comment => (
-    is        => 'rw',
-    isa       => 'Str',
-    reader    => 'get_comment',
-    writer    => 'set_comment',
-    #clearer   => 'clear_comment',
-    predicate => 'has_comment',
-    );
+#has comment => (
+#    is        => 'rw',
+#    isa       => 'Str',
+#    reader    => 'get_comment',
+#    writer    => 'set_comment',
+#    #clearer   => 'clear_comment',
+#    predicate => 'has_comment',
+#    );
 
 has qual => (
     is        => 'rw',
@@ -56,18 +56,8 @@ sub next_seq {
     die "\nERROR: $hline does not look like Fasta or Fastq. Exiting.\n" 
 	unless (substr($hline, 0, 1) eq '>' || substr($hline, 0, 1) eq '@');
     if (substr($hline, 0, 1) eq '>') {
-	if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
-	    $name = $1."/".$2;
-	    $self->set_id($name);
-	}
-	elsif ($hline =~ /^.?(\S+)/) {      
-	    $name = $1;
-	    $self->set_id($name);
-	} 
-	else {
-	    $name = '';                     
-	    $self->set_id($name);
-	}
+	my $name = _set_id_per_encoding($hline);
+	$self->set_id($name);
 
 	my $sline = <$fh>;
 	return unless defined $sline;
@@ -79,18 +69,8 @@ sub next_seq {
 	return $self;
     }
     elsif (substr($hline, 0, 1) eq '@') {
-	if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
-            $name = $1."/".$2;
-            $self->set_id($name);
-        }
-        elsif ($hline =~ /^.?(\S+)/) {
-            $name = $1;
-            $self->set_id($name);
-        } 
-	else {
-            $name = '';
-            $self->set_id($name);
-        }
+	my $name = _set_id_per_encoding($hline);
+	$self->set_id($name);
 
         my $sline = <$fh>;
         return unless defined $sline;
@@ -102,15 +82,14 @@ sub next_seq {
 	my $cline = <$fh>;
 	return unless defined $cline;
 	chomp $cline;
-	my $c = substr($cline, 0, 1);
 	die "\nERROR: No comment line for Fastq record $name. Exiting.\n" 
-	    unless length($cline) && $c eq '+';
-	#if (length($c) > 1) {
+	    unless length($cline) && substr($cline, 0, 1) eq '+';
+	# silly to actually set this, can just print the name if that is needed. 
+	#if (length($cline) > 1) {
 	#    die "\nERROR: Comment line and record identifier are different lengths for $name. Exiting.\n" 
-	#	unless length($name) == length($cline);
-	#    $self->set_comment($cline);
+	#	unless length($name) == length($cline)-1;
+	#    $self->set_comment($name);
 	#}
-	$self->set_comment($cline);
 
 	my $qline = <$fh>;
 	return unless defined $qline;
@@ -127,6 +106,18 @@ sub next_seq {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
+sub _set_id_per_encoding {
+    my $hline = shift;
+    if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
+	return $1."/".$2;
+    }
+    elsif ($hline =~ /^.?(\S+)/) {
+	return $1;
+    }
+    else {
+	return '';
+    }
+}
+    __PACKAGE__->meta->make_immutable;
 
 1;
