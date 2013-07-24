@@ -53,7 +53,9 @@ sub next_seq {
     my $hline = <$fh>;
     return unless defined $hline;
     chomp $hline;
-    if (substr($hline, 0, 1) eq '>' || substr($hline, 0, 1) eq '@') {
+    die "\nERROR: $hline does not look like Fasta or Fastq. Exiting.\n" 
+	unless (substr($hline, 0, 1) eq '>' || substr($hline, 0, 1) eq '@');
+    if (substr($hline, 0, 1) eq '>') {
 	if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
 	    $name = $1."/".$2;
 	    $self->set_id($name);
@@ -61,32 +63,68 @@ sub next_seq {
 	elsif ($hline =~ /^.?(\S+)/) {      
 	    $name = $1;
 	    $self->set_id($name);
-	} else {
+	} 
+	else {
 	    $name = '';                     
 	    $self->set_id($name);
 	}
+
+	my $sline = <$fh>;
+	return unless defined $sline;
+	chomp $sline;
+	die "\nERROR: No sequence for Fasta record $name. Exiting.\n" if !length($sline);
+	$seq .= $sline;
+        $self->set_seq($seq);
+
+	return $self;
     }
-    my $sline = <$fh>;
-    return unless defined $sline;
-    chomp $sline;
-    my $c = substr($sline, 0, 1);
-    #last if ($c eq '>' || $c eq '@' || $c eq '+');
-    $seq .= $sline;
-    $self->set_seq($seq);
-    
-    if ($c eq '>' || $c eq '@' || $c eq '+') {
-	$self->set_comment($c);
+    elsif (substr($hline, 0, 1) eq '@') {
+	if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
+            $name = $1."/".$2;
+            $self->set_id($name);
+        }
+        elsif ($hline =~ /^.?(\S+)/) {
+            $name = $1;
+            $self->set_id($name);
+        } 
+	else {
+            $name = '';
+            $self->set_id($name);
+        }
+
+        my $sline = <$fh>;
+        return unless defined $sline;
+        chomp $sline;
+	die "\nERROR: No sequence for Fastq record $name. Exiting.\n" if !length($sline);
+	$seq .= $sline;
+        $self->set_seq($seq);
+
+	my $cline = <$fh>;
+	return unless defined $cline;
+	chomp $cline;
+	my $c = substr($cline, 0, 1);
+	die "\nERROR: No comment line for Fastq record $name. Exiting.\n" 
+	    unless length($cline) && $c eq '+';
+	#if (length($c) > 1) {
+	#    die "\nERROR: Comment line and record identifier are different lengths for $name. Exiting.\n" 
+	#	unless length($name) == length($cline);
+	#    $self->set_comment($cline);
+	#}
+	$self->set_comment($cline);
+
 	my $qline = <$fh>;
 	return unless defined $qline;
 	chomp $qline;
+	die "\nERROR: No quality scores for $name\n" if !length($qline);
 	$qual .= $qline;
-	
 	if (length($qual) >= length($seq)) {
 	    $self->set_qual($qual);
 	    return $self;
 	}
+	else {
+	    die "\nERROR: Unequal number of quality and scores and bases for $name";
+	}
     }
-    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;
