@@ -2,11 +2,12 @@
 
 use strict;
 use warnings;
-use Transposome::t::TestUtils;
+use TestUtils;
+use SeqIO;
 
 use Test::More tests => 2;
 
-my $test = TestUtils->new;
+my $test = TestUtils->new( build_all => 1, destroy => 1 );
 
-ok( $test->fasta_constructor(1), 'Can build Fasta data for testing' );
-ok( $test->fastq_constructor(1), 'Can build Fastq data for testing' );
+ok( $test->fasta_constructor, 'Can build Fasta data for testing' );
+ok( $test->fastq_constructor, 'Can build Fastq data for testing' );
