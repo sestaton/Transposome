@@ -6,29 +6,97 @@ use File::Temp;
 use Cwd;
 use namespace::autoclean;
 
+has destroy => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => 'has_destroy',
+    default   => 0,
+    );
+
+has build_proper => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => 'has_build_proper',
+    default   => 0,
+    );
+
+has build_problematic => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => 'has_build_problematic',
+    default   => 0,
+    );
+
+has build_all => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => 'has_build_all',
+    default   => 0,
+    );
+
 sub fasta_constructor {
-    my ($self, $destroy) = @_;
-    my $proper_fa = $self->_build_proper_fa_data;
-    my $problematic_fa = $self->_build_problematic_fa_data;
-    if ($destroy == 1) {
-	unlink $proper_fa;
-	unlink $problematic_fa;
+    my ($self) = @_;
+    if ($self->has_build_all) {
+	my $proper_fa = $self->_build_proper_fa_data;
+	my $problematic_fa = $self->_build_problematic_fa_data;
+	if ($self->has_destroy) {
+	    unlink $proper_fa;
+	    unlink $problematic_fa;
+	}
+	else {
+	    return [ $proper_fa, $problematic_fa ];
+	}
     }
-    else {
-	return [ $proper_fa, $problematic_fa ];
+    elsif ($self->has_build_proper) {
+	my $proper_fa = $self->_build_proper_fa_data;
+	if ($self->has_destroy) {
+	    unlink $proper_fa;
+	}
+	else {
+	    return [ $proper_fa ];
+	}
+    }
+    elsif ($self->has_build_problematic) {
+	my $problematic_fa = $self->_build_problematic_fa_data;
+	if ($self->has_destroy) {
+	    unlink $problematic_fa;
+	}
+	else {
+	    return [ $problematic_fa ];
+	}
     }
 }
 
 sub fastq_constructor {
-    my ($self, $destroy) = @_;
-    my $proper_fq = $self->_build_proper_fq_data;
-    my $problematic_fq = $self->_build_problematic_fq_data;
-    if ($destroy == 1) {
-	unlink $proper_fq;
-	unlink $problematic_fq;
+       my ($self) = @_;
+    if ($self->has_build_all) {
+	my $proper_fq = $self->_build_proper_fq_data;
+	my $problematic_fq = $self->_build_problematic_fq_data;
+	if ($self->has_destroy) {
+	    unlink $proper_fq;
+	    unlink $problematic_fq;
+	}
+	else {
+	    return [ $proper_fq, $problematic_fq ];
+	}
     }
-    else {
-	return [ $proper_fq, $problematic_fq ];
+    elsif ($self->has_build_proper) {
+	my $proper_fq = $self->_build_proper_fq_data;
+	if ($self->has_destroy) {
+	    unlink $proper_fq;
+	}
+	else {
+	    return [ $proper_fq ];
+	}
+    }
+    elsif ($self->has_build_problematic) {
+	my $problematic_fq = $self->_build_problematic_fq_data;
+	if ($self->has_destroy) {
+	    unlink $problematic_fq;
+	}
+	else {
+	    return [ $problematic_fq ];
+	}
     }
 }
 
