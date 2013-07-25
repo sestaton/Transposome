@@ -1,4 +1,4 @@
-package SeqIO_n;
+package Transposome::SeqIO;
 
 use 5.012;
 use Moose;
@@ -6,7 +6,32 @@ use Try::Tiny;
 use Carp;
 use namespace::autoclean;
 
-with 'File';
+with 'Transposome::Role::File';
+
+=head1 NAME
+
+Transposome::SeqIO - Class for reading Fasta/q data.
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+=head1 SYNOPSIS
+
+    use Transposome::SeqIO;
+
+    my $trans_obj = Transposome::SeqIO->new( file => $infile );
+    my $fh = $trans_obj->get_fh;
+
+    while (my $seq = $trans_obj->next_seq($fh)) {
+         # do something interesting with $seq
+    }
+
+=cut
 
 # class attributes
 has id => (
@@ -37,7 +62,41 @@ has qual => (
     predicate => 'has_qual',
     );
 
-# class methods
+=head1 SUBROUTINES/METHODS
+
+=head2 next_seq
+
+ Title   : next_seq
+ Usage   : while (my $seq = $trans_obj->next_seq($fh)) { ... };
+           
+ Function: Reads fasta/fastq files seamlessly without needing to 
+           specify the format.
+
+ Returns : A Transposome::SeqIO object on which you can call methods
+           representing the sequence, id, or quality scores (in the
+           case of fastq). E.g.,
+           
+           while (my $seq = $trans_obj->next_seq($fh)) { 
+               $seq->get_id;   # gets the sequence id
+               $seq->get_seq;  # gets the sequence
+               $seq->get_qual; # gets the quality scores
+           }
+
+           Each of the above methods an easy way of checking to see
+           if that slot is set. E.g.,
+           
+           if ($seq->has_id)   { ... # is the id set? }
+           if ($seq->has_seq)  { ... # is the seq set? }
+           if ($seq->has_qual) { ... # is the qual set? This will be no for Fasta. }
+
+ Args    : Takes a file handle. You can get the file handle
+           by calling the method 'get_fh' on a Transposome::SeqIO object. E.g.,
+ 
+           my $trans_obj = Transposome::SeqIO->new( file => $infile );
+           my $fh = $trans_obj->get_fh;
+
+=cut
+
 sub next_seq {
     my $self = shift;
     my $fh = shift;
@@ -123,6 +182,7 @@ sub next_seq {
     }
 }
 
+# private
 sub _set_id_per_encoding {
     my $hline = shift;
     if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
