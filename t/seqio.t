@@ -2,12 +2,12 @@
 
 use strict;
 use warnings;
-use Transposome::t::TestUtils;
+use TestUtils;
 use Transposome::SeqIO;
 
 use Test::More tests => 35;
 
-my $test = TestUtils2->new;
+my $test = TestUtils->new;
 my $seq_num = 1;
 
 ok( $test->fasta_constructor(1), 'Can build Fasta data for testing' );
