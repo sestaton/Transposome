@@ -5,41 +5,42 @@ use Moose;
 use File::Temp;
 use Cwd;
 use namespace::autoclean;
+use Data::Dump qw(dd);
 
 has destroy => (
-    is        => 'ro',
+    traits    => ['Bool'],
+    is        => 'rw',
     isa       => 'Bool',
-    predicate => 'has_destroy',
     default   => 0,
     );
 
 has build_proper => (
-    is        => 'ro',
+    traits    => ['Bool'],
+    is        => 'rw',
     isa       => 'Bool',
-    predicate => 'has_build_proper',
     default   => 0,
     );
 
 has build_problematic => (
+    traits    => ['Bool'],
     is        => 'ro',
     isa       => 'Bool',
-    predicate => 'has_build_problematic',
     default   => 0,
     );
 
 has build_all => (
+    traits    => ['Bool'],
     is        => 'ro',
     isa       => 'Bool',
-    predicate => 'has_build_all',
     default   => 0,
     );
 
 sub fasta_constructor {
     my ($self) = @_;
-    if ($self->has_build_all) {
+    if ($self->build_all) {
 	my $proper_fa = $self->_build_proper_fa_data;
 	my $problematic_fa = $self->_build_problematic_fa_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $proper_fa;
 	    unlink $problematic_fa;
 	}
@@ -47,18 +48,18 @@ sub fasta_constructor {
 	    return [ $proper_fa, $problematic_fa ];
 	}
     }
-    elsif ($self->has_build_proper) {
+    elsif ($self->build_proper) {
 	my $proper_fa = $self->_build_proper_fa_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $proper_fa;
 	}
 	else {
 	    return [ $proper_fa ];
 	}
     }
-    elsif ($self->has_build_problematic) {
+    elsif ($self->build_problematic) {
 	my $problematic_fa = $self->_build_problematic_fa_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $problematic_fa;
 	}
 	else {
@@ -69,10 +70,10 @@ sub fasta_constructor {
 
 sub fastq_constructor {
        my ($self) = @_;
-    if ($self->has_build_all) {
+    if ($self->build_all) {
 	my $proper_fq = $self->_build_proper_fq_data;
 	my $problematic_fq = $self->_build_problematic_fq_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $proper_fq;
 	    unlink $problematic_fq;
 	}
@@ -80,18 +81,18 @@ sub fastq_constructor {
 	    return [ $proper_fq, $problematic_fq ];
 	}
     }
-    elsif ($self->has_build_proper) {
+    elsif ($self->build_proper) {
 	my $proper_fq = $self->_build_proper_fq_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $proper_fq;
 	}
 	else {
 	    return [ $proper_fq ];
 	}
     }
-    elsif ($self->has_build_problematic) {
+    elsif ($self->build_problematic) {
 	my $problematic_fq = $self->_build_problematic_fq_data;
-	if ($self->has_destroy) {
+	if ($self->destroy) {
 	    unlink $problematic_fq;
 	}
 	else {
