@@ -5,13 +5,10 @@ use warnings;
 use TestUtils;
 use Transposome::SeqIO;
 
-use Test::More tests => 35;
+use Test::More tests => 33;
 
 my $test = TestUtils->new;
 my $seq_num = 1;
-
-ok( $test->fasta_constructor(1), 'Can build Fasta data for testing' );
-ok( $test->fastq_constructor(1), 'Can build Fastq data for testing' );
 
 my $fa_arr = $test->fasta_constructor(0);
 my $fq_arr = $test->fastq_constructor(0);
