@@ -1,4 +1,4 @@
-package Transposome::Cluster;
+package Cluster;
 
 use 5.012;
 use Moose;
@@ -7,7 +7,9 @@ use Graph::UnionFind;
 use File::Spec;
 use File::Basename;
 use Try::Tiny;
-use IPC::System::Simple qw(system EXIT_ANY);
+use IPC::System::Simple qw(system capture EXIT_ANY);
+
+with 'File';
 
 =head1 NAME
 
@@ -47,9 +49,13 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 sub louvain_method {
-    my ($int_file, $outdir) = @_;
+    #my ($self, $int_file, $outdir) = @_;
+    my ($self) = @_;
     #chdir($outdir) || die "\nERROR: Could not change $outdir: $!\n";
+    my $int_file = $self->file->relative;
+    my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
+
     my $cls_bin = $iname.".bin";                    # Community "bin" format
     my $cls_tree = $iname.".tree";                  # hierarchical tree of clustering results
     my $cls_tree_weights = $cls_tree.".weights";    # bit score, the weights applied to clustering
@@ -57,24 +63,27 @@ sub louvain_method {
     my $hierarchy_err = $cls_tree.".hierarchy.log"; # hierarchical tree building log (not actually used)
     my $levels;                                     # the number of hierarchical levels
 
-    my $cls_bin_path = File::Spec->catfile($outdir, $cls_bin);
-    my $cls_tree_path = File::Spec->catfile($outdir, $cls_tree);
-    my $cls_tree_weights_path = File::Spec->catfile($outdir, $cls_tree_weights);
-    my $cls_tree_log_path = File::Spec->catfile($outdir, $cls_tree_log);
-    my $hierarchy_err_path = File::Spec->catfile($outdir, $hierarchy_err);
+    my $cls_bin_path = File::Spec->catfile($out_dir, $cls_bin);
+    my $cls_tree_path = File::Spec->catfile($out_dir, $cls_tree);
+    my $cls_tree_weights_path = File::Spec->catfile($out_dir, $cls_tree_weights);
+    my $cls_tree_log_path = File::Spec->catfile($out_dir, $cls_tree_log);
+    my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
 
+    #TODO use File::Spec to get path to bin
+    #my @convert_cmd = "../bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path";
+    #say @convert_cmd;
     try {
-	system([0..5],"louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
+	system([0..5], "../bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
-	warn "\nERROR: louvain_convert failed. Caught error: $_" and exit;
+	warn "\nERROR: Louvain 'convert' failed. Caught error: $_" and exit;
     };
 
     try {
-	system([0..5],"louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
+	system([0..5],"../bin/community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
-	warn "\nERROR: louvain_community failed. Caught error: $_" and exit;
+	warn "\nERROR: Louvain 'community' failed. Caught error: $_" and exit;
     };
 
     try {
@@ -87,14 +96,14 @@ sub louvain_method {
 
     my @comm;
     for (my $i = 0; $i <= $levels-1; $i++) {
-        my $cls_graph_comm = $cls_tree.".graph_node2comm_level_".$i;
-	my $cls_graph_comm_path = File::Spec->catfile($outdir, $cls_graph_comm);
+        my $cls_graph_comm = $cls_tree.".graph_node2comm_level_".$i; #
+	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
-	    system([0..5],"louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
+	    system([0..5],"../bin/hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
-	    warn "\nERROR: louvain_hierarchy failed. Caught error: $_" and exit;
+	    warn "\nERROR: Louvain 'hierarchy' failed. Caught error: $_" and exit;
 	};
 
 	push @comm, $cls_graph_comm;
@@ -114,12 +123,12 @@ sub louvain_method {
 =cut
 
 sub find_pairs {
-    my ($cls_file, $report, $merge_threshold) = @_;
+    my ($self, $cls_file, $report, $merge_threshold) = @_;
     
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    my $cls_file_path = File::Spec->rel2abs($clpath.$outdir."/".$clname.$clsuffix);
+    my $cls_file_path = File::Spec->rel2abs($clpath.$self->dir."/".$clname.$clsuffix);
     open my $rep, '>', $rp_path;
 
     $merge_threshold //= 500;
@@ -210,7 +219,7 @@ sub find_pairs {
 =cut
 
 sub make_clusters {
-    my ($graph_comm, $int_file, $idx_file, $outdir) = @_;
+    my ($self, $graph_comm, $int_file, $idx_file, $outdir) = @_;
 
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
     my $cluster_file = $iname.".cls";
@@ -282,7 +291,7 @@ sub make_clusters {
 =cut
 
 sub merge_clusters {
-    my ($infile, $str, $vertex, $seqs, $read_pairs, $report, $cluster_size, $outdir) = @_;
+    my ($self, $infile, $str, $vertex, $seqs, $read_pairs, $report, $cluster_size, $outdir, $uf) = @_;
 
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
     my $cls_dir_base = $iname;
