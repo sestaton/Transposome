@@ -11,7 +11,7 @@ use PairFinder;
 use TestUtils;
 use Cluster;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 my $outdir = 'pairfinder_t';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
@@ -37,5 +37,9 @@ diag("\nTrying Louvain clustering now, this may take a couple of seconds...\n");
 my $comm = $cluster->louvain_method;
 
 ok( defined($comm), 'Can successfully perform clustering' );
+
+my $cluster_file = $cluster->make_clusters($comm, $idx_file);
+
+ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
 system("rm -rf $outdir $blfl");
