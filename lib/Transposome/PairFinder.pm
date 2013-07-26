@@ -1,19 +1,22 @@
-package Transposome::PairFinder;
+package PairFinder;
+
+use Moose;
+use namespace::autoclean;
 
 use 5.012;
-use Moose;
-use MooseX::Types::Path::Class;
-use namespace::autoclean;
+use utf8;
 use Encode qw(encode decode);
-BEGIN {
-  @AnyDBM_File::ISA = qw( DB_File SQLite_File )
-      unless @AnyDBM_File::ISA == 1;
-}
-use AnyDBM_File;                  
+use DB_File;
 use vars qw( $DB_BTREE &R_DUP );  
-use AnyDBM_File::Importer qw(:bdb);
 use DBM::Deep;
 use File::Spec;
+use File::Basename;
+use File::Path qw(make_path);
+use autodie qw(open);
+use List::Util qw(sum max);
+#use Data::Dump qw(dd);
+
+with 'File', 'Util';
 
 =head1 NAME
 
@@ -31,8 +34,11 @@ our $VERSION = '0.01';
 
     use Transposome::PairFinder;
 
-    my $blast_res = Transposome::PairFinder->new( blast_file => 'myblast.bln' );
-    ...
+    my $blast_res = Transposome::PairFinder->new( file              => 'myblast.bln',
+                                                  dir               => 'transposome_out',
+                                                  in_memory         => 1,
+                                                  percent_identity  => 90.0,
+                                                  fraction_coverage => 0.55 );
 
 =head1 EXPORT
 
@@ -44,11 +50,28 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =cut
 
-has 'file' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 1,
-      coerce   => 1,
+has 'in_memory' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_in_memory',
+    lazy       => 1,
+    default    => 0,
+    );
+
+has 'percent_identity' => (
+    is        => 'ro',
+    isa       => 'Num',
+    predicate => 'has_percent_identity',
+    lazy      => 1,
+    default   => 90.0,
+    );
+
+has 'fraction_coverage' => (
+    is        => 'ro',
+    isa       => 'Num',
+    predicate => 'has_percent_coverage',
+    lazy      => 1,
+    default   => 0.55,
     );
 
 =head1 SUBROUTINES/METHODS
@@ -66,11 +89,11 @@ has 'file' => (
 =cut
 
 sub parse_blast {
-    my ($self, $infile, $percent_id, $percent_cov, $outdir, $memory) = @_;
+     my ($self) = @_;
 
-    my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
-    unless (-d $outdir) {
-	make_path($outdir, {verbose => 0, mode => 0771,});
+    my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
+    unless (-d $self->dir) {
+	make_path($self->dir, {verbose => 0, mode => 0771,});
     }
     my $int_file = $iname;
     my $idx_file = $iname;
@@ -78,25 +101,26 @@ sub parse_blast {
     $int_file .= "_louvain.int";
     $idx_file .= "_louvain.idx";
     $hs_file .= "_louvain.hs";
-    my $int_path = File::Spec->catfile($outdir, $int_file);
-    my $idx_path = File::Spec->catfile($outdir, $idx_file);
-    my $hs_path = File::Spec->catfile($outdir, $hs_file);
+    my $int_path = File::Spec->catfile($self->dir, $int_file);
+    my $idx_path = File::Spec->catfile($self->dir, $idx_file);
+    my $hs_path = File::Spec->catfile($self->dir, $hs_file);
 
     # counters
     my $total_hits = 0;
     my $parsed_hits = 0;
     my $index = 0;
 
-    open my $in, '<', $infile;
+    #open my $in, '<', $infile; ## or die
+    my $fh = $self->file->openr;
     open my $int, '>', $int_path;
     open my $idx, '>', $idx_path;
     open my $hs, '>', $hs_path;
 
-    if (defined $memory) {
+    if ($self->in_memory) {
 	my %match_pairs;
 	my %match_index;
 
-	while (<$in>) {
+	while (<$fh>) {
 	    chomp;
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
@@ -111,7 +135,7 @@ sub parse_blast {
 		my $neg_query_hit_length = ($q_start - $q_end) + 1;
 		my $neg_query_cov = $neg_query_hit_length/$q_len;
 
-		if ( ($neg_query_cov >= $percent_cov) && ($pid >= $percent_id) ) {
+		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		    if (exists $match_pairs{$pair}) {
 			push @{$match_pairs{$pair}}, $score;
 		    }
@@ -132,7 +156,7 @@ sub parse_blast {
                 my $pos_query_hit_length = ($q_end - $q_start) + 1;
                 my $pos_query_cov = $pos_query_hit_length/$q_len;
 
-                if ( ($pos_query_cov >= $percent_cov) && ($pid >= $percent_id) ) {
+                if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
                     if (exists $match_pairs{$pair}) {
                         push @{$match_pairs{$pair}}, $score;
                     }
@@ -149,10 +173,10 @@ sub parse_blast {
                 }
             }
         }
-        close $in;
+        close $fh;
 
         for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
-            say $idx join " ", $idx_mem, $match_index{$idx_mem};
+            say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
         }
         close $idx;
 
@@ -202,18 +226,16 @@ sub parse_blast {
 	$DB_BTREE->{cachesize} = 100000;
 	$DB_BTREE->{flags} = R_DUP;
 	
-	tie %match_index, 'AnyDBM_File', $dbi, O_RDWR|O_CREAT, 0666, $DB_BTREE
+	tie %match_index, 'DB_File', $dbi, O_RDWR|O_CREAT, 0666, $DB_BTREE
 	    or die "\nERROR: Could not open DBM file $dbi: $!\n";
 
-	while (<$in>) {
+	while (<$fh>) {
 	    chomp;
-	        my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
-		    $s_start, $s_end, $pid, $score, $e_val, $strand) = split;
+	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
+		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 
 	    my $pair = mk_key($q_name, $s_name);
 	    my $revpair = mk_key($s_name, $q_name);
-	    my $enc_pair = encode("UTF-8", $pair, 1);
-	    my $enc_revpair = encode("UTF-8", $revpair, 1);
 	    my $subj_hit_length = ($s_end - $s_start) + 1;
 	    my $subj_cov = $subj_hit_length/$s_len;
 
@@ -222,15 +244,15 @@ sub parse_blast {
 		my $neg_query_hit_length = ($q_start - $q_end) + 1;
 		my $neg_query_cov = $neg_query_hit_length/$q_len;
 
-		if ( ($neg_query_cov >= $percent_cov) && ($pid >= $percent_id) ) {
-		    if (exists $db->{$enc_pair}) {
-			push @{$db->{$enc_pair}}, $score;
+		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
+		    if (exists $db->{$pair}) {
+			push @{$db->{$pair}}, $score;
 		    }
-		    elsif (exists $db->{$enc_revpair}) {
-			push @{$db->{$enc_revpair}}, $score;
+		    elsif (exists $db->{$revpair}) {
+			push @{$db->{$revpair}}, $score;
 		    }
 		    else {
-			$db->{$enc_pair} = [$score];
+			$db->{$pair} = [$score];
 			$match_index{$q_name} = $index unless exists $match_index{$q_name};
 			$index++;
 			$match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -243,15 +265,15 @@ sub parse_blast {
 		my $pos_query_hit_length = ($q_end - $q_start) + 1;
 		my $pos_query_cov = $pos_query_hit_length/$q_len;
 
-		if ( ($pos_query_cov >= $percent_cov) && ($pid >= $percent_id) ) {
-		    if (exists $db->{$enc_pair}) {
-			push @{$db->{$enc_pair}}, $score;
+		if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
+		    if (exists $db->{$pair}) {
+			push @{$db->{$pair}}, $score;
 		    }
-		    elsif (exists $db->{$enc_revpair}) {
-			push @{$db->{$enc_revpair}}, $score;
+		    elsif (exists $db->{$revpair}) {
+			push @{$db->{$revpair}}, $score;
 		    }
 		    else {
-			$db->{$enc_pair} = [$score];
+			$db->{$pair} = [$score];
 			$match_index{$q_name} = $index unless exists $match_index{$q_name};
 			$index++;
 			$match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -260,30 +282,28 @@ sub parse_blast {
 		}
 	    }
 	}
-	close $in;
+	close $fh;
 
 	for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
-	    say $idx join " ", $idx_mem, $match_index{$idx_mem};
+	    say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
 	}
 	close $idx;
-
+	
 	while (my ($match, $scores) = each %$db) {
-	    my $enc_match = encode("UTF-8", $match, 1);
 	    my $match_score = max(@$scores);
-	    my ($qry, $sbj) = mk_vec($enc_match);
+	    my ($qry, $sbj) = mk_vec($match);
 	    my $revmatch = mk_key($sbj, $qry);
-	    my $enc_revmatch = encode("UTF-8", $revmatch, 1);
-	    if (exists $db->{$enc_revmatch}) {
-		my $rev_match_score = max(@{$db->{$enc_revmatch}});
+	    if (exists $db->{$revmatch}) {
+		my $rev_match_score = max(@{$db->{$revmatch}});
 		if ($rev_match_score > $match_score) {
 		    if (exists $match_index{$sbj} && exists $match_index{$qry}) {
 			say $hs join "\t", $sbj, $qry, $rev_match_score;
 			say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-			delete $db->{$enc_match};
+			delete $db->{$match};
 		    }
 		}
 		else {
-		    delete $db->{$enc_revmatch};
+		    delete $db->{$revmatch};
 		}
 	    }
 	    else {
@@ -297,6 +317,8 @@ sub parse_blast {
 	close $hs;
 
 	untie %match_index;
+	unlink $dbi;
+	unlink $dbm;
 
 	return($idx_path, $int_path, $hs_path);
 
