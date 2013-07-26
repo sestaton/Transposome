@@ -42,4 +42,5 @@ my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 
 ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
+#my ($read_pairs, $vertex, $uf) = find_pairs($cls_file, $report, $merge_threshold);
 system("rm -rf $outdir $blfl");
