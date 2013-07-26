@@ -8,6 +8,7 @@ use File::Spec;
 use File::Basename;
 use Try::Tiny;
 use IPC::System::Simple qw(system capture EXIT_ANY);
+use autodie qw(open);
 
 with 'File';
 
@@ -219,18 +220,20 @@ sub find_pairs {
 =cut
 
 sub make_clusters {
-    my ($self, $graph_comm, $int_file, $idx_file, $outdir) = @_;
+    my ($self, $graph_comm, $idx_file) = @_;
 
+    my $int_file = $self->file->relative;
+    my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
     my $cluster_file = $iname.".cls";
     my $membership_file = $cluster_file.".membership.txt";
-    my $cluster_file_path = File::Spec->catfile($outdir, $cluster_file);
-    my $membership_file_path = File::Spec->catfile($outdir, $membership_file);
+    my $cluster_file_path = File::Spec->catfile($out_dir, $cluster_file);
+    my $membership_file_path = File::Spec->catfile($out_dir, $membership_file);
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
     my $graph = shift @graph_comm_sort;
     die "\nERROR: Community clustering failed. Exiting.\n" unless defined $graph; ## can probably remove this statement
-    my $graph_path = File::Spec->catfile($outdir, $graph);
+    my $graph_path = File::Spec->catfile($out_dir, $graph);
     my %clus;
     my %index;
 
