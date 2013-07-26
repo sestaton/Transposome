@@ -103,12 +103,14 @@ sub fastq_constructor {
 
 sub blast_constructor {
     my ($self) = @_;
-    my $proper_bl = $self->_build_blast_data;
-    if ($self->destroy) {
-	unlink $proper_bl;
-    }
-    else {
-	return [ $proper_bl ];
+    if ($self->build_proper) {
+	my $proper_bl = $self->_build_blast_data;
+	if ($self->destroy) {
+	    unlink $proper_bl;
+	}
+	else {
+	    return [ $proper_bl ];
+	}
     }
 }
 
@@ -121,6 +123,7 @@ sub _build_proper_fa_data {
                                  UNLINK   => 0 );
 
     my $tmpfa_name = $tmpfa->filename;
+    
     say $tmpfa '>HWI-ST766:139:D13WEACXX:3:1101:1210:2183 1:N:0:GATCAG';
     say $tmpfa 'CTAGCACTCCTACAAAATTCATCCACCACACAGGCTCACGAAATTGCTCTCTCTCTCTAAACTCTGATTTCTAATTTCAAGTGCTTAACCCTAACCCTAA';
     say $tmpfa '>HWI-ST766:139:D13WEACXX:3:1101:1296:2221 1:N:0:GATCAG';
