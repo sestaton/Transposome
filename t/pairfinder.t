@@ -133,6 +133,6 @@ ok( $mem_idx_recct == $file_idx_recct, 'In-memory and on-file processing methods
 ok( $mem_int_recct == $file_int_recct, 'In-memory and on-file processing methods generated the integer mapping files' );
 ok( $mem_hs_recct == $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
 
-system("rm -rf $outdir");
+system("rm -rf $outdir $blfl");
 
 done_testing();
