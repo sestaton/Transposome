@@ -27,8 +27,10 @@ my $blast_res = PairFinder->new( file              => $blfl,
 
 my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
-my $cluster = Cluster->new( file   =>  $int_file,
-			    dir    =>  $outdir );
+my $cluster = Cluster->new( file            => $int_file,
+                            dir             => $outdir,
+                            merge_threshold => 2,
+                            cluster_size    => 1);
 
 ok( $cluster->louvain_method, 'Can perform clusterin with Louvain method' );
 
