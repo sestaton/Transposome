@@ -18,7 +18,7 @@ has 'file' => (
 has 'dir' => (
       is       => 'ro',
       isa      => 'Path::Class::Dir',
-      required => 1,
+      required => 0,
       coerce   => 1,
     );
 
