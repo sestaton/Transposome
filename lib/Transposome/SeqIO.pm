@@ -1,4 +1,4 @@
-package Transposome::SeqIO;
+package SeqIO;
 
 use 5.012;
 use Moose;
@@ -6,7 +6,7 @@ use Try::Tiny;
 use Carp;
 use namespace::autoclean;
 
-with 'Transposome::Role::File';
+with 'File';
 
 =head1 NAME
 
@@ -98,10 +98,10 @@ has qual => (
 =cut
 
 sub next_seq {
-    my $self = shift;
-    my $fh = shift;
+    my ($self, $fh) = @_;
 
-    my ($name, $seq, $qual, @aux);
+    return unless defined $fh;
+    my ($name, $seq, $qual);
     my $hline = <$fh>;
     return unless defined $hline;
     chomp $hline;
