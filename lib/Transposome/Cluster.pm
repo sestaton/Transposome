@@ -9,8 +9,10 @@ use File::Basename;
 use Try::Tiny;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use autodie qw(open);
+use File::Path qw(make_path);
+use POSIX qw(strftime);
 
-with 'File';
+with 'File', 'Util';
 
 =head1 NAME
 
@@ -35,6 +37,23 @@ our $VERSION = '0.01';
 
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
+
+=head1 ATTRIBUTES
+
+
+=cut
+
+has 'merge_threshold' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+    );
+
+has 'cluster_size' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+    );
 
 =head1 SUBROUTINES/METHODS
 
@@ -124,15 +143,16 @@ sub louvain_method {
 =cut
 
 sub find_pairs {
-    my ($self, $cls_file, $report, $merge_threshold) = @_;
+    my ($self, $cls_file, $report) = @_;
     
+    my $out_dir = $self->dir->relative;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    my $cls_file_path = File::Spec->rel2abs($clpath.$self->dir."/".$clname.$clsuffix);
+    my $cls_file_path = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix);
     open my $rep, '>', $rp_path;
 
-    $merge_threshold //= 500;
+    #$merge_threshold //= 500;
 
     my $uf = Graph::UnionFind->new;
 
@@ -198,7 +218,7 @@ sub find_pairs {
 	my ($i, $j) = mk_vec($p);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
         my $j_noct = $j; $j_noct =~ s/\_.*//;
-        if ($cls_conn_ct{$p} >= $merge_threshold) {   
+        if ($cls_conn_ct{$p} >= $self->merge_threshold) {   
             say $rep join "\t", $i_noct, $j_noct, $cls_conn_ct{$p};
             ++$vertex{$_} for $i, $j;
             $uf->union($i, $j);
@@ -294,23 +314,28 @@ sub make_clusters {
 =cut
 
 sub merge_clusters {
-    my ($self, $infile, $str, $vertex, $seqs, $read_pairs, $report, $cluster_size, $outdir, $uf) = @_;
+    my ($self, $vertex, $seqs, $read_pairs, $report, $uf) = @_;
 
+    my $infile = $self->file->relative;
+    my $out_dir = $self->dir->relative;
+    my $str = POSIX::strftime("%m_%d_%Y_%H_%M_%S", localtime);
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
     my $cls_dir_base = $iname;
     my $cls_with_merges = $cls_dir_base;
     my $cls_dir = $cls_dir_base."_cls_fasta_files_$str";
     $cls_with_merges .= "_merged_$str.cls";
     my $cls_dir_path = $ipath.$cls_dir;
-    make_path($outdir."/".$cls_dir_path, {verbose => 0, mode => 0711,}); # allows for recursively making paths                                                                
-    my $cls_with_merges_path = File::Spec->catfile($outdir, $cls_with_merges);
+    #say join "\n", "iname: $iname", "cls_with_merges: $cls_with_merges", "cls_dir: $cls_dir", "cls_dir_path: $cls_dir_path";
+    #exit;
+    make_path($cls_dir_path, {verbose => 0, mode => 0711,}); # allows for recursively making paths                                                                
+    my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path;
 
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path;
 
-    $cluster_size //= 500;
+    #$cluster_size //= 500;
     my $cls_tot = 0;
 
     my %cluster;
@@ -330,7 +355,7 @@ sub merge_clusters {
 	say $rep join "\t", $group_index, join ",", @grpcp;
 	say $clsnew ">G$group_index $groupseqnum";
 	my $group_file = "G$group_index"."_$groupseqnum".".fas";
-	my $group_file_path = File::Spec->catfile($outdir."/".$cls_dir_path, $group_file);
+	my $group_file_path = File::Spec->catfile($cls_dir_path, $group_file);
 	open my $groupout, '>', $group_file_path;
     
 	for my $clus (@$group) {
@@ -345,7 +370,7 @@ sub merge_clusters {
 		    }
 		}
 	    }
-	    print $clsnew " ";
+	    print $clsnew q{ };
 	    delete $read_pairs->{$clus}
 	}
 	print $clsnew "\n";
@@ -361,9 +386,9 @@ sub merge_clusters {
 	say $rep $non_paired_clsid;
 	say $clsnew join "\n", ">$non_paired_clsid $non_paired_clsseqnum", join " ", @{$read_pairs->{$non_paired_cls}};
 
-	if (scalar(@{$read_pairs->{$non_paired_cls}}) >= $cluster_size) {
+	if (scalar(@{$read_pairs->{$non_paired_cls}}) >= $self->cluster_size) {
 	    my $non_paired_clsfile .= $non_paired_cls.".fas";
-	    my $cls_file_path = File::Spec->catfile($outdir."/".$cls_dir_path, $non_paired_clsfile);
+	    my $cls_file_path = File::Spec->catfile($cls_dir_path, $non_paired_clsfile);
 	    open my $clsout, '>', $cls_file_path;
 
 	    for my $non_paired_read (@{$read_pairs->{$non_paired_cls}}) {
