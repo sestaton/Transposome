@@ -10,10 +10,13 @@ use Data::Dump qw(dd);
 use PairFinder;
 use TestUtils;
 use Cluster;
+use SeqStore;
 
-use Test::More tests => 3;
+use Test::More tests => 6;
 
+my $infile = 'Phoeb_330164_interl.fasta';
 my $outdir = 'pairfinder_t';
+my $report = 'cluster_test_rep.txt';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
@@ -32,17 +35,28 @@ my $cluster = Cluster->new( file            => $int_file,
                             merge_threshold => 2,
                             cluster_size    => 1);
 
-ok( $cluster->louvain_method, 'Can perform clusterin with Louvain method' );
+ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
 
 diag("\nTrying Louvain clustering now, this may take a couple of seconds...\n");
-
 my $comm = $cluster->louvain_method;
-
 ok( defined($comm), 'Can successfully perform clustering' );
 
 my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-
 ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
-#my ($read_pairs, $vertex, $uf) = find_pairs($cls_file, $report, $merge_threshold);
+my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
+ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
+
+diag("\nIndexing sequences, this will take a few seconds...\n");
+my $memstore = SeqStore->new( file => $infile, in_memory => 1 );
+my ($seqs, $seqct) = $memstore->store_seq;
+
+diag("\nTrying to merge clusters...\n");
+
+my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
+                                                                               $read_pairs, $report, $uf);
+
+ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
+ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
+
 system("rm -rf $outdir $blfl");
