@@ -1,4 +1,4 @@
-package Transposome::Util;
+package Util;
 
 use 5.012;
 use Moose::Role;
@@ -45,7 +45,10 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =cut
 
-sub mk_key { join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_ }
+sub mk_key {
+    my ($self) = shift;
+    return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_;
+}
 
 =head2 mk_vec
 
@@ -58,7 +61,10 @@ sub mk_key { join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_ }
 
 =cut
 
-sub mk_vec { split "\N{INVISIBLE SEPARATOR}", shift }
+sub mk_vec {
+    my ($self, $key) = @_;
+    return split "\N{INVISIBLE SEPARATOR}", $key;
+}
 
 =head2 json_to_hash
 
@@ -72,7 +78,7 @@ sub mk_vec { split "\N{INVISIBLE SEPARATOR}", shift }
 =cut
 
 sub json_to_hash {
-    my $json = shift;
+    my ($self, $json) = @_;
    
     my $json_text;
     local $/;
@@ -159,5 +165,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-#1; # End of Transposome::Util
-__PACKAGE__->meta->make_immutable;
+1; # End of Transposome::Util
+#__PACKAGE__->meta->make_immutable;
