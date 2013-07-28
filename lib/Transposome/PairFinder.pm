@@ -125,8 +125,8 @@ sub parse_blast {
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 	    
-	    my $pair = mk_key($q_name, $s_name);
-	    my $revpair = mk_key($s_name, $q_name);
+	    my $pair = $self->mk_key($q_name, $s_name);
+	    my $revpair = $self->mk_key($s_name, $q_name);
 	    my $subj_hit_length = ($s_end - $s_start) + 1;
 	    my $subj_cov = $subj_hit_length/$s_len;
 
@@ -182,8 +182,8 @@ sub parse_blast {
 
         while (my ($match, $scores) = each %match_pairs) {
             my $match_score = max(@$scores);
-            my ($qry, $sbj) = mk_vec($match);
-            my $revmatch = mk_key($sbj, $qry);
+            my ($qry, $sbj) = $self->mk_vec($match);
+            my $revmatch = $self->mk_key($sbj, $qry);
             if (exists $match_pairs{$revmatch}) {
                 my $rev_match_score = max(@{$match_pairs{$revmatch}});
                 if ($rev_match_score > $match_score) {
@@ -234,8 +234,8 @@ sub parse_blast {
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 
-	    my $pair = mk_key($q_name, $s_name);
-	    my $revpair = mk_key($s_name, $q_name);
+	    my $pair = $self->mk_key($q_name, $s_name);
+	    my $revpair = $self->mk_key($s_name, $q_name);
 	    my $subj_hit_length = ($s_end - $s_start) + 1;
 	    my $subj_cov = $subj_hit_length/$s_len;
 
@@ -291,8 +291,8 @@ sub parse_blast {
 	
 	while (my ($match, $scores) = each %$db) {
 	    my $match_score = max(@$scores);
-	    my ($qry, $sbj) = mk_vec($match);
-	    my $revmatch = mk_key($sbj, $qry);
+	    my ($qry, $sbj) = $self->mk_vec($match);
+	    my $revmatch = $self->mk_key($sbj, $qry);
 	    if (exists $db->{$revmatch}) {
 		my $rev_match_score = max(@{$db->{$revmatch}});
 		if ($rev_match_score > $match_score) {

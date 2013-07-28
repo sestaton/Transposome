@@ -207,7 +207,7 @@ sub find_pairs {
                 delete $mapped_pairs{$allpairs};           # which is uninformative for merging clusters
             }
             else {
-		my $k = mk_key($cls_i, $cls_j);
+		my $k = $self->mk_key($cls_i, $cls_j);
                 $cls_conn_ct{$k}++;
             }
         }
@@ -215,7 +215,7 @@ sub find_pairs {
     }
 
     for my $p (reverse sort { $cls_conn_ct{$a} <=> $cls_conn_ct{$b} } keys %cls_conn_ct) {
-	my ($i, $j) = mk_vec($p);
+	my ($i, $j) = $self->mk_vec($p);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
         my $j_noct = $j; $j_noct =~ s/\_.*//;
         if ($cls_conn_ct{$p} >= $self->merge_threshold) {   
