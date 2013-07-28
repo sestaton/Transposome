@@ -83,4 +83,7 @@ ok( $total_readct == $cls_tot, 'Same number of reads clustered and annotated' );
 ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (1)' );
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
+$annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
+                                            $seqct, $rep_frac, $blasts, $superfams, $report);
+
 system("rm -rf $outdir $blfl");
