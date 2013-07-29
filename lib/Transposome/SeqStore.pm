@@ -14,7 +14,7 @@ use Carp;
 use SeqIO;
 
 with 'Transposome::Role::File',
-     'Transposome::Type::Types';
+     'Transposome::Role::Types';
 
 =head1 NAME
 
