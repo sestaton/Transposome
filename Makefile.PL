@@ -15,13 +15,15 @@ BEGIN {
 	    say "Here are the errors: $_. Exiting.\n";
 	    close $err;
 	    unlink("comm_make_errs");
+	    system("make clean 2>&1 > /dev/null");
 	    exit(1);
 	}
     }
     close $err;
     unlink("comm_make_errs");
+    system("cp convert ../bin; cp community ../bin; cp hierarchy ../bin;");
+    system("make clean 2>&1 > /dev/null");
     chdir("..");
-    system("cp src/convert bin; cp src/community bin; cp src/hierarchy bin;");
 }
 
 WriteMakefile(
@@ -49,6 +51,10 @@ WriteMakefile(
 	'File::Path'                 => 0,
 	'Graph::UnionFind'           => 0,
     },
+    #INSTALLBIN => '${INSTALL_BASE}/bin',
+    #INST_BIN   => 'blib/bin',
+    INST_SCRIPT => 'blib/bin',
+    EXE_FILES => [ 'bin/convert', 'bin/community', 'bin/hierarchy', 'bin/transposome' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-*' },
 );
