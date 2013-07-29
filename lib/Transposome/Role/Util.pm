@@ -1,4 +1,4 @@
-package Util;
+package Transposome::Role::Util;
 
 use 5.012;
 use Moose::Role;

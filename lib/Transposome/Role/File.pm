@@ -1,4 +1,4 @@
-package File;
+package Transposome::Role::File;
 
 use 5.012;
 use Moose::Role;

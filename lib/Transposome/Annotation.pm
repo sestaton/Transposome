@@ -1,4 +1,4 @@
-package Annotation;
+package Transposome::Annotation;
 
 use 5.012;
 use Moose;

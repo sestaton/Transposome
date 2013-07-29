@@ -1,4 +1,4 @@
-package SeqIO;
+package Transposome::SeqIO;
 
 use 5.012;
 use Moose;

@@ -1,4 +1,4 @@
-package PairFinder;
+package Transposome::PairFinder;
 
 use Moose;
 use namespace::autoclean;

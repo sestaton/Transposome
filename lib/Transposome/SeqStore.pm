@@ -1,4 +1,4 @@
-package SeqStore;
+package Transposome::SeqStore;
 
 use 5.012;
 use Moose;

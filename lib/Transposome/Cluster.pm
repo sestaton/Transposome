@@ -1,4 +1,4 @@
-package Cluster;
+package Transposome::Cluster;
 
 use 5.012;
 use Moose;
