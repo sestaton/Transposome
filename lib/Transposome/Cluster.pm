@@ -10,6 +10,7 @@ use Try::Tiny;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use autodie qw(open);
 use File::Path qw(make_path);
+use Path::Class::Dir;
 use POSIX qw(strftime);
 
 with 'Transposome::Role::File', 
@@ -70,13 +71,12 @@ has 'cluster_size' => (
 =cut
 
 sub louvain_method {
-    #my ($self, $int_file, $outdir) = @_;
     my ($self) = @_;
-    #chdir($outdir) || die "\nERROR: Could not change $outdir: $!\n";
     my $int_file = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-
+    my $bin = Path::Class::Dir->new("$Bin/../../bin");
+    my $realbin = $bin->resolve;
     my $cls_bin = $iname.".bin";                    # Community "bin" format
     my $cls_tree = $iname.".tree";                  # hierarchical tree of clustering results
     my $cls_tree_weights = $cls_tree.".weights";    # bit score, the weights applied to clustering
@@ -91,17 +91,17 @@ sub louvain_method {
     my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
 
     #TODO use File::Spec to get path to bin
-    #my @convert_cmd = "../bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path";
+    #my @convert_cmd = "$bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path";
     #say @convert_cmd;
     try {
-	system([0..5], "../bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
+	system([0..5], "$bin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
 	warn "\nERROR: Louvain 'convert' failed. Caught error: $_" and exit;
     };
 
     try {
-	system([0..5],"../bin/community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
+	system([0..5],"$bin/community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
 	warn "\nERROR: Louvain 'community' failed. Caught error: $_" and exit;
@@ -121,7 +121,7 @@ sub louvain_method {
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
-	    system([0..5],"../bin/hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
+	    system([0..5],"$bin/hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
 	    warn "\nERROR: Louvain 'hierarchy' failed. Caught error: $_" and exit;
