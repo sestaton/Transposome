@@ -14,7 +14,7 @@ use SeqStore;
 
 use Test::More tests => 6;
 
-my $infile = 'Phoeb_330164_interl.fasta';
+my $infile = 'test_data/t_reads.fas';
 my $outdir = 'pairfinder_t';
 my $report = 'cluster_test_rep.txt';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );

@@ -21,7 +21,7 @@ my $outdir = 'pairfinder_t';
 my $report = 'cluster_test_rep.txt';
 my $db_fas = 'test_data/t_db.fas';
 my $db     = 'test_data/t_bldb';
-my $json   = 'test_data/repbase1801_full.json';
+my $json   = 'test_data/t_repeats.json';
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
