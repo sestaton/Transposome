@@ -19,8 +19,16 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moose'                      => 2.0802,
-        #'MooseX::Types::Path::Class' => 5.0401,
+        'MooseX::Types::Path::Class' => 0.06,
+	'namespace::autoclean'       => 0.13,
+	'Try::Tiny'                  => 0.12,
+	'IPC::System::Simple'        => 1.21,
+	'DB_File'                    => 1.826,
+	'DBM::Deep'                  => 0,
+	'File::Path'                 => 0,
+	'Graph::UnionFind'           => 0,
     },
+    C => { 'src/*.c' }
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-*' },
 );
