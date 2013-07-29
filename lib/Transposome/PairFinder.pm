@@ -16,7 +16,8 @@ use autodie qw(open);
 use List::Util qw(sum max);
 #use Data::Dump qw(dd);
 
-with 'File', 'Util';
+with 'Transposome::Role::File', 
+     'Transposome::Role::Util';
 
 =head1 NAME
 

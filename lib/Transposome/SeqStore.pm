@@ -12,7 +12,9 @@ use vars qw( $DB_BTREE &R_DUP );
 use AnyDBM_File::Importer qw(:bdb);
 use Carp;
 use SeqIO;
-with 'File','Types';
+
+with 'Transposome::Role::File',
+     'Transposome::Type::Types';
 
 =head1 NAME
 

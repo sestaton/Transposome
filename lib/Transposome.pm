@@ -2,8 +2,11 @@ package Transposome;
 
 use 5.012;
 use Moose;
-use MooseX::Types::Path::Class;
 use namespace::autoclean;
+use Transposome::PairFinder;
+use Transposome::Cluster;
+use Transposome::SeqStore;
+use Transpsome::Annotation;
 
 =head1 NAME
 
@@ -28,41 +31,8 @@ our $VERSION = '0.01';
 
 =head1 ATTRIBUTES
 
-These are options given to new();
-blast_file ...
-seq_file ...
 
 =cut 
-
-has 'blast_file' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 1,
-      coerce   => 1,
-    );
-
-has 'seq_file' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 1,
-      coerce   => 1,
-    );
-
-has 'db' => (
-     is        => 'ro',
-     isa        ...
-    );
-
-has 'id' => ( );
-
-has 'cov' => ( );
-
-has 'repbase_json' => ( );
-has 'merge_thresh' => ( );
-has 'report'       => ( );
-has 'out_dir'      => ( );
-has 'in_memory'    => ( );
-
 
 =head1 AUTHOR
 

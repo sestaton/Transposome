@@ -12,7 +12,8 @@ use autodie qw(open);
 use File::Path qw(make_path);
 use POSIX qw(strftime);
 
-with 'File', 'Util';
+with 'Transposome::Role::File', 
+     'Transposome::Role::Util';
 
 =head1 NAME
 

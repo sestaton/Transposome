@@ -10,7 +10,8 @@ use File::Basename;
 use Try::Tiny;
 use autodie qw(open);
 
-with 'File', 'Util';
+with 'Transposome::Role::File', 
+     'Transposome::Role::Util';
 
 =head1 NAME
 

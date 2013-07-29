@@ -6,7 +6,7 @@ use Try::Tiny;
 use Carp;
 use namespace::autoclean;
 
-with 'File';
+with 'Transposome::Role::File';
 
 =head1 NAME
 
