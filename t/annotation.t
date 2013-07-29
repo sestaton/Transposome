@@ -7,6 +7,7 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
+use IPC::System::Simple qw(system EXIT_ANY);
 use PairFinder;
 use TestUtils;
 use Cluster;
@@ -15,11 +16,12 @@ use Annotation;
 
 use Test::More tests => 12;
 
-my $infile = 'Phoeb_330164_interl.fasta';
+my $infile = 'test_data/t_reads.fas';
 my $outdir = 'pairfinder_t';
 my $report = 'cluster_test_rep.txt';
-my $db = '../db/RepBase1801_Hannuus_LTR-RT_families';
-my $json = '../db/repbase1801_full.json';
+my $db_fas = 'test_data/t_db.fas';
+my $db     = 'test_data/t_bldb';
+my $json   = 'test_data/repbase1801_full.json';
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
@@ -54,7 +56,7 @@ ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 diag("\nIndexing sequences, this will take a few seconds...\n");
 my $memstore = SeqStore->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
-ok( $seqct == 330164, 'Correct number of sequences stored' );
+ok( $seqct == 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
 diag("\nTrying to merge clusters...\n");
@@ -66,6 +68,12 @@ ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
 diag("\nStarting cluster annotation...\n");
+my $exit_value = system(EXIT_ANY,"makeblastdb -in $db_fas -dbtype nucl -title $db -out $db 2>&1 > /dev/null");
+if ($exit_value > 0) {
+    say "\n[ERROR]: Unable to make blast database for testing. Exited with exit value: $exit_value.";
+    say "[ERROR]: Here is the exception: $_\nCheck your blast installation and try to get this test to pass before proceeding. Exiting.\n";
+    exit(1);
+};
 
 my $annotation = Annotation->new( database  => $db,
                                   rb_json   => $json,
@@ -86,4 +94,4 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $report);
 
-system("rm -rf $outdir $blfl");
+system("rm -rf $outdir $blfl $report $anno_sum_rep_path");
