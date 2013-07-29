@@ -1,4 +1,4 @@
-package Transposome::Types;
+package Transposome::Role::Types;
 
 use 5.012;
 use Moose::Role;
