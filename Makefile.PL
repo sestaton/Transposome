@@ -2,6 +2,27 @@ use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
+use autodie qw(open);
+
+BEGIN {
+    chdir("src");
+    system("make all 2> comm_make_errs");
+    open my $err, '<', "comm_make_errs";
+    while (<$err>) {
+	chomp;
+	if (/error/i) {
+	    say "\n[ERROR]: Encountered problems trying to compile source. Contact the author if you are unable to resolve this issue.\n";
+	    say "Here are the errors: $_. Exiting.\n";
+	    close $err;
+	    unlink("comm_make_errs");
+	    exit(1);
+	}
+    }
+    close $err;
+    unlink("comm_make_errs");
+    chdir("..");
+    system("cp src/convert bin; cp src/community bin; cp src/hierarchy bin;");
+}
 
 WriteMakefile(
     NAME             => 'Transposome',
@@ -28,7 +49,7 @@ WriteMakefile(
 	'File::Path'                 => 0,
 	'Graph::UnionFind'           => 0,
     },
-    C => { 'src/*.c' }
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-*' },
 );
+
