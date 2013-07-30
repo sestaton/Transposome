@@ -13,7 +13,7 @@ use t::TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqStore;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
@@ -45,6 +45,9 @@ ok( defined($comm), 'Can successfully perform clustering' );
 my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
+my ($id_seqct, $cls_seqct) = analyze_cluster_groupings("t/pairfinder_t/$cluster_file");
+ok( $id_seqct == $cls_seqct, 'Correct number of reads in clusters' );
+
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
@@ -57,10 +60,13 @@ diag("\nTrying to merge clusters...\n");
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $report, $uf);
 
+my ($id_seqct_wmerge, $cls_seqct_wmerge) = analyze_cluster_groupings($cls_with_merges_path);
+ok( $id_seqct_wmerge == $cls_seqct_wmerge, 'Correct number of reads in merged clusters' );
+
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
-open my $rep, $report;
+open my $rep, '<', $report;
 my ($g1, $g0, $cls11, $cls12, $cls21, $cls22, $reads1, $reads2, $mems1, $mems2);
 while (<$rep>) {
     chomp;
@@ -81,4 +87,26 @@ while (<$rep>) {
     }
 }
 close $rep;
-system("rm -rf $outdir $blfl $report")
+system("rm -rf $outdir $blfl $report");
+
+#
+#
+# 
+sub analyze_cluster_groupings {
+    my ($cls_file_path) = @_;
+    {
+        local $/ = '>';
+
+        open my $in, '<', $cls_file_path;   
+        while (my $line = <$in>) {
+            $line =~ s/>//g;
+            next if !length($line);
+            my ($clsid, $seqids) = split /\n/, $line;
+            my ($id, $seqct)  = split /\s/, $clsid;;
+            my @ids = split /\s+/, $seqids;
+	    my $clsct = scalar @ids;
+	    return ($seqct, $clsct);
+        }
+        close $in;
+    }
+}
