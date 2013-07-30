@@ -8,11 +8,12 @@ use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
 use IPC::System::Simple qw(system EXIT_ANY);
-use PairFinder;
-use TestUtils;
-use Cluster;
-use SeqStore;
-use Annotation;
+use lib qw(../blib/lib ..);
+use Transposome::PairFinder;
+use t::TestUtils;
+use Transposome::Cluster;
+use Transposome::SeqStore;
+use Transposome::Annotation;
 
 use Test::More tests => 12;
 
@@ -23,23 +24,23 @@ my $db_fas = 'test_data/t_db.fas';
 my $db     = 'test_data/t_bldb';
 my $json   = 'test_data/t_repeats.json';
 
-my $test = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
 
-my $blast_res = PairFinder->new( file              => $blfl,  
-				 dir               => $outdir,                                                                              
-				 in_memory         => 1,                                                                                              
-				 percent_identity  => 90.0,                                                                                           
-				 fraction_coverage => 0.55 );
+my $blast_res = Transposome::PairFinder->new( file              => $blfl,  
+					      dir               => $outdir,                                                                              
+					      in_memory         => 1,                                                                                              
+					      percent_identity  => 90.0,                                                                                           
+					      fraction_coverage => 0.55 );
 
 
 my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
-my $cluster = Cluster->new( file            => $int_file,
-                            dir             => $outdir,
-                            merge_threshold => 2,
-                            cluster_size    => 1);
+my $cluster = Transposome::Cluster->new( file            => $int_file,
+					 dir             => $outdir,
+					 merge_threshold => 2,
+					 cluster_size    => 1);
 
 ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
 
@@ -54,7 +55,7 @@ my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 diag("\nIndexing sequences, this will take a few seconds...\n");
-my $memstore = SeqStore->new( file => $infile, in_memory => 1 );
+my $memstore = Transposome::SeqStore->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
 ok( $seqct == 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
@@ -75,10 +76,10 @@ if ($exit_value > 0) {
     exit(1);
 };
 
-my $annotation = Annotation->new( database  => $db,
-                                  rb_json   => $json,
-                                  dir       => $outdir,
-                                  file      => $report );
+my $annotation = Transposome::Annotation->new( database  => $db,
+					       rb_json   => $json,
+					       dir       => $outdir,
+					       file      => $report );
 
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
@@ -94,4 +95,4 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $report);
 
-system("rm -rf $outdir $blfl $report $anno_sum_rep_path");
+system("rm -rf $outdir $blfl cluster_test_rep*");
