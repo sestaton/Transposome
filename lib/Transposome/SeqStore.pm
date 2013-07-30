@@ -3,16 +3,10 @@ package Transposome::SeqStore;
 use 5.012;
 use Moose;
 use namespace::autoclean;
-BEGIN {
-  @AnyDBM_File::ISA = qw( DB_File SQLite_File )
-      unless @AnyDBM_File::ISA == 1;
-}
-use AnyDBM_File;                  
+use DB_File;
 use vars qw( $DB_BTREE &R_DUP );  
-use AnyDBM_File::Importer qw(:bdb);
 use Carp;
-use SeqIO;
-
+use Transposome::SeqIO;
 with 'Transposome::Role::File',
      'Transposome::Role::Types';
 
@@ -66,22 +60,22 @@ has 'in_memory' => (
 =cut
 
 sub store_seq {
-    my $self = shift;
+    my ($self) = @_;
  
     my %seqhash;
-    unless ($self->has_in_memory) {
+    unless ($self->in_memory) {
         $DB_BTREE->{cachesize} = 100000;
         $DB_BTREE->{flags} = R_DUP;
         my $seq_dbm = "transposome_seqstore.dbm";
         unlink $seq_dbm if -e $seq_dbm;
-        tie %seqhash, 'AnyDBM_File', $seq_dbm, O_RDWR|O_CREAT, 0666, $DB_BTREE
+        tie %seqhash, 'DB_File', $seq_dbm, O_RDWR|O_CREAT, 0666, $DB_BTREE
             or croak "\nERROR: Could not open DBM file $seq_dbm: $!\n";
     }
 
     if (-e $self->file) {
-	my $filename = $self->file->basename;
+	my $filename = $self->file->relative;
 	#say $name and exit;
-	my $seqio = SeqIO->new( file => $filename );
+	my $seqio = Transposome::SeqIO->new( file => $filename );
 	my $fh = $seqio->get_fh;
 	while (my $seq = $seqio->next_seq($fh)) {
 	    $self->inc_counter if $seq->has_seq;
