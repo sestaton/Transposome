@@ -45,9 +45,24 @@ ok( defined($comm), 'Can successfully perform clustering' );
 my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
-#my ($id_seqct, $cls_seqct) = analyze_cluster_groupings("t/pairfinder_t/$cluster_file");
-analyze_cluster_groupings("t/pairfinder_t/$cluster_file");
-#ok( $id_seqct == $cls_seqct, 'Correct number of reads in clusters' );
+{
+    local $/ = '>';
+
+    open my $in, '<', "t/pairfinder_t/$cluster_file";
+    while (my $line = <$in>) {
+	$line =~ s/>//g;
+	next if !length($line);
+	my ($clsid, $seqids) = split /\n/, $line;
+	my ($id, $seqct)  = split /\s/, $clsid;
+	my @ids = split /\s+/, $seqids;
+	my $clsct = scalar @ids;
+
+	if ($seqct > 1) {
+	    ok( $seqct == $clsct, 'Correct number of reads in clusters' );
+	}
+    }
+    close $in;
+}
 
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
@@ -61,9 +76,21 @@ diag("\nTrying to merge clusters...\n");
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $report, $uf);
 
-#my ($id_seqct_wmerge, $cls_seqct_wmerge) = analyze_cluster_groupings($cls_with_merges_path);
-analyze_cluster_groupings($cls_with_merges_path);
-#ok( $id_seqct_wmerge == $cls_seqct_wmerge, 'Correct number of reads in merged clusters' );
+{
+    local $/ = '>';
+
+    open my $in, '<', $cls_with_merges_path;
+    while (my $line = <$in>) {
+	$line =~ s/>//g;
+	next if !length($line);
+	my ($clsid, $seqids) = split /\n/, $line;
+	my ($id, $seqct)  = split /\s/, $clsid;
+	my @ids = split /\s+/, $seqids;
+	my $clsct = scalar @ids;
+	ok( $seqct == $clsct, 'Correct number of reads in merged clusters' );
+    }
+    close $in;
+}
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
@@ -90,29 +117,3 @@ while (<$rep>) {
 }
 close $rep;
 system("rm -rf $outdir $blfl $report");
-
-#
-#
-# 
-sub analyze_cluster_groupings {
-    my ($cls_file_path) = @_;
-    {
-        local $/ = '>';
-
-        open my $in, '<', $cls_file_path;   
-        while (my $line = <$in>) {
-            $line =~ s/>//g;
-            next if !length($line);
-            my ($clsid, $seqids) = split /\n/, $line;
-            my ($id, $seqct)  = split /\s/, $clsid;
-            my @ids = split /\s+/, $seqids;
-	    my $clsct = scalar @ids;
-	    #return ($seqct, $clsct);
-	    #say join "\t", $seqct, $clsct;
-	    if ($seqct > 1) {
-		ok( $seqct == $clsct, 'Correct number of reads in clusters' );
-	    }
-        }
-        close $in;
-    }
-}
