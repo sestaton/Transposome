@@ -196,7 +196,7 @@ sub clusters_annotation_to_summary  {
     my ($self, $anno_rp_path, $anno_sum_rep_path, $total_readct, 
 	$seqct, $rep_frac, $blasts, $superfams) = @_;
 
-    my $report = $self->report->relative;
+    my $report = $self->file->relative;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path;
