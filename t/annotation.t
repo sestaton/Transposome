@@ -17,12 +17,12 @@ use Transposome::Annotation;
 
 use Test::More tests => 12;
 
-my $infile = 'test_data/t_reads.fas';
-my $outdir = 'pairfinder_t';
-my $report = 'cluster_test_rep.txt';
-my $db_fas = 'test_data/t_db.fas';
-my $db     = 'test_data/t_bldb';
-my $json   = 'test_data/t_repeats.json';
+my $infile = 't/test_data/t_reads.fas';
+my $outdir = 't/pairfinder_t';
+my $report = 't/cluster_test_rep.txt';
+my $db_fas = 't/test_data/t_db.fas';
+my $db     = 't/test_data/t_bldb';
+my $json   = 't/test_data/t_repeats.json';
 
 my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
@@ -95,4 +95,4 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $report);
 
-system("rm -rf $outdir $blfl cluster_test_rep*");
+system("rm -rf $outdir $blfl t/cluster_test_rep* $db");

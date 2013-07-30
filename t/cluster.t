@@ -15,9 +15,9 @@ use Transposome::SeqStore;
 
 use Test::More tests => 6;
 
-my $infile = 'test_data/t_reads.fas';
-my $outdir = 'pairfinder_t';
-my $report = 'cluster_test_rep.txt';
+my $infile = 't/test_data/t_reads.fas';
+my $outdir = 't/pairfinder_t';
+my $report = 't/cluster_test_rep.txt';
 my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
