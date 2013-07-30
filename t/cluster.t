@@ -13,7 +13,7 @@ use t::TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqStore;
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
@@ -60,4 +60,25 @@ my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
-system("rm -rf $outdir $blfl $report");
+open my $rep, $report;
+my ($g1, $g0, $cls11, $cls12, $cls21, $cls22, $reads1, $reads2, $mems1, $mems2);
+while (<$rep>) {
+    chomp;
+    if (/=====> Cluster connections/) {
+	my $first = <$rep>; chomp $first;
+	my $second = <$rep>; chomp $second;
+	($cls11, $cls12, $reads1) = split /\t/, $first;
+	($cls21, $cls22, $reads2) = split /\t/, $second;
+	ok( $reads1 == $reads2, 'Expected number of reads went into each cluster grouping' );
+    }
+    if (/=====> Cluster groupings/) {
+	my $first = <$rep>; chomp $first;
+	my $second = <$rep>; chomp $second;
+	($g0, $mems1) = split /\t/, $first;
+	($g1, $mems2) = split /\t/, $second;
+	ok($mems1 eq $cls12.",".$cls11, 'Expected clusters were joined (1)' );
+	ok($mems2 eq $cls22.",".$cls21, 'Expected clusters were joined (2)' );
+    }
+}
+close $rep;
+system("rm -rf $outdir $blfl $report")
