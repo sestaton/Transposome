@@ -5,23 +5,26 @@ use strict;
 use warnings;
 use Data::Dump qw(dd);
 use autodie qw(open);
-use PairFinder;
-use TestUtils;
+use lib qw(../blib/lib ..);
+use Transposome::PairFinder;
+use t::TestUtils;
+
 use Test::More tests => 498;
 
 my $outdir = 'pairfinder_t';
-my $test = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
+system("rm transposome_mgblast_*");
 
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
 
 ## test in-memory processing
-my $mem_test = PairFinder->new( file              => $blfl,    
-				dir               => $outdir,                                                                              
-				in_memory         => 1,                                                                                              
-				percent_identity  => 90.0,                                                                                           
-				fraction_coverage => 0.55 );
+my $mem_test = Transposome::PairFinder->new( file              => $blfl,    
+					     dir               => $outdir,                                                                              
+					     in_memory         => 1,                                                                                              
+					     percent_identity  => 90.0,                                                                                           
+					     fraction_coverage => 0.55 );
 
 ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
 
@@ -75,11 +78,11 @@ ok( $mem_hs_recct == $mem_int_recct, 'Index and integer mapping files contain th
 system("rm -rf $outdir");
 
 ## test on-file processing
-my $file_test = PairFinder->new( file              => $blfl,
-				 dir               => $outdir,
-				 in_memory         => 0,
-				 percent_identity  => 90.0,
-				 fraction_coverage => 0.55 );
+my $file_test = Transposome::PairFinder->new( file              => $blfl,
+					      dir               => $outdir,
+					      in_memory         => 0,
+					      percent_identity  => 90.0,
+					      fraction_coverage => 0.55 );
 
 ok( $file_test->parse_blast, 'Can build database on file and parse blast' );
 
