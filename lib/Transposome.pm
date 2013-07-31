@@ -8,6 +8,8 @@ use Transposome::Cluster;
 use Transposome::SeqStore;
 use Transpsome::Annotation;
 
+with 'MooseX::Getopt';
+
 =head1 NAME
 
 Transposome - Explore the transposon strucuture of a genome through sequence reads.
@@ -24,12 +26,20 @@ our $VERSION = '0.01';
 
     use Transposome;
 
-    my $trans_obj = Transposome->new( blast_file => my.bln,
-                                      seq_file   => my.fas,
-                                    );
+    my $trans_obj = Transposome->new_from_options();
     ...
 
 =head1 ATTRIBUTES
+
+has 'config' => (isa => 'Str', is => 'ro', required => 1);
+
+has 'context' => (
+    isa     => 'HashRef',
+    is      => 'rw',
+    lazy    => 1,
+    traits  => ['NoGetopt'],
+    default => sub { LoadFile shift->config }
+);
 
 
 =cut 
