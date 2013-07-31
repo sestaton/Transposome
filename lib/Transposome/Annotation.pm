@@ -108,6 +108,7 @@ sub annotate_clusters {
     
     my $report = $self->file->relative;
     my $database = $self->database->relative;
+    my $db_path = $self->_make_blastdb($database);
     my $out_dir = $self->dir->relative;
     my $json = $self->rb_json->relative;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
@@ -142,8 +143,6 @@ sub annotate_clusters {
     my $annodir = $cls_with_merges_dir."_annotations";
     my $out_path = File::Spec->rel2abs($annodir);
     make_path($annodir, {verbose => 0, mode => 0711,}); # allows for recursively making paths                                                                 
-    my ($dname, $dpath, $dsuffix) = fileparse($database, qr/\.[^.]*/);
-    my $db_path = File::Spec->rel2abs($dpath.$dname);
     my @blasts;    # container for each report (hash) 
     my @blast_out; # container for blastn output
     my @superfams;
@@ -288,6 +287,45 @@ sub clusters_annotation_to_summary  {
     close $outsum;
     say $rep "======> Total repeat fraction from annotations: ",$total_gcov;
     close $rep;
+}
+
+=head2 _make_blastdb
+
+ Title : _make_blastdb
+ 
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Creates a BLAST database of the repeat types being used
+           for annotation.
+                                                                   Return_type
+ Returns : In order, 1) the blast database                         Scalar
+
+                                                                   Arg_type
+ Args    : In order, 1) the Fasta file of repeats being            Scalar
+                        used for annotation
+
+=cut 
+
+sub _make_blastdb {
+    my ($self, $db_fas) = @_;
+
+    my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
+    my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
+
+    my $db = $dbname."_blastdb";
+    my $db_path = File::Spec->rel2abs($dbpath.$db);
+    unlink $db_path if -e $db_path;
+
+    my $exit_value;
+    try {
+	$exit_value = system(EXIT_ANY,"makeblastdb -in $db_file -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+    }
+    catch {
+	say "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
+	say "[ERROR]: Here is the exception: $_\nCheck your blast installation. Exiting.\n";
+	exit(1);
+    }
+    return $db_path;
 }
 
 =head2 _parse_blast_to_top_hit
