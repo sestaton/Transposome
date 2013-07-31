@@ -2,10 +2,11 @@ package Transposome;
 
 use 5.012;
 use Moose;
+use YAML;
 use namespace::autoclean;
 
 with 'MooseX::Getopt',
-     'Transposome::Role::Config';
+     'Transposome::Role::Util';
 
 =head1 NAME
 
@@ -23,8 +24,26 @@ our $VERSION = '0.01';
 
     use Transposome;
 
-    my $trans_obj = Transposome->new_with_config( configfile => 'transposome.yaml' );
+    my $trans_obj = Transposome->new_with_options();
     ...
+
+=cut 
+
+has 'config' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1
+    );
+
+has 'configuration' => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    lazy    => 1,
+    traits  => ['NoGetopt'],
+    default => sub { YAML::LoadFile shift->config }
+    );
+
+=head1 SUBROUTINES/METHODS
 
 =cut 
 
