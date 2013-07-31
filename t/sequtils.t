@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
+use lib qw(../blib/lib ../t/lib);
 use TestUtils;
-use SeqIO;
 use Data::Dump qw(dd);
+
 use Test::More tests => 7;
 
 my $test = TestUtils->new( build_all => 1, destroy => 1 );

@@ -8,9 +8,9 @@ use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
 use IPC::System::Simple qw(system EXIT_ANY);
-use lib qw(../blib/lib ..);
+use lib qw(../blib/lib ../t/lib);
 use Transposome::PairFinder;
-use t::TestUtils;
+use TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqStore;
 use Transposome::Annotation;
@@ -24,7 +24,7 @@ my $db_fas = 't/test_data/t_db.fas';
 my $db     = 't/test_data/t_bldb';
 my $json   = 't/test_data/t_repeats.json';
 
-my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
 

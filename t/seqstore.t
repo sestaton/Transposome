@@ -4,14 +4,14 @@ use 5.012;
 use strict;
 use warnings;
 use Data::Dump qw(dd);
-use lib qw(../blib/lib ..);
-use t::TestUtils;
+use lib qw(../blib/lib ../t/lib);
+use TestUtils;
 use Transposome::SeqStore;
 use Transposome::SeqIO;
 
 use Test::More tests => 24;
 
-my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;

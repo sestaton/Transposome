@@ -5,14 +5,14 @@ use strict;
 use warnings;
 use Data::Dump qw(dd);
 use autodie qw(open);
-use lib qw(../blib/lib ..);
+use lib qw(../blib/lib ../t/lib);
 use Transposome::PairFinder;
-use t::TestUtils;
+use TestUtils;
 
 use Test::More tests => 498;
 
 my $outdir = 'pairfinder_t';
-my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 system("rm transposome_mgblast_*");
 

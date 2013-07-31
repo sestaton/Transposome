@@ -7,9 +7,9 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
-use lib qw(../blib/lib ..);
+use lib qw(../blib/lib ../t/lib);
 use Transposome::PairFinder;
-use t::TestUtils;
+use TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqStore;
 
@@ -18,7 +18,7 @@ use Test::More tests => 49;
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
 my $report = 't/cluster_test_rep.txt';
-my $test = t::TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
 
