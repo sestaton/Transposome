@@ -1,21 +1,17 @@
 clustering_input:
-	sequence_file:
-	blast_file: 
-	output_directory: 
-	in_memory:
-
+  - sequence_file:     t_reads.fas
+  - blast_file:        transposome_mgblast_iS2b.bln
+  - output_directory:  test_cli_out
+  - in_memory:         1
 clustering_options:
-	percent_identity:
-	percent_coverage:
-	merge_threshold:
-
+  - percent_identity:  90
+  - fraction_coverage: 0.55
+  - merge_threshold:   2
 annotation_input:
-	repeat_database:
-        repeat_json_file:
-
+  - repeat_database:  t_bldb
+  - repeat_json_file: t_repeats.json
 annotation_options:
-	cluster_size:
-	blast_evalue:
-
+  - cluster_size:     1
+  - blast_evalue:     10
 output:
-	report_file:		
+  - report_file:      t_rep.out
