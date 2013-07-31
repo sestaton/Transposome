@@ -9,7 +9,7 @@ use JSON;
 
 =head1 NAME
 
-Transposome::Util - Numerous utility routines for Transposome. 
+Transposome::Role::Util - Numerous utility routines for Transposome. 
 
 =head1 VERSION
 
@@ -22,9 +22,9 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use Transposome::Util;
+    use Transposome;
 
-    my $foo = Transposome::Util->new();
+    with 'Transposome::Role::Util'
     ...
 
 =head1 EXPORT
@@ -88,6 +88,41 @@ sub json_to_hash {
 
     my $repeats = JSON->new->utf8->space_after->decode($json_text);
     return $repeats;
+}
+
+=head2 get_config
+
+ Title    : get_config
+ Usage    :
+ Function :
+ Returns  :
+ Args     :
+
+=cut 
+
+sub get_config {
+    my ($self) = @_;
+
+    my %config;
+
+    $config{sequence_file}    = $self->configuration->{clustering_input}->[0]->{sequence_file};
+    $config{blast_file}       = $self->configuration->{clustering_input}->[1]->{blast_file};
+    $config{output_directory} = $self->configuration->{clustering_input}->[2]->{output_directory};
+    $config{in_memory}        = $self->configuration->{clustering_input}->[3]->{in_memory};
+
+    $config{percent_identity}  = $self->configuration->{clustering_options}->[0]->{percent_identity};
+    $config{fraction_coverage} = $self->configuration->{clustering_options}->[1]->{fraction_coverage};
+    $config{merge_threshold}   = $self->configuration->{clustering_options}->[2]->{merge_threshold};
+
+    $config{cluster_size} = $self->configuration->{annotation_options}->[0]->{cluster_size};
+    $config{blast_evalue} = $self->configuration->{annotation_options}->[1]->{blast_evalue};
+
+    $config{repeat_database}   = $self->configuration->{annotation_input}->[0]->{repeat_database};
+    $config{repeat_json_file} = $self->configuration->{annotation_input}->[1]->{repeat_json_file};
+
+    $config{report_file} = $self->configuration->{output}->[0]->{report_file};
+
+    return \%config;
 }
 
 =head1 AUTHOR
