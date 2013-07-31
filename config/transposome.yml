@@ -1,0 +1,21 @@
+clustering_input:
+	sequence_file:
+	blast_file: 
+	output_directory: 
+	in_memory:
+
+clustering_options:
+	percent_identity:
+	percent_coverage:
+	merge_threshold:
+
+annotation_input:
+	repeat_database:
+        repeat_json_file:
+
+annotation_options:
+	cluster_size:
+	blast_evalue:
+
+output:
+	report_file:		
