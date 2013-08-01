@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use lib qw(../blib/lib ../t/lib);
+use TestUtils;
+use Data::Dump qw(dd);
+
+use Test::More tests => 2;
+
+my $test = TestUtils->new( seq_file     => 'test_data/t_reads.fas',
+			   repeat_db    => 'test_data/t_db.fas',
+			   repeat_json  => 'test_data/t_repeats.json',
+			   destroy      => 1,
+                           build_proper => 1 );
+
+ok( $test->config_constructor, 'Can build all configuration data for testing' );
+
+my $test2 = TestUtils->new( seq_file     => 'test_data/t_reads.fas',
+                            repeat_db    => 'test_data/t_db.fas',
+                            repeat_json  => 'test_data/t_repeats.json',
+                            destroy      => 0,
+                            build_proper => 1 );
+
+my $conf = $test2->config_constructor;
+my ($conf_file) = @$conf;
+
+ok( defined($conf_file), 'Correctly build configuration data for testing' );
+
+system("rm transposome_mgblast_* transposome_config_*");
