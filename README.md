@@ -38,6 +38,7 @@ using. For example,
     perldoc Transposome::Cluster
 
 Available classes are: 
+
     Transposome
     Transposome::Annotation
     Transposome::Cluster
