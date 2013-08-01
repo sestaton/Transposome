@@ -11,7 +11,7 @@ use Transposome::SeqStore;
 use Transposome::Annotation;
 use TestUtils;
 
-use Test::More tests => 24;
+use Test::More tests => 30;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas',
@@ -29,14 +29,20 @@ my $config = $trans_obj->get_config;
 ok( defined($config->{sequence_file}), 'Can set sequence data for configuration' );
 ok( defined($config->{blast_file}), 'Can set blast data for configuration' );
 ok( defined($config->{output_directory}), 'Can set ouput directory for configuration' );
-ok( defined($config->{in_memory}), 'Can set memory status for configuration' );
+ok( defined($config->{in_memory}), 'Can set memory conditions for configuration' );
+ok( $config->{in_memory} == 1, 'Can correctly set memory conditions for analysis' );
 
 ok( defined($config->{percent_identity}), 'Can set percent identity for configuration' );
 ok( defined($config->{fraction_coverage}), 'Can set fraction coverage for configuration' );
 ok( defined($config->{merge_threshold}), 'Can set merge threshold for configuration' );
+ok( $config->{percent_identity} == 90, 'Can correctly set percent identity for analysis' );
+ok( $config->{fraction_coverage} == 0.55, 'Can correctly set fraction coverage for analysis' );
+ok( $config->{merge_threshold} == 2, 'Can correctly set merge threshold for analysis' );
 
 ok( defined($config->{cluster_size}), 'Can set cluster size for configuration' );
 ok( defined($config->{blast_evalue}), 'Can set blast evalue for configuration' );
+ok( $config->{cluster_size} == 1, 'Can correctly set cluster size for analysis' );
+ok( $config->{blast_evalue} == 10, 'Can correctly set blast evalue for analysis' );
 
 ok( defined($config->{repeat_database}), 'Can set repeat database for configuration' );
 ok( defined($config->{repeat_json_file}), 'Can set repeat json file for configuration' );
