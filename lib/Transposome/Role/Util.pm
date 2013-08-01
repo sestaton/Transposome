@@ -27,7 +27,7 @@ our $VERSION = '0.01';
     with 'Transposome::Role::Util'
     ...
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 mk_key
 

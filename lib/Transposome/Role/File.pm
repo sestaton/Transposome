@@ -41,7 +41,7 @@ has 'dir' => (
       coerce   => 1,
     );
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 get_fh
 
