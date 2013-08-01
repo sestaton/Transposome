@@ -9,20 +9,19 @@ lib/Transposome/Role/Util.pm
 lib/Transposome/Role/File.pm
 lib/Transposome/Role/Types.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
-README
-t/00-load.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
 t/seqio.t
 t/cluster.t
 t/seqstore.t
-t/sequtils.t
+t/utils_blast.t
+t/utils_config.t
+t/utils_seq.t
 t/annotation.t
 t/pairfinder.t
-t/TestUtils.pm
+t/lib/TestUtils.pm
+t/lib/TestUtils/TestConfig.pm
+t/Transposome/transposome.t
 src/Makefile
 src/README.md
 src/community.cpp
