@@ -19,15 +19,10 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
-    use Transposome::Types;
-
-    my $types = Transposome::Types->new();
+    with 'Transposome::Role::Types';
     ...
-
-=Head1 ATTRIBUTES
 
 =cut
 
@@ -118,5 +113,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-#1; # End of Transposome::Types
-__PACKAGE__->meta->make_immutable;
+1;
+
