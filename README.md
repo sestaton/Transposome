@@ -9,8 +9,11 @@ Annotation of transposable element families from unassembled sequence reads
 
 **INSTALLATION**
 
-To install this module, run the following commands:
+To install this package, you will first need to install some Perl dependencies. The recommened method is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and and run the following commands (requires git):
 
+    git clone github.com/sestaton/Transposome.git
+    cd Transposome
+    cpanm --installdeps .
     perl Makefile.PL
     make
     make test
@@ -18,7 +21,7 @@ To install this module, run the following commands:
 
 **BASIC USAGE**
 
-Following successful installation, fill out the sample configuration file in the 'config' directory
+Following installation, fill out the sample configuration file in the 'config' directory
 in the Transposome distribution, specifying the location of data files and parameters for analysis.
 
 Then, simply run the `transposome` program, specifying your configuration file:
