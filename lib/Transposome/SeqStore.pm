@@ -4,9 +4,10 @@ use 5.012;
 use Moose;
 use namespace::autoclean;
 use DB_File;
-use vars qw( $DB_BTREE &R_DUP );  
+use vars qw($DB_BTREE &R_DUP);  
 use Carp;
 use Transposome::SeqIO;
+
 with 'Transposome::Role::File',
      'Transposome::Role::Types';
 
@@ -30,11 +31,6 @@ our $VERSION = '0.01';
                                                 in_memory => 1,
                                                );
 
-=head1 ATTRIBUTES
-
-'seq_file'  - Takes the name of a Fasta/q file as the argument.
-'in_memory' - Set whether or not perform calculations in memory (Boolean: 0/1; Default: 0).
-
 =cut
 
 has 'in_memory' => (
@@ -52,10 +48,16 @@ has 'in_memory' => (
  Title   : store_seqs
  Usage   : my ($seqs, $seq_ct) = $seq_store->store_seq;
           
- Function: 
- Returns : 
- Args    : 
+ Function: Take a Fasta or Fastq file and return a reference
+           to a data structure containing the sequences, along
+           with the total sequence count.
 
+                                                               Data_type
+ Returns : A hash containing the id => sequence mappings       HashRef
+           for each Fasta/q record
+
+ Args    : A sequence file and the option of specifying        Scalar
+           the analysis to be done in memory
 
 =cut
 
@@ -79,7 +81,6 @@ sub store_seq {
 	my $fh = $seqio->get_fh;
 	while (my $seq = $seqio->next_seq($fh)) {
 	    $self->inc_counter if $seq->has_seq;
-	    #say join "\n", ">".$seq->get_id, $seq->get_seq;
 	    $seqhash{$seq->get_id} = $seq->get_seq;
 	}
 	return(\%seqhash, $self->counter);
