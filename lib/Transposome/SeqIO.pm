@@ -33,36 +33,32 @@ our $VERSION = '0.01';
 
 =cut
 
-# class attributes
-has id => (
+has 'id' => (
     is        => 'rw',
     isa       => 'Str',
     reader    => 'get_id',
     writer    => 'set_id',
-    #clearer   => 'clear_id',
     predicate => 'has_id',
     );
 
-has seq => (
+has 'seq' => (
     is        => 'rw',
     isa       => 'Str',
     reader    => 'get_seq',
     writer    => 'set_seq',
-    #clearer   => 'clear_seq',
     predicate => 'has_seq',
     );
 
-has qual => (
+has 'qual' => (
     is        => 'rw',
     lazy      => 1,
     default   => undef,
     reader    => 'get_qual',
     writer    => 'set_qual',
-    #clearer   => 'clear_qual',
     predicate => 'has_qual',
     );
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 next_seq
 
@@ -71,8 +67,8 @@ has qual => (
            
  Function: Reads fasta/fastq files seamlessly without needing to 
            specify the format.
-
- Returns : A Transposome::SeqIO object on which you can call methods
+                                                                            
+ Returns : A Transposome::SeqIO object on which you can call methods                  
            representing the sequence, id, or quality scores (in the
            case of fastq). E.g.,
            
@@ -89,7 +85,7 @@ has qual => (
            if ($seq->has_seq)  { ... # is the seq set? }
            if ($seq->has_qual) { ... # is the qual set? This will be no for Fasta. }
 
- Args    : Takes a file handle. You can get the file handle
+ Args    : Takes a file handle. You can get the file handle                 
            by calling the method 'get_fh' on a Transposome::SeqIO object. E.g.,
  
            my $trans_obj = Transposome::SeqIO->new( file => $infile );
@@ -182,7 +178,22 @@ sub next_seq {
     }
 }
 
-# private
+=head2 _set_id_per_encoding
+
+Title   : _set_id_per_encoding
+Usage   : This is a private method, don't use it directly.
+          
+Function: Try to determine format of sequence files
+          and preserve paired-end information.
+                                                               Data_type
+Returns : A corrected sequence header if Illumina              Scalar
+          Illumina 1.8+ is detected                           
+        
+
+Args    : A sequence header                                    Scalar
+
+=cut
+
 sub _set_id_per_encoding {
     my $hline = shift;
     if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
@@ -198,4 +209,3 @@ sub _set_id_per_encoding {
 
 __PACKAGE__->meta->make_immutable;
 
-1;
