@@ -57,5 +57,6 @@ WriteMakefile(
     EXE_FILES => [ 'bin/convert', 'bin/community', 'bin/hierarchy', 'bin/transposome' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-*' },
+    test  => { TESTS => 't/*.t t/Transposome/*.t' },
 );
 
