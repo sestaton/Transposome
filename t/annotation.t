@@ -8,7 +8,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
 use IPC::System::Simple qw(system EXIT_ANY);
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 use Transposome::Cluster;
@@ -21,8 +21,8 @@ my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
 my $report = 't/cluster_test_rep.txt';
 my $db_fas = 't/test_data/t_db.fas';
-my $db     = 't/test_data/t_bldb';
 my $json   = 't/test_data/t_repeats.json';
+my $db = 't/test_data/t_db_blastdb';
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
@@ -69,14 +69,8 @@ ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
 diag("\nStarting cluster annotation...\n");
-my $exit_value = system(EXIT_ANY,"makeblastdb -in $db_fas -dbtype nucl -title $db -out $db 2>&1 > /dev/null");
-if ($exit_value > 0) {
-    say "\n[ERROR]: Unable to make blast database for testing. Exited with exit value: $exit_value.";
-    say "[ERROR]: Here is the exception: $_\nCheck your blast installation and try to get this test to pass before proceeding. Exiting.\n";
-    exit(1);
-};
 
-my $annotation = Transposome::Annotation->new( database  => $db,
+my $annotation = Transposome::Annotation->new( database  => $db_fas,
 					       rb_json   => $json,
 					       dir       => $outdir,
 					       file      => $report );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Data::Dump qw(dd);
 use autodie qw(open);
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 

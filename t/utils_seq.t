@@ -2,9 +2,8 @@
 
 use strict;
 use warnings;
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use TestUtils;
-use Data::Dump qw(dd);
 
 use Test::More tests => 6;
 

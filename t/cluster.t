@@ -7,7 +7,7 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use Data::Dump qw(dd);
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 use Transposome::Cluster;

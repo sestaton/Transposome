@@ -3,8 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
-use Data::Dump qw(dd);
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use TestUtils;
 use Transposome::SeqStore;
 use Transposome::SeqIO;

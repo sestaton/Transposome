@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use lib qw(../blib/lib ../t/lib);
+use lib qw(../blib/lib t/lib);
 use TestUtils;
 use Transposome::SeqIO;
 use Test::More tests => 18;
