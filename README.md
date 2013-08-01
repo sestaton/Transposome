@@ -9,7 +9,7 @@ Annotation of transposable element families from unassembled sequence reads
 
 **INSTALLATION**
 
-To install this package, you will first need to install some Perl dependencies. The recommened method is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and and run the following commands (requires git):
+To install this package, you will first need to install some Perl dependencies. The recommened method is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and run the following commands (requires git):
 
     git clone github.com/sestaton/Transposome.git
     cd Transposome
