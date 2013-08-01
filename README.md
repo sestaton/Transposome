@@ -21,28 +21,29 @@ To install this module, run the following commands:
 Following successful installation, fill out the sample configuration file in the 'config' directory
 in the Transposome distribution, specifying the location of data files and parameters for analysis.
 
-Then,
+Then, simply run the `transposome` program, specifying your configuration file:
 
     transposome --config transposome.yml
 
-The name of the configuration file does not matter.
+Note: The name of the configuration file does not matter, this is just an example. Though, the format is important.
 
 **ADVANCED USAGE**
 
-It is possible to run only one part of Transposome package, the clustering methods for example, or create 
-your own analysis methods to plug into Transposome.
+It is possible to run only one part of the Transposome package, the clustering methods for example, or create 
+your own analysis methods to plug into Transposome. In addition, you can extend existing methods.
 
 For all available methods, simply type `perldoc` followed by the name of the class you are interested in 
 using. For example,
 
     perldoc Transposome::Cluster
 
-Available classes are: Transposome
-	               Transposome::Annotation
-                       Transposome::Cluster
-                       Transposome::PairFinder
-		       Transposome::SeqIO
-                       Transposome::SeqStore
+Available classes are: 
+    Transposome
+    Transposome::Annotation
+    Transposome::Cluster
+    Transposome::PairFinder
+    Transposome::SeqIO
+    Transposome::SeqStore
                       
 
 **SUPPORT AND DOCUMENTATION**
