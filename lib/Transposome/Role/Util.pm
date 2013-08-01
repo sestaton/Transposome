@@ -27,21 +27,25 @@ our $VERSION = '0.01';
     with 'Transposome::Role::Util'
     ...
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
 =head1 SUBROUTINES/METHODS
 
 =head2 mk_key
 
  Title   : mk_key
- Usage   : 
+ Usage   : my $key = mk_key('string1','string2');
           
- Function: 
- Returns : 
- Args    :
+ Function: Safely creates a string of joined strings
+           to be used (internally) as a hash key. Could
+           also be used in comparisons. This uses a Unicode
+           character that is unlikely to be found in the
+           data being analyzed. This is accomplished with
+           Perl's charnames(), though these characters are available
+           by default as of Perl v5.16.
+
+                                                   Data_type
+ Returns : A string comprising the input           Scalar
+
+ Args    : An array of strings                     Array
 
 =cut
 
@@ -53,11 +57,15 @@ sub mk_key {
 =head2 mk_vec
 
  Title   : mk_vec
- Usage   : 
+ Usage   : my @vec = mk_vec('some_joined_string');
           
- Function: 
- Returns : 
- Args    :
+ Function: Creates an array out of a string.
+                  
+                                                   Data_type                                  
+ Returns : An array comprised of the elements      Array
+           joined in the input string
+
+ Args    : A string                                Scalar
 
 =cut
 
@@ -69,11 +77,18 @@ sub mk_vec {
 =head2 json_to_hash
 
  Title   : json_to_hash
- Usage   : 
+ 
+ Usage   : my $hash = json_to_hash($json);
           
- Function: 
- Returns : 
- Args    :
+ Function: Creates an easy to parse data structure out of
+           a JSON file. Helpful for going back and forth
+           between Perl and some serialized data form.
+
+                                                    Data_type
+ Returns : A Perl data structure comprised of       HashRef
+           all the JSON contents
+
+ Args    : A valid JSON file                        Scalar
 
 =cut
 
@@ -93,10 +108,16 @@ sub json_to_hash {
 =head2 get_config
 
  Title    : get_config
- Usage    :
- Function :
- Returns  :
- Args     :
+
+ Usage    : my $config = $trans_obj->get_config;
+
+ Function : The parsed configuration for Transposome.
+
+                                                           Data_type
+ Returns  : A hash containing the user-set configuration   HashRef
+            for how transposome is to be executed
+
+ Args     : None. This is a role that can be consumed.
 
 =cut 
 
@@ -140,7 +161,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Transposome::Util
+    perldoc Transposome::Role::Util
 
 
 You can also look for information at:
@@ -200,5 +221,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-1; # End of Transposome::Util
-#__PACKAGE__->meta->make_immutable;
+1; 
+
