@@ -50,16 +50,16 @@ Available classes are:
 **SUPPORT AND DOCUMENTATION**
 
 After installing, you can find documentation for the Transposome package with the
-perldoc command.
+`perldoc` command.
 
     perldoc Transposome
 
-If you are not interesting in using Transposome programmatically or inspecting the class methods, simply type
-`perldoc` followed by the name of program to run the full analysis.
+If you are not interested in using Transposome programmatically or inspecting the class methods, simply type
+`perldoc` followed by the name of main program to run the full analysis.
 
     perldoc transposome 
 
-This program will also print a diagnostic help message when executed with no arguments.
+The `transposome` program will also print a diagnostic help message when executed with no arguments.
 
 You can also look for information at:
 
