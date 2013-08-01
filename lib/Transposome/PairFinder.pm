@@ -1,27 +1,24 @@
 package Transposome::PairFinder;
 
+use 5.012;
 use Moose;
 use namespace::autoclean;
-
-use 5.012;
 use utf8;
 use Encode qw(encode decode);
 use DB_File;
-use vars qw( $DB_BTREE &R_DUP );  
+use vars qw($DB_BTREE &R_DUP);  
 use DBM::Deep;
 use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
-use autodie qw(open);
 use List::Util qw(sum max);
-#use Data::Dump qw(dd);
 
 with 'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME
 
-Transposome::PairFinder - 
+Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
 
 =head1 VERSION
 
@@ -40,14 +37,6 @@ our $VERSION = '0.01';
                                                   in_memory         => 1,
                                                   percent_identity  => 90.0,
                                                   fraction_coverage => 0.55 );
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 ATTRIBUTES
-
 
 =cut
 
@@ -75,17 +64,25 @@ has 'fraction_coverage' => (
     default   => 0.55,
     );
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 parse_blast
 
  Title   : parse_blast
- Usage   : 
-           
- Function: 
- Returns : 
- Args    : 
+ Usage   : my ($idx_file, $int_file, $hs_file) = $pairfinder_obj->parse_blast;
 
+ Function: Find the best scoring matches for each pair of sequences. 
+
+                                                                            Data_type
+ Returns : In order, 1) an index mapping the sequence ID and the            Scalar
+                        sequence index used for clustering
+                     2) a file containing the index of each sequence        Scalar
+                        and match score
+                     3) a file containg the pairwise information            Scalar
+                        for each best scoring match
+
+ Args    : None. This is class method called on a Transposome::PairFinder
+           object.
 
 =cut
 
@@ -111,7 +108,6 @@ sub parse_blast {
     my $parsed_hits = 0;
     my $index = 0;
 
-    #open my $in, '<', $infile; ## or die
     my $fh = $self->file->openr;
     open my $int, '>', $int_path;
     open my $idx, '>', $idx_path;
