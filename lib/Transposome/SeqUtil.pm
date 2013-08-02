@@ -29,9 +29,9 @@ For storing all sequences:
 
     use Transposome::SeqUtil;
 
-    my $sequtil = Transposome::SeqUtil->new( file     => 'myseqs.fas',
-                                               in_memory => 1,
-                                               );
+    my $sequtil = Transposome::SeqUtil->new( file      => 'myseqs.fas',
+                                             in_memory => 1,
+                                           );
     my ($seqs, $seqct) = $sequtil->store_seq;
 
     ...
@@ -42,7 +42,7 @@ use Transposome::SeqUtil;
 
     my $sequtil = Transposome::SeqUtil->new( file        => 'myseqs.fas',
                                              sample_size => 500_000,
-                                               );
+                                           );
 
     my ($seqs, $seqct) = $sequtil->sample_seq;
 
@@ -56,11 +56,18 @@ has 'in_memory' => (
     default    => 0,
     );
 
-has 'sample' => (
+has 'sample_size' => (
     is        => 'ro',
-    isa       => 'PosInt',
+    isa       => 'Int',
     predicate => 'has_sample',
-    lazy      => 1,
+    );
+
+has 'no_store' => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => 'has_no_store',
+    lazy      => 'no_store',
+    default   => 0,
     );
 
 =head1 METHODS
@@ -134,7 +141,7 @@ sub sample_seq {
     my $k = $self->sample_size;
     my $n      = 0;
     my @sample;
-    my $seqhash;
+    my %seqhash;
 
     my $seqio_fa = Transposome::SeqIO->new( file => $filename );
     my $seqfh = $seqio_fa->get_fh;
@@ -155,12 +162,17 @@ sub sample_seq {
 
     for my $seq (@sample) {
 	for my $h (keys %$seq) {
-	    $self->inc_counter if $seq->{$h};
-	    $seqhash{$h} = $seq->{$h};
+	    if ($self->no_store) {
+		say join "\n", ">".$h, $seq->{$h};
+	    }
+	    else {
+		$self->inc_counter if $seq->{$h};
+		$seqhash{$h} = $seq->{$h};
+	    }
 	}
     }
     
-    return (\%seqhash, $self->counter);
+    return (\%seqhash, $self->counter) unless $self->no_store;
 }
 
 =head1 AUTHOR
