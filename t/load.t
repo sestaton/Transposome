@@ -8,7 +8,7 @@ use Test::More tests => 6;
 
 BEGIN {
     use_ok( 'Transposome' ) || print "Bail out!\n";
-    use_ok( 'Transposome::SeqStore' ) || print "Bail out!\n";
+    use_ok( 'Transposome::SeqUtil' ) || print "Bail out!\n";
     use_ok( 'Transposome::SeqIO' ) || print "Bail out!\n";
     use_ok( 'Transposome::Cluster' ) || print "Bail out!\n";
     use_ok( 'Transposome::Annotation' ) || print "Bail out!\n";

@@ -24,6 +24,7 @@ BEGIN {
     system("cp convert ../bin; cp community ../bin; cp hierarchy ../bin;");
     system("make clean 2>&1 > /dev/null");
     chdir("..");
+    system("chmod +x bin/transposome");
 }
 
 WriteMakefile(
@@ -48,7 +49,6 @@ WriteMakefile(
 	'Try::Tiny'                  => 0.12,
 	'IPC::System::Simple'        => 1.21,
 	'DB_File'                    => 1.826,
-	'DBM_Deep'                   => 2.0008,
 	'Module::Path'               => 0.09,
 	'Path::Class'                => 0.32,
 	'JSON'                       => 2.59,

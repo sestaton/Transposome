@@ -1,10 +1,10 @@
 Changes
-README
+READMD.md
 lib/Transposome.pm
 lib/Transposome/Annotation.pm
 lib/Transposome/Cluster.pm
 lib/Transposome/PairFinder.pm
-lib/Transposome/SeqStore.pm
+lib/Transposome/SeqUtil.pm
 lib/Transposome/Role/Util.pm
 lib/Transposome/Role/File.pm
 lib/Transposome/Role/Types.pm

@@ -433,7 +433,7 @@ sub merge_clusters {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		}
 		else {
-		    warn "[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.";
+		    warn "[WARNING]: $non_paired_read not found. This indicates something went wrong processing the input. Please check your input data.";
 		}
 	    }
 	    close $clsout;
