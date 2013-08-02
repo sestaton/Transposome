@@ -10,7 +10,7 @@ with 'MooseX::Getopt',
 
 =head1 NAME
 
-Transposome - Investigate the repeat strucuture of a genome through sequence reads.
+Transposome - Investigate the repeat strucuture of a genome through unassembled sequence reads.
 
 =head1 VERSION
 
