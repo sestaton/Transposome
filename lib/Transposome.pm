@@ -24,7 +24,7 @@ our $VERSION = '0.01';
 
     use Transposome;
 
-    my $trans_obj = Transposome->new_with_options();
+    my $trans_obj = Transposome->new( config => 'transposome.yml' );
     ...
 
 =cut 
@@ -43,8 +43,6 @@ has 'configuration' => (
     default => sub { YAML::LoadFile shift->config }
     );
 
-=head1 SUBROUTINES/METHODS
-
 =cut 
 
 =head1 AUTHOR
@@ -53,42 +51,16 @@ S. Evan Staton, C<< <statonse at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-transposome at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Transposome>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Transposome
-
-You can also look for information at:
-
-github.io.transposome.com
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Transposome>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Transposome>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Transposome>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Transposome/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
@@ -122,5 +94,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-#make immutable
 __PACKAGE__->meta->make_immutable;

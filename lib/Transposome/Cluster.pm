@@ -403,7 +403,7 @@ sub merge_clusters {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
 		    }
 		    else {
-			warn "[WARNING]: $read not found. Something went wrong. Please check your input data.";
+			warn "[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.";
 		    }
 		}
 	    }
@@ -433,7 +433,7 @@ sub merge_clusters {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		}
 		else {
-		    warn "[WARNING]: $non_paired_read not found. Something went wrong. Please check your input data.";
+		    warn "[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.";
 		}
 	    }
 	    close $clsout;
@@ -451,40 +451,16 @@ S. Evan Staton, C<< <statonse at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-transposome at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Transposome>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Transposome::Cluster
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Transposome>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Transposome>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Transposome>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Transposome/>
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
