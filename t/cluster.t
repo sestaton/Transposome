@@ -11,7 +11,7 @@ use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 use Transposome::Cluster;
-use Transposome::SeqStore;
+use Transposome::SeqUtil;
 
 use Test::More tests => 49;
 
@@ -68,7 +68,7 @@ my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 diag("\nIndexing sequences, this will take a few seconds...\n");
-my $memstore = Transposome::SeqStore->new( file => $infile, in_memory => 1 );
+my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
 
 diag("\nTrying to merge clusters...\n");

@@ -12,7 +12,7 @@ use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 use Transposome::Cluster;
-use Transposome::SeqStore;
+use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 use Test::More tests => 12;
@@ -53,7 +53,7 @@ ok( defined($cluster_file), 'Can successfully make communities following cluster
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
-my $memstore = Transposome::SeqStore->new( file => $infile, in_memory => 1 );
+my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
 ok( $seqct == 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
