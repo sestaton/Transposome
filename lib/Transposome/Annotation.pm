@@ -32,7 +32,7 @@ our $VERSION = '0.01';
     my $seqct = 'total_seqs_in_analysis';  # Integer
     my $cls_tot = 'total_reads_clustered'; # Integer
 
-    my $annotation = Transposome::Annotation->new( database  => 'repeat_blastdb',
+    my $annotation = Transposome::Annotation->new( database  => 'repeat_db.fas',
                                                    rb_json   => 'repeats.json',
                                                    dir       => 'outdir',
                                                    file      => 'report.txt' );
@@ -74,7 +74,7 @@ has 'report' => (
       coerce   => 1,
     );
     
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 annotate_clusters
 
@@ -135,8 +135,7 @@ sub annotate_clusters {
 
 
     if (scalar @clus_fas_files < 1) {
-        say "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n";
-        exit(1);
+        warn "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n" and exit;
     }
 
     ## set path to output dir
@@ -318,13 +317,14 @@ sub _make_blastdb {
 
     my $exit_value;
     try {
-	$exit_value = system(EXIT_ANY,"makeblastdb -in $db_file -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	$exit_value = system([0..5],"makeblastdb -in $db_file -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-	say "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
-	say "[ERROR]: Here is the exception: $_\nCheck your blast installation. Exiting.\n";
-	exit(1);
-    }
+	warn "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
+	warn "[ERROR]: Here is the exception: $_\nCheck your blast installation. Exiting.\n";
+	exit;
+    };
+
     return $db_path;
 }
 
@@ -552,41 +552,16 @@ S. Evan Staton, C<< <statonse at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-transposome at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Transposome>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Transposome::Annotation
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Transposome>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Transposome>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Transposome>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Transposome/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
@@ -620,5 +595,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
-#1; # End of Transposome::Annotation
 __PACKAGE__->meta->make_immutable;
