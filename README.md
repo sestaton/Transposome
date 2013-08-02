@@ -66,18 +66,11 @@ The `transposome` program will also print a diagnostic help message when execute
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Transposome
+    Transposome wiki
+        https://github.com/sestaton/Transposome/wiki
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Transposome
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Transposome
-
-    Search CPAN
-        http://search.cpan.org/dist/Transposome/
-
+    Transposome issue tracker
+        https://github.com/sestaton/Transposome/issues
 
 **LICENSE AND COPYRIGHT**
 
