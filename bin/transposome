@@ -6,7 +6,7 @@ use warnings;
 use Transposome;
 use Transposome::PairFinder;
 use Transposome::Cluster;
-use Transposome::SeqStore;
+use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 =head1 NAME
@@ -56,7 +56,7 @@ my $cluster = Transposome::Cluster->new( file            => $int_file,
 my $comm = $cluster->louvain_method;
 my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{report_file});
-my $memstore = Transposome::SeqStore->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
+my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
 my ($seqs, $seqct) = $memstore->store_seq;
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $config->{report_file}, $uf);
