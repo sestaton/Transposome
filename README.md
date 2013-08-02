@@ -26,7 +26,7 @@ in the Transposome distribution, specifying the location of data files and param
 
 Then, simply run the `transposome` program, specifying your configuration file:
 
-    transposome --config transposome.yml
+    transposome --config transposome_config.yml
 
 Note: The name of the configuration file does not matter, this is just an example. Though, the format is important.
 
