@@ -28,7 +28,7 @@ Then, simply run the `transposome` program, specifying your configuration file:
 
     transposome --config transposome_config.yml
 
-Note: The name of the configuration file does not matter, this is just an example. Though, the format is important.
+The name of the configuration file does not matter, this is just an example. Though, the format is important. See the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) wiki page for more details.
 
 **ADVANCED USAGE**
 
