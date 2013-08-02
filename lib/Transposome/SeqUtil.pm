@@ -1,4 +1,4 @@
-package Transposome::SeqStore;
+package Transposome::SeqUtil;
 
 use 5.012;
 use Moose;
@@ -13,7 +13,7 @@ with 'Transposome::Role::File',
 
 =head1 NAME
 
-Transposome::SeqStore - Store sequences on disk or in memory.
+Transposome::SeqUtil - Utilities for handling Fasta/q sequence files.
 
 =head1 VERSION
 
@@ -25,11 +25,26 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use Transposome::SeqStore;
+For storing all sequences:
 
-    my $seq_store = Transposome::SeqStore->new( file  => 'myseqs.fas',
-                                                in_memory => 1,
+    use Transposome::SeqUtil;
+
+    my $sequtil = Transposome::SeqUtil->new( file     => 'myseqs.fas',
+                                               in_memory => 1,
                                                );
+    my ($seqs, $seqct) = $sequtil->store_seq;
+
+    ...
+
+For storing a sample of a sequence file:
+
+use Transposome::SeqUtil;
+
+    my $sequtil = Transposome::SeqUtil->new( file        => 'myseqs.fas',
+                                             sample_size => 500_000,
+                                               );
+
+    my ($seqs, $seqct) = $sequtil->sample_seq;
 
 =cut
 
@@ -41,23 +56,31 @@ has 'in_memory' => (
     default    => 0,
     );
 
+has 'sample' => (
+    is        => 'ro',
+    isa       => 'PosInt',
+    predicate => 'has_sample',
+    lazy      => 1,
+    );
+
 =head1 METHODS
 
 =head2 store_seq
 
- Title   : store_seqs
+ Title   : store_seq
  Usage   : my ($seqs, $seq_ct) = $seq_store->store_seq;
           
  Function: Take a Fasta or Fastq file and return a reference
            to a data structure containing the sequences, along
            with the total sequence count.
 
-                                                               Data_type
- Returns : A hash containing the id => sequence mappings       HashRef
-           for each Fasta/q record
+                                                              Data_type
+Returns : In order, 1) a hash containing the id, sequence     HashRef 
+                        mappings for each Fasta/q record
+                     2) the sequence count                     Scalar
 
- Args    : A sequence file and the option of specifying        Scalar
-           the analysis to be done in memory
+ Args    : A sequence file                                     Scalar
+
 
 =cut
 
@@ -86,6 +109,60 @@ sub store_seq {
     }
 }
 
+=head2 sample_seq
+
+ Title   : sample_seq
+ Usage   : my ($seqs, $seq_ct) = $sequtil->sample_seq;
+          
+ Function: Take a Fasta or Fastq file and return a reference
+           to a data structure containing the sequences, along
+           with the total sequence count.
+
+                                                               Data_type
+ Returns : In order, 1) a hash containing the id, sequence     HashRef 
+                        mappings for each Fasta/q record
+                     2) the sequence count                     Scalar
+
+ Args    : A sequence file                                     Scalar
+
+=cut
+
+sub sample_seq {
+    my ($self) = @_;
+
+    my $filename = $self->file->relative;
+    my $k = $self->sample_size;
+    my $n      = 0;
+    my @sample;
+    my $seqhash;
+
+    my $seqio_fa = Transposome::SeqIO->new( file => $filename );
+    my $seqfh = $seqio_fa->get_fh;
+
+    srand();
+    while (my $seq = $seqio_fa->next_seq($seqfh)) {
+	$n++;
+	push @sample, {$seq->get_id => $seq->get_seq};
+	last if $n == $k;
+    }
+
+    while (my $seq = $seqio_fa->next_seq($seqfh)) {
+	my $i = int rand $n++;
+	if ($i < scalar @sample) {
+	    $sample[$i] = {$seq->get_id => $seq->get_seq};
+	}
+    }
+
+    for my $seq (@sample) {
+	for my $h (keys %$seq) {
+	    $self->inc_counter if $seq->{$h};
+	    $seqhash{$h} = $seq->{$h};
+	}
+    }
+    
+    return (\%seqhash, $self->counter);
+}
+
 =head1 AUTHOR
 
 S. Evan Staton, C<< <statonse at gmail.com> >>
@@ -101,7 +178,7 @@ reached at the email address listed above to resolve any questions.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Transposome::SeqStore
+    perldoc Transposome::SeqUtil
 
 
 =head1 LICENSE AND COPYRIGHT
