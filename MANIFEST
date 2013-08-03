@@ -14,6 +14,7 @@ MANIFEST.SKIP
 t/seqio.t
 t/cluster.t
 t/seqstore.t
+t/seqsample.t
 t/utils_blast.t
 t/utils_config.t
 t/utils_seq.t
