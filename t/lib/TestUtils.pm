@@ -2,33 +2,36 @@ package TestUtils;
 
 use 5.012;
 use Moose;
+use MooseX::Types::Path::Class;
 use File::Temp;
 use Cwd;
 use namespace::autoclean;
-use Data::Dump qw(dd);
+#use Data::Dump qw(dd);
 
-has destroy => (
+with 'TestUtils::TestConfig';
+
+has 'destroy' => (
     traits    => ['Bool'],
     is        => 'rw',
     isa       => 'Bool',
     default   => 0,
     );
 
-has build_proper => (
+has 'build_proper' => (
     traits    => ['Bool'],
     is        => 'rw',
     isa       => 'Bool',
     default   => 0,
     );
 
-has build_problematic => (
+has 'build_problematic' => (
     traits    => ['Bool'],
     is        => 'ro',
     isa       => 'Bool',
     default   => 0,
     );
 
-has build_all => (
+has 'build_all' => (
     traits    => ['Bool'],
     is        => 'ro',
     isa       => 'Bool',
