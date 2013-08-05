@@ -41,6 +41,13 @@ has 'dir' => (
       coerce   => 1,
     );
 
+has 'report' => (
+      is       => 'ro',
+      isa      => 'Path::Class::File',
+      required => 0,
+      coerce   => 1,
+    );
+
 =head1 METHODS
 
 =head2 get_fh
