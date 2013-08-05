@@ -1,7 +1,12 @@
+blast_input:
+  - sequence_file:      t_reads.fas
+  - description_num:    100
+  - alignment_num:      100
+  - cpu:                1
+  - thread:             1
+  - output_directory:   transposome_results_out
 clustering_input:
-  - sequence_file:     t_reads.fas
   - blast_file:        transposome_mgblast_iS2b.bln
-  - output_directory:  test_cli_out
   - in_memory:         1
 clustering_options:
   - percent_identity:  90
