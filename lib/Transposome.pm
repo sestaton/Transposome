@@ -43,8 +43,6 @@ has 'configuration' => (
     default => sub { YAML::LoadFile shift->config }
     );
 
-=cut 
-
 =head1 AUTHOR
 
 S. Evan Staton, C<< <statonse at gmail.com> >>
