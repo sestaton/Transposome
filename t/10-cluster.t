@@ -24,8 +24,8 @@ my ($blfl) = @$blast;
 
 my $blast_res = Transposome::PairFinder->new( file              => $blfl,  
 					      dir               => $outdir,                                                                              
-					      in_memory         => 1,                                                                                              
-					      percent_identity  => 90.0,                                                                                           
+					      in_memory         => 1,
+					      percent_identity  => 90.0,
 					      fraction_coverage => 0.55 );
 
 
@@ -38,7 +38,7 @@ my $cluster = Transposome::Cluster->new( file            => $int_file,
 
 ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
 
-diag("\nTrying Louvain clustering now, this may take a couple of seconds...\n");
+diag("Trying Louvain clustering now, this may take a couple of seconds...");
 my $comm = $cluster->louvain_method;
 ok( defined($comm), 'Can successfully perform clustering' );
 
@@ -67,11 +67,11 @@ ok( defined($cluster_file), 'Can successfully make communities following cluster
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $report);
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
-diag("\nIndexing sequences, this will take a few seconds...\n");
+diag("Indexing sequences, this will take a few seconds...");
 my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
 
-diag("\nTrying to merge clusters...\n");
+diag("Trying to merge clusters...");
 
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $report, $uf);

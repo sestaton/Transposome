@@ -3,7 +3,7 @@
 use 5.012;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 6;
+use Test::More qw(no_plan);
 
 use lib qw(../blib/lib);
 # Ensure a recent version of Test::Pod::Coverage
@@ -26,5 +26,6 @@ pod_coverage_ok("Transposome::Cluster", $trustme);
 pod_coverage_ok("Transposome::PairFinder");
 pod_coverage_ok("Transposome::SeqIO");
 pod_coverage_ok("Transposome::SeqUtil");
+pod_coverage_ok("Transposome::Run::Blast");
 
 done_testing();

@@ -64,7 +64,7 @@ my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
-diag("\nStarting cluster annotation...\n");
+diag("Starting cluster annotation...");
 
 my $annotation = Transposome::Annotation->new( database  => $db_fas,
 					       rb_json   => $json,
