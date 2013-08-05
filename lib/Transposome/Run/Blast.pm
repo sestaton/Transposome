@@ -1,4 +1,4 @@
-package Blast;
+package Transposome::Run::Blast;
 
 use 5.012;
 use Moose;
@@ -9,11 +9,13 @@ use Time::HiRes qw(gettimeofday);
 use File::Temp;
 use File::Path qw(make_path);
 use Path::Class::File;
+use Parallel::ForkManager;
 use Try::Tiny;
 use SeqIO;
+use Cwd;
 
-with 'File', 
-     'Types';
+with 'Transposome::Role::File', 
+     'Transposome::Role::Types';
 
 =head1 SYNOPSIS
 
@@ -23,7 +25,10 @@ with 'File',
                                               dir       => 'transposome_results_out',
                                               threads   => 1,
                                               cpus      => 1,
-                                              seq_num   => 50_000 );
+                                              seq_num   => 50_000,
+                                              report    => 'blastpm.out' );
+
+   my $blast_file = $blast->run_allvall_blast;
 
 =cut
 
@@ -74,16 +79,109 @@ has 'percent_identity' => (
     default   => 85.0,
     );
 
+has 'min_overlap' => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_min_overlap',
+    lazy      => 1,
+    default   => 50,
+    );
+
+has 'max_mismatch' => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_max_mismatch',
+    lazy      => 1,
+    default   => 30,
+    );
 
 =head1 METHODS
 
 =cut
 
-=head2 make_mgblastdb
+=head2 run_allvall_blast
 
- Title : make_mgblastdb
+ Title : run_allvall_blast
  
- Usage   : my $mgblastdb = $blast->make_mgblastdb;
+ Usage   : my $blast_file = $blast->run_allvall_blast;
+           
+ Function: Runs all vs. all blast comparison of sequence
+           data using mgblast. The output of this blast
+           is the input to the clustering methods.
+           
+                                                          Data_type
+ Returns : File name of the blast_results                 Scalar
+
+ Args    : None. This is a class method called
+           on a Transposome::Run::Blast object.
+
+=cut 
+
+sub run_allvall_blast {
+    my ($self) = @_;
+
+    my $t0 = gettimeofday();
+    my $file = $self->file->absolute;
+    my $cpu = $self->cpus;
+    my $thread = $self->threads;
+    my $numseqs = $self->seq_num;
+    my $outfile = $self->file->basename;
+    #$outfile =~ s/\.fa.*//;
+    $outfile .= "_allvall_blast.bln";
+    my $dir   = $self->dir->absolute; 
+    make_path($dir, {verbose => 0, mode => 0771,});
+    my $out_path = Path::Class::File->new($dir, $outfile);
+    my $report_path = Path::Class::File->new($dir, $self->report);
+
+    my ($seq_files, $seqct) = $self->_split_reads($numseqs);
+    
+    my $database = $self->_make_mgblastdb;
+    my $files_ct = @$seq_files;
+    my %blasts;
+
+    open my $out, '>>', $out_path or die "\n[ERROR]: Could not open file: $out_path\n";
+    open my $rep, '>', $report_path or die "\n[ERROR]: Could not open file: $report_path\n"; 
+
+    my $pm = Parallel::ForkManager->new($thread);
+    $pm->run_on_finish( sub { my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_ref) = @_;
+			      for my $bl (sort keys %$data_ref) {
+				  open my $report, '<', $bl or die "\n[ERROR]: Could not open file: $bl\n";
+				  print $out $_ while <$report>;
+				  close $report;
+				  unlink $bl;
+			      }
+			      my $t1 = gettimeofday();
+			      my $elapsed = $t1 - $t0;
+			      my $time = sprintf("%.2f",$elapsed/60);
+			      say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
+			} );
+
+    for my $seqs (@$seq_files) {
+	$pm->start($seqs) and next;
+	my $blast_out = $self->_run_blast($seqs, $database, $cpu);
+	$blasts{$blast_out} = 1;
+    
+	unlink $seqs;
+	$pm->finish(0, \%blasts);
+    }
+
+    $pm->wait_all_children;
+    close $out;
+
+    my $t2 = gettimeofday();
+    my $total_elapsed = $t2 - $t0;
+    my $final_time = sprintf("%.2f",$total_elapsed/60);
+
+    say $rep "\n========> Finished running mgblast on $seqct sequences in $final_time minutes";
+    close $rep;
+    return $outfile;
+}
+
+=head2 _make_mgblastdb
+
+ Title : _make_mgblastdb
+ 
+ Usage   : This is private method, don't use it directly.
            
  Function: Creates a BLAST database in the Legacy BLAST format
            for doing an all vs. all BLAST with the program mgblast.
@@ -96,16 +194,13 @@ has 'percent_identity' => (
 
 =cut 
 
-sub make_mgblastdb {
+sub _make_mgblastdb {
     my ($self) = @_;
 
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
     my $db    = $fname."_allvall_mgblastdb";
-    unless (-d $self->dir) {
-	make_path($self->dir, {verbose => 0, mode => 0771,});
-    }
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
@@ -122,132 +217,108 @@ sub make_mgblastdb {
     return $db_path;
 }
 
-#sub process_all_blasts {
-#    my ($self) = @_;
+=head2 _run_blast
 
-#    my $t0 = gettimeofday();
-#    #$cpu = defined($cpu) ? $cpu : '1';          # we are going to set defaults this way
-#    #$thread = defined($thread) ? $thread : '1'; # to work with Perl versions released prior to 5.10
+ Title : _run_blast
+ 
+ Usage   : This is private method, don't use it directly.
+           
+ Function: Runs the program mgblast on each subset of sequences
+           based on the conditions set when creating the object.
 
-#    my $file = $self->file->absolute;
-#    my $cpu = $self->cpus;
-#    my $thread = $self->threads;
-#    my $numseqs = $self->seq_num;
-#    my $outfile = $self->file->relative;
-#    $outfile .= "_allvall_blast.bln";
-#    my ($seq_files, $seqct) = $self->_split_reads($file, $outfile, $numseqs);
+                                                                   Return_type
+ Returns : In order, 1) the blast output file                      Scalar
 
-#    open my $out, '>>', $outfile or die "\n[ERROR]: Could not open file: $outfile\n"; 
+                                                                   Return_type
+ Args    : In order, 1) the file to run mgblast on                 Scalar
+                     2) the database name                          Scalar
+                     3) the number of CPUs for each mgblast job    Scalar
 
-#    my $pm = Parallel::ForkManager->new($thread);
-#    $pm->run_on_finish( sub { my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_ref) = @_;
-#			      for my $bl (sort keys %$data_ref) {
-#				  open my $report, '<', $bl or die "\n[ERROR]: Could not open file: $bl\n";
-#				  print $out $_ while <$report>;
-#				  close $report;
-#				  unlink $bl;
-#			      }
-#			      my $t1 = gettimeofday();
-#			      my $elapsed = $t1 - $t0;
-#			      my $time = sprintf("%.2f",$elapsed/60);
-#			      say basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
-#			} );
+=cut 
 
-#    for my $seqs (@$seq_files) {
-#	$pm->start($seqs) and next;
-#	my $blast_out = run_blast($seqs,$database,$cpu,$blast_program,$blast_format,$num_alignments,$num_descriptions,$evalue);
-#	$blasts{$blast_out} = 1;
-#    
-#	unlink($seqs);
-#	$pm->finish(0, \%blasts);
-#    }
+sub _run_blast {
+    my ($self, $subseq_file, $database, $cpu) = @_;
 
-#    $pm->wait_all_children;
+    my ($dbfile,$dbdir,$dbext) = fileparse($database, qr/\.[^.]*/);
+    my ($subfile,$subdir,$subext) = fileparse($subseq_file, qr/\.[^.]*/);
+    my $suffix = ".bln";
+    my $subseq_out = $subfile."_".$dbfile.$suffix;
+    my $min_overlap = $self->min_overlap;
+    my $max_mismatch = $self->max_mismatch;
+    my $pid = $self->percent_identity;
+    my $desc_num = $self->desc_num;
+    my $aln_num = $self->aln_num;
 
-#    close($out);
+    my $exit_value;
+    my $blast_cmd = "mgblast ".            # program
+                    "-i $subseq_file ".    # query
+                    "-d $database ".       # db
+                    "-F \"m D\" ".         # filter with dust
+                    "-D 4 ".               # tab-delimited ouput
+                    "-p $pid ".            # min percent identity of match 
+                    "-W18 ".               # word size
+                    "-UT ".                # use lowercase filtering
+                    "-X40 ".               # Xdrop for gapped alignment                             
+                    "-KT ".                # database slice
+                    "-JF ".                # whether to believe the defline
+                    "-v$desc_num ".        # number of descriptions to keep per query
+                    "-b$aln_num ".         # number of alignments to keep per query
+                    "-C$min_overlap ".     # minimum overlap for matches
+                    "-H $max_mismatch ".   # maximum mismatch allowed for matches
+                    "-o $subseq_out ".     # output file
+                    "-a $cpu ";            # number of cpus assigned 
 
-#    my $t2 = gettimeofday();
-#    my $total_elapsed = $t2 - $t0;
-#    my $final_time = sprintf("%.2f",$total_elapsed/60);
+    try {
+        $exit_value = system([0..5],$blast_cmd);
+    }
+    catch {
+        "\n[ERROR]: BLAST exited with exit value $exit_value. Here is the exception: $_\n";
+    };
 
-#    print "\n========> Finihsed running BLAST on $seqct sequences in $final_time minutes\n";
-#}
+    return $subseq_out;
+}
 
-#sub run_blast {
-#    my ($self, $subseq_file, $database, $cpu,,
-#        $num_alignments, $num_descriptions,
-#         $warn) = @_;
+=head2 _split_reads
 
-    ## use file routines from MooseX::Types::Path::Class
-#    my ($dbfile,$dbdir,$dbext) = fileparse($database, qr/\.[^.]*/);
-#    my ($subfile,$subdir,$subext) = fileparse($subseq_file, qr/\.[^.]*/);
+ Title : _split_reads
+ 
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Splits the input into smaller pieces so
+           that mgblast can be run concurrently on 
+           each subset.
+           
+                                                          Data_type
+ Returns : In order, 1) an array of the split file names  ArrayRef
+                     2) the total sequence count          Scalar
 
-#    my $suffix;
-#    if ($blast_format == 8) {
-#        $suffix = ".bln";
-#    }
-#    elsif ($blast_format == 7) {
-#        $suffix = ".blastxml";
-#    }
-#    elsif ($blast_format == 0) {
-#        $suffix = ".$blast_program";
-#    }
-#    my $subseq_out = $subfile."_".$dbfile.$suffix;
+                                                          Data_type
+ Args    : The number of sequences to go into each        Scalar
+           subset 
 
-#    my ($blast_cmd, $exit_value);
-#    my $blast_cmd = . "mgblast ".
-#                    "-i $subseq_file ".
-#                    "-d $database ".
-#                    "-F \"m D\" ".
-#                    "-D 4 ".
-#                    "-p 85 ".
-#                    "-W18 ".
-#                    "-UT ".
-#                    "-X40 ".
-#                    "-KT ".
-#                    "-JF ".
-#                    "-v90000000 ".
-#                    "-b90000000 ".
-#                    "-C50 ".
-#                    "-H 30 ".
-#                    "-o $subseq_out ".
-#                    "-a $cpu ";
-
-#    try {
-#        $exit_value = system([0..5],$blast_cmd);
-#    }
-#    catch {
-#        "\nERROR: BLAST exited with exit value $exit_value. Here is the exception: $_\n";
-#    };
-
-#    return $subseq_out;
-#}
+=cut
 
 sub _split_reads {
-    my ($self, $infile, $outfile, $numseqs) = @_;
+    my ($self, $numseqs) = @_;
 
-    my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
-    
+    my ($iname, $ipath, $isuffix) = fileparse($self->file->absolute, qr/\.[^.]*/);
+    my $dir = $self->dir->absolute;
+
     my $out;
     my $count = 0;
     my $fcount = 1;
     my @split_files;
     $iname =~ s/\.fa.*//;     # clean up file name like seqs.fasta.1
-    
-    my $cwd = getcwd();
 
     my $tmpiname = $iname."_".$fcount."_XXXX";
     my $fname = File::Temp->new( TEMPLATE => $tmpiname,
-                                 DIR      => $cwd,
+                                 DIR      => $dir,
                                  SUFFIX   => ".fasta",
                                  UNLINK   => 0);
 
-    open $out, '>', $fname or die "\nERROR: Could not open file: $fname\n";
+    open $out, '>', $fname or die "\n[ERROR]: Could not open file: $fname\n";
     
     push @split_files, $fname;
-    open my $in, '<', $infile or die "\nERROR: Could not open file: $infile\n";
-    my @aux = undef;
-
     if (-e $self->file) {
         my $filename = $self->file->basename;
         my $seqio = SeqIO->new( file => $filename );
@@ -257,24 +328,71 @@ sub _split_reads {
 	    if ($count % $numseqs == 0 && $count > 0) {
 		$fcount++;
 		$tmpiname = $iname."_".$fcount."_XXXX";
-		my $fname = File::Temp->new( TEMPLATE => $tmpiname,
-					     DIR      => $cwd,
-					     SUFFIX   => ".fasta",
-					     UNLINK   => 0);
+		$fname = File::Temp->new( TEMPLATE => $tmpiname,
+					  DIR      => $dir,
+					  SUFFIX   => ".fasta",
+					  UNLINK   => 0);
 		
-		open $out, '>', $fname or die "\nERROR: Could not open file: $fname\n";
+		open $out, '>', $fname or die "\n[ERROR]: Could not open file: $fname\n";
 		
 		push @split_files, $fname;
 	    }
-	    #say $out join "\n", ">".$name, $seq;
-	    say $out join "\n", ">".$seq->id, $seq->seq;
+
+	    say $out join "\n", ">".$seq->get_id, $seq->get_seq;
 	    $count++;
 	}
     }
-    close $in; close $out;
+    close $out;
     return (\@split_files, $count);
 }
 
-__PACKAGE__->meta->make_immutable;
+=head1 AUTHOR
 
-1;
+S. Evan Staton, C<< <statonse at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Transposome::Run::Blast
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 S. Evan Staton.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut
+
+__PACKAGE__->meta->make_immutable;
