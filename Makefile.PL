@@ -53,6 +53,7 @@ WriteMakefile(
 	'Path::Class'                => 0.32,
 	'JSON'                       => 2.59,
 	'YAML'                       => 0.84,
+	'Parallel::ForkManager'      => 0.7.9,
 	'DBM::Deep'                  => 0,
 	'File::Path'                 => 0,
 	'Graph::UnionFind'           => 0,
