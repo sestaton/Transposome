@@ -58,11 +58,16 @@ sub _build_config_data {
     my $test = TestUtils->new( build_proper => 1, destroy => 0 );
     my $blast = $test->blast_constructor;
     my ($blfl) = @$blast;
-    
-    say $tmpyml "clustering_input:";
+
+    say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";
+    say $tmpyml "  - description_num:   100";
+    say $tmpyml "  - alignment_num:     100";
+    say $tmpyml "  - cpu:               1";
+    say $tmpyml "  - thread:            1";
+    say $tmpyml "  - output_directory:  test_transposome_cli_out";
+    say $tmpyml "clustering_input:";
     say $tmpyml "  - blast_file:        $blfl";
-    say $tmpyml "  - output_directory:  test_cli_out";
     say $tmpyml "  - in_memory:         1";
     say $tmpyml "clustering_options:";
     say $tmpyml "  - percent_identity:  90";
