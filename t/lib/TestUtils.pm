@@ -121,7 +121,7 @@ sub blast_constructor {
 sub _build_proper_fa_data {
     my $cwd = getcwd();
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
-                                 DIR      => $cwd,
+                                 DIR      => 't',
                                  SUFFIX   => ".fasta",
                                  UNLINK   => 0 );
 
@@ -140,7 +140,7 @@ sub _build_proper_fa_data {
 sub _build_proper_fq_data {
     my $cwd = getcwd();
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
-                                 DIR      => $cwd,
+                                 DIR      => 't',
                                  SUFFIX   => ".fastq",
                                  UNLINK   => 0 );
 
@@ -165,7 +165,7 @@ sub _build_proper_fq_data {
 sub _build_problematic_fa_data {
     my $cwd = getcwd();
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
-                                 DIR      => $cwd,
+                                 DIR      => 't',
                                  SUFFIX   => ".fasta",
                                  UNLINK   => 0 );
 
@@ -184,7 +184,7 @@ sub _build_problematic_fa_data {
 sub _build_problematic_fq_data {
     my $cwd = getcwd();
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
-                                 DIR      => $cwd,
+                                 DIR      => 't',
                                  SUFFIX   => ".fastq",
                                  UNLINK   => 0 );
 
@@ -209,7 +209,7 @@ sub _build_problematic_fq_data {
 sub _build_blast_data {
     my $cwd = getcwd();
     my $tmpbl = File::Temp->new( TEMPLATE => "transposome_mgblast_XXXX",
-                                 DIR      => $cwd,
+                                 DIR      => 't',
                                  SUFFIX   => ".bln",
                                  UNLINK   => 0 );
 
