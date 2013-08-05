@@ -11,7 +11,7 @@ use TestUtils;
 
 use Test::More tests => 498;
 
-my $outdir = 'pairfinder_t';
+my $outdir = 't/transposome_pairfinder_t';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 system("rm t/transposome_mgblast_*");
@@ -136,6 +136,6 @@ ok( $mem_idx_recct == $file_idx_recct, 'In-memory and on-file processing methods
 ok( $mem_int_recct == $file_int_recct, 'In-memory and on-file processing methods generated the integer mapping files' );
 ok( $mem_hs_recct == $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
 
-system("rm -rf t/$outdir t/$blfl");
+system("rm -rf $outdir t/$blfl");
 
 done_testing();
