@@ -1,5 +1,5 @@
 Changes
-READMD.pod
+README.pod
 lib/Transposome.pm
 lib/Transposome/Annotation.pm
 lib/Transposome/Cluster.pm
