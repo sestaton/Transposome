@@ -46,7 +46,7 @@ sub _build_config_data {
     my ($self) = @_;
     my $cwd = getcwd();
     my $tmpyml = File::Temp->new( TEMPLATE => "transposome_config_XXXX",
-                                  DIR      => $cwd,
+                                  DIR      => 't',
                                   SUFFIX   => ".yml",
                                   UNLINK   => 0 );
 
