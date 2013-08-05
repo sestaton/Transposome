@@ -22,8 +22,8 @@ my ($blfl) = @$blast;
 ## test in-memory processing
 my $mem_test = Transposome::PairFinder->new( file              => $blfl,    
 					     dir               => $outdir,                                                                              
-					     in_memory         => 1,                                                                                              
-					     percent_identity  => 90.0,                                                                                           
+					     in_memory         => 1,                 
+					     percent_identity  => 90.0, 
 					     fraction_coverage => 0.55 );
 
 ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
