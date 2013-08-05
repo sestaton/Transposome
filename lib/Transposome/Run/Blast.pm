@@ -11,7 +11,7 @@ use File::Path qw(make_path);
 use Path::Class::File;
 use Parallel::ForkManager;
 use Try::Tiny;
-use SeqIO;
+use Transposome::SeqIO;
 use Cwd;
 
 with 'Transposome::Role::File', 
@@ -321,7 +321,7 @@ sub _split_reads {
     push @split_files, $fname;
     if (-e $self->file) {
         my $filename = $self->file->basename;
-        my $seqio = SeqIO->new( file => $filename );
+        my $seqio = Transposome::SeqIO->new( file => $filename );
         my $fh = $seqio->get_fh;
         while (my $seq = $seqio->next_seq($fh)) {
 
