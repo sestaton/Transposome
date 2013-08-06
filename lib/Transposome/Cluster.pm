@@ -8,10 +8,11 @@ use File::Spec;
 use File::Basename;
 use Try::Tiny;
 use IPC::System::Simple qw(system capture EXIT_ANY);
-use Module::Path qw(module_path);
+#use Module::Path qw(module_path);
 use File::Path qw(make_path);
 use Path::Class::File;
 use POSIX qw(strftime);
+use Config;
 
 with 'Transposome::Role::File', 
      'Transposome::Role::Util';
@@ -41,13 +42,21 @@ has 'merge_threshold' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
-    );
+);
 
 has 'cluster_size' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
-    );
+);
+
+has 'bin_dir' => (
+    is       => 'rw',
+    isa      => 'Path::Class::Dir',
+    default  => sub {
+	return Path::Class::Dir->new($Config{sitebin})
+    },
+);
 
 =head1 METHODS
 
@@ -72,11 +81,13 @@ sub louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-    my $path = module_path("Transposome::Cluster");
-    my $file = Path::Class::File->new($path);
-    my $pdir = $file->dir;
-    my $bdir = Path::Class::Dir->new("$pdir/../../bin");
-    my $realbin = $bdir->resolve;
+    #my $path = module_path("Transposome::Cluster");
+    #my $file = Path::Class::File->new($path);
+    #my $pdir = $file->dir;
+    #my $bdir = Path::Class::Dir->new("$pdir/../../bin");
+    #my $bdir = Path::Class::Dir->new($Config{sitebin});
+    #my $realbin = $bdir->resolve;
+    my $realbin = $self->bin_dir->resolve;
     my $cls_bin = $iname.".bin";                    # Community "bin" format
     my $cls_tree = $iname.".tree";                  # hierarchical tree of clustering results
     my $cls_tree_weights = $cls_tree.".weights";    # bit score, the weights applied to clustering

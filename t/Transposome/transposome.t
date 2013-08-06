@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
+use Module::Path qw(module_path);
 use lib qw(../../blib/lib t/lib);
 use Transposome;
 use Transposome::PairFinder;
@@ -70,10 +71,17 @@ ok( defined($idx_file), 'Can parse all vs. all blast correctly' );
 ok( defined($int_file), 'Can parse all vs. all blast correctly' );
 ok( defined($hs_file),  'Can parse all vs. all blast correctly' );
 
+my $path = module_path("Transposome::Cluster");
+my $file = Path::Class::File->new($path);
+my $pdir = $file->dir;
+my $bdir = Path::Class::Dir->new("$pdir/../../bin");
+my $realbin = $bdir->resolve;
+
 my $cluster = Transposome::Cluster->new( file            => $int_file,
 					 dir             => $config->{output_directory},
 					 merge_threshold => $config->{merge_threshold},
-					 cluster_size    => $config->{cluster_size} );
+					 cluster_size    => $config->{cluster_size},
+                                         bin_dir         => $realbin );
 
 my $comm = $cluster->louvain_method;
 ok( defined($comm), 'Can successfully perform clustering' );

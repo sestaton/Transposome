@@ -6,7 +6,7 @@ use warnings;
 use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
-use Data::Dump qw(dd);
+use Module::Path qw(module_path);
 use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
@@ -31,10 +31,17 @@ my $blast_res = Transposome::PairFinder->new( file              => $blfl,
 
 my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
+my $path = module_path("Transposome::Cluster");
+my $file = Path::Class::File->new($path);
+my $pdir = $file->dir;
+my $bdir = Path::Class::Dir->new("$pdir/../../bin");
+my $realbin = $bdir->resolve;
+
 my $cluster = Transposome::Cluster->new( file            => $int_file,
 					 dir             => $outdir,
 					 merge_threshold => 2,
-					 cluster_size    => 1);
+					 cluster_size    => 1,
+                                         bin_dir         => $realbin );
 
 ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
 
