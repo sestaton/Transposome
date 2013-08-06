@@ -8,6 +8,7 @@ use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
+use Transposome::Run::Blast;
 
 =head1 NAME
 
@@ -35,9 +36,21 @@ my $trans_obj = Transposome->new_with_options();
 my $config = $trans_obj->get_config;
 
 #
+# perform the all vs. all blast
+#
+my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
+                                          dir       => $config->{output_directory},
+                                          threads   => $config->{thread},
+                                          cpus      => $config->{cpu},
+                                          seq_num   => $config->{sequence_num},
+                                          report    => $config->{report_file} );
+
+my $blastdb = $blast->run_allvall_blast;
+
+#
 # parse mglblast results to find best scoring pairwise matches
 #
-my $blast_res = Transposome::PairFinder->new( file              => $config->{blast_file},  
+my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
 					      dir               => $config->{output_directory},
 					      in_memory         => $config->{in_memory},
 					      percent_identity  => $config->{percent_identity},
