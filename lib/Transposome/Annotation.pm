@@ -318,7 +318,7 @@ sub _make_blastdb {
 
     my $exit_value;
     try {
-	$exit_value = system([0..5],"makeblastdb -in $db_file -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	$exit_value = system([0..5],"makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
 	warn "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
