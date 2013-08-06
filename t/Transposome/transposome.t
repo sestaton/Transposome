@@ -12,7 +12,7 @@ use Transposome::Annotation;
 use Transposome::Run::Blast;
 use TestUtils;
 
-use Test::More tests => 34;
+use Test::More tests => 33;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas',
@@ -28,7 +28,6 @@ ok ( $trans_obj->get_config, 'Configuration data loaded from file correctly' );
 my $config = $trans_obj->get_config;
 
 ok( defined($config->{sequence_file}), 'Can set sequence data for configuration' );
-ok( defined($config->{blast_file}), 'Can set blast data for configuration' );
 ok( defined($config->{output_directory}), 'Can set ouput directory for configuration' );
 ok( defined($config->{in_memory}), 'Can set memory conditions for configuration' );
 ok( $config->{in_memory} == 1, 'Can correctly set memory conditions for analysis' );
@@ -112,5 +111,5 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $config->{report_file});
 
-system("rm -rf $config->{output_directory} $config->{report_file} $config->{blast_file} t_rep** $conf_file");
+system("rm -rf $config->{output_directory} $config->{report_file} t/transposome_mgblast* t_rep** $conf_file");
 
