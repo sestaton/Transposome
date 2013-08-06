@@ -126,7 +126,6 @@ sub get_config {
 
     my %config;
 
-
     $config{sequence_file}    = $self->configuration->{blast_input}->[0]->{sequence_file};
     $config{sequence_num}     = $self->configuration->{blast_input}->[1]->{sequence_num};
     $config{cpu}              = $self->configuration->{blast_input}->[2]->{cpu};
@@ -145,6 +144,18 @@ sub get_config {
     $config{repeat_json_file} = $self->configuration->{annotation_input}->[1]->{repeat_json_file};
 
     $config{report_file} = $self->configuration->{output}->[0]->{report_file};
+
+    #for my $file in (qw($config{sequence_file} $config{$output_directory} $config{repeat_database} $config{repeat_json_file})) {
+	#if ($file =~ /^~/) { 
+	    #$db =~ s/^~/$ENV{"HOME"}/; 
+	#}
+    #}
+    for (my ($k, $v) = each %config) {
+	if ($k =~ /^~/) { 
+	    $k =~ s/^~/$ENV{"HOME"}/; 
+	    $config{$k} = $v;
+	}
+    }
 
     return \%config;
 }
