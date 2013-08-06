@@ -135,12 +135,10 @@ sub get_config {
     $config{thread}           = $self->configuration->{blast_input}->[5]->{thread};
     $config{output_directory} = $self->configuration->{blast_input}->[6]->{output_directory};
 
-    $config{blast_file}       = $self->configuration->{clustering_input}->[0]->{blast_file};
-    $config{in_memory}        = $self->configuration->{clustering_input}->[1]->{in_memory};
-
-    $config{percent_identity}  = $self->configuration->{clustering_options}->[0]->{percent_identity};
-    $config{fraction_coverage} = $self->configuration->{clustering_options}->[1]->{fraction_coverage};
-    $config{merge_threshold}   = $self->configuration->{clustering_options}->[2]->{merge_threshold};
+    $config{in_memory}         = $self->configuration->{clustering_options}->[0]->{in_memory};
+    $config{percent_identity}  = $self->configuration->{clustering_options}->[1]->{percent_identity};
+    $config{fraction_coverage} = $self->configuration->{clustering_options}->[2]->{fraction_coverage};
+    $config{merge_threshold}   = $self->configuration->{clustering_options}->[3]->{merge_threshold};
 
     $config{cluster_size} = $self->configuration->{annotation_options}->[0]->{cluster_size};
     $config{blast_evalue} = $self->configuration->{annotation_options}->[1]->{blast_evalue};
