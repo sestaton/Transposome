@@ -107,7 +107,7 @@ sub annotate_clusters {
     my ($self, $cls_with_merges_dir, $seqct, $cls_tot) = @_;
     
     my $report = $self->file->relative;
-    my $database = $self->database->relative;
+    my $database = $self->database->absolute;
     my $db_path = $self->_make_blastdb($database);
     my $out_dir = $self->dir->relative;
     my $json = $self->rb_json->relative;
@@ -309,10 +309,11 @@ sub _make_blastdb {
     my ($self, $db_fas) = @_;
 
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
-    my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
+    #my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
 
     my $db = $dbname."_blastdb";
-    my $db_path = File::Spec->rel2abs($dbpath.$db);
+    #my $db_path = File::Spec->rel2abs($dbpath.$db);
+    my $db_path = Path::Class::File->new($self->dir, $db);
     unlink $db_path if -e $db_path;
 
     my $exit_value;
