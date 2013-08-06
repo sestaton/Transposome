@@ -1,7 +1,5 @@
 blast_input:
   - sequence_file:      t_reads.fas
-  - description_num:    100
-  - alignment_num:      100
   - sequence_num:       10
   - cpu:                1
   - thread:             1
