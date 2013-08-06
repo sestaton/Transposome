@@ -61,8 +61,6 @@ sub _build_config_data {
 
     say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";
-    say $tmpyml "  - description_num:   100";
-    say $tmpyml "  - alignment_num:     100";
     say $tmpyml "  - sequence_num:      10";
     say $tmpyml "  - cpu:               1";
     say $tmpyml "  - thread:            1";
