@@ -94,7 +94,7 @@ my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($
                                                                                $read_pairs, $config->{report_file}, $uf);
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
-ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
+ok( $cls_tot == 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       rb_json   => $config->{repeat_json_file},
@@ -104,7 +104,7 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
 
-ok( $total_readct == 46, 'Correct number of reads annotated' );
+ok( $total_readct == 48, 'Correct number of reads annotated' );
 ok( $total_readct == $cls_tot, 'Same number of reads clustered and annotated' );
 ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (1)' );
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
@@ -112,6 +112,5 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $config->{report_file});
 
-END {
-    system("rm -rf $config->{output_directory} $config->{report_file} $config->{blast_file} t_rep** $conf_file");
-}
+system("rm -rf $config->{output_directory} $config->{report_file} $config->{blast_file} t_rep** $conf_file");
+
