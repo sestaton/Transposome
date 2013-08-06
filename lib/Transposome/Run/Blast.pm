@@ -242,7 +242,7 @@ sub _run_blast {
     my ($dbfile,$dbdir,$dbext) = fileparse($database, qr/\.[^.]*/);
     my ($subfile,$subdir,$subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
-    my $subseq_out = $subfile."_".$dbfile.$suffix;
+    my $subseq_out = Path::Class::File->new($dbdir, $subfile."_".$dbfile.$suffix);
     my $min_overlap = $self->min_overlap;
     my $max_mismatch = $self->max_mismatch;
     my $pid = $self->percent_identity;
