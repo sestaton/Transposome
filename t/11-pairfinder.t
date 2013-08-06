@@ -137,7 +137,7 @@ ok( $mem_int_recct == $file_int_recct, 'In-memory and on-file processing methods
 ok( $mem_hs_recct == $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
 
 END {
-    system("rm -rf $outdir t/$blfl");
+    system("rm -rf $outdir $blfl");
 }
 
 done_testing();
