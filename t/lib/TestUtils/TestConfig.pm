@@ -67,10 +67,8 @@ sub _build_config_data {
     say $tmpyml "  - cpu:               1";
     say $tmpyml "  - thread:            1";
     say $tmpyml "  - output_directory:  t/test_transposome_cli_out";
-    say $tmpyml "clustering_input:";
-    say $tmpyml "  - blast_file:        $blfl";
-    say $tmpyml "  - in_memory:         1";
     say $tmpyml "clustering_options:";
+    say $tmpyml "  - in_memory:         1";
     say $tmpyml "  - percent_identity:  90";
     say $tmpyml "  - fraction_coverage: 0.55";
     say $tmpyml "  - merge_threshold:   2";
