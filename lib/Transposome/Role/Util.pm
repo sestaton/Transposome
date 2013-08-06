@@ -128,12 +128,10 @@ sub get_config {
 
 
     $config{sequence_file}    = $self->configuration->{blast_input}->[0]->{sequence_file};
-    $config{description_num}  = $self->configuration->{blast_input}->[1]->{description_num};
-    $config{alignment_num}    = $self->configuration->{blast_input}->[2]->{alignment_num};
-    $config{sequence_num}     = $self->configuration->{blast_input}->[3]->{sequence_num};
-    $config{cpu}              = $self->configuration->{blast_input}->[4]->{cpu};
-    $config{thread}           = $self->configuration->{blast_input}->[5]->{thread};
-    $config{output_directory} = $self->configuration->{blast_input}->[6]->{output_directory};
+    $config{sequence_num}     = $self->configuration->{blast_input}->[1]->{sequence_num};
+    $config{cpu}              = $self->configuration->{blast_input}->[2]->{cpu};
+    $config{thread}           = $self->configuration->{blast_input}->[3]->{thread};
+    $config{output_directory} = $self->configuration->{blast_input}->[4]->{output_directory};
 
     $config{in_memory}         = $self->configuration->{clustering_options}->[0]->{in_memory};
     $config{percent_identity}  = $self->configuration->{clustering_options}->[1]->{percent_identity};
