@@ -126,7 +126,7 @@ sub run_allvall_blast {
     my $thread = $self->threads;
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
-    #$outfile =~ s/\.fa.*//;
+    $outfile =~ s/\.fa.*//;
     $outfile .= "_allvall_blast.bln";
     my $dir   = $self->dir->absolute; 
     make_path($dir, {verbose => 0, mode => 0771,});
