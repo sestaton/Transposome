@@ -320,7 +320,7 @@ sub _split_reads {
     
     push @split_files, $fname;
     if (-e $self->file) {
-        my $filename = $self->file->basename;
+        my $filename = $self->file->absolute;
         my $seqio = Transposome::SeqIO->new( file => $filename );
         my $fh = $seqio->get_fh;
         while (my $seq = $seqio->next_seq($fh)) {
