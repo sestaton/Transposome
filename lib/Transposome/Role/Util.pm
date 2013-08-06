@@ -145,18 +145,14 @@ sub get_config {
 
     $config{report_file} = $self->configuration->{output}->[0]->{report_file};
 
-    #for my $file in (qw($config{sequence_file} $config{$output_directory} $config{repeat_database} $config{repeat_json_file})) {
-	#if ($file =~ /^~/) { 
-	    #$db =~ s/^~/$ENV{"HOME"}/; 
-	#}
-    #}
-    for (my ($k, $v) = each %config) {
-	if ($k =~ /^~/) { 
-	    $k =~ s/^~/$ENV{"HOME"}/; 
+    for my $k (keys %config) {
+	my $v = $config{$k};
+	if ($v =~ /^~/) { 
+	    $v =~ s/^~/$ENV{"HOME"}/; 
 	    $config{$k} = $v;
 	}
     }
-
+    
     return \%config;
 }
 
