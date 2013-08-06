@@ -174,7 +174,7 @@ sub run_allvall_blast {
 
     say $rep "\n========> Finished running mgblast on $seqct sequences in $final_time minutes";
     close $rep;
-    return $outfile;
+    return $out_path;
 }
 
 =head2 _make_mgblastdb
