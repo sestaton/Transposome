@@ -9,7 +9,6 @@ use Test::More tests => 2;
 
 my $test = TestUtils->new( seq_file     => 'test_data/t_reads.fas',
 			   repeat_db    => 'test_data/t_db.fas',
-			   repeat_json  => 'test_data/t_repeats.json',
 			   destroy      => 1,
                            build_proper => 1 );
 
@@ -17,7 +16,6 @@ ok( $test->config_constructor, 'Can build all configuration data for testing' );
 
 my $test2 = TestUtils->new( seq_file     => 'test_data/t_reads.fas',
                             repeat_db    => 'test_data/t_db.fas',
-                            repeat_json  => 'test_data/t_repeats.json',
                             destroy      => 0,
                             build_proper => 1 );
 
