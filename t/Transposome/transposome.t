@@ -13,7 +13,7 @@ use Transposome::Annotation;
 use Transposome::Run::Blast;
 use TestUtils;
 
-use Test::More tests => 33;
+use Test::More tests => 32;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas',
