@@ -17,7 +17,6 @@ use Test::More tests => 33;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas',
-			   repeat_json  => 't/test_data/t_repeats.json',
 			   destroy      => 0,
 			   build_proper => 1 );
 
@@ -46,7 +45,6 @@ ok( $config->{cluster_size} == 1, 'Can correctly set cluster size for analysis' 
 ok( $config->{blast_evalue} == 10, 'Can correctly set blast evalue for analysis' );
 
 ok( defined($config->{repeat_database}), 'Can set repeat database for configuration' );
-ok( defined($config->{repeat_json_file}), 'Can set repeat json file for configuration' );
 
 ok( defined($config->{report_file}), 'Can generate report file for configuration' );
 
@@ -104,7 +102,6 @@ ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-
 ok( $cls_tot == 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
-					       rb_json   => $config->{repeat_json_file},
 					       dir       => $config->{output_directory},
 					       file      => $config->{report_file} );
 
