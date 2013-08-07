@@ -131,7 +131,7 @@ sub annotate_clusters {
 
 
     if (scalar @clus_fas_files < 1) {
-        warn "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n" and exit;
+        warn "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n" and exit(1);
     }
 
     ## set path to output dir
@@ -319,7 +319,7 @@ sub _make_blastdb {
     catch {
 	warn "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
 	warn "[ERROR]: Here is the exception: $_\nCheck your blast installation. Exiting.\n";
-	exit;
+	exit(1);
     };
 
     return $db_path;
@@ -408,8 +408,6 @@ sub _blast_to_annotation {
 
     my %top_hit_superfam;
     my %cluster_annot;
-    #my $repeats = $self->json_to_hash($json);
-    #my $repeats = %{ thaw($repeat_typemap) };
 
     for my $type (keys %$repeats) {
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
