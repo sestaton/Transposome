@@ -5,7 +5,6 @@ use Moose::Role;
 use namespace::autoclean;
 use utf8;
 use charnames qw(:full :short);
-use JSON;
 
 =head1 NAME
 
@@ -74,37 +73,6 @@ sub mk_vec {
     return split "\N{INVISIBLE SEPARATOR}", $key;
 }
 
-=head2 json_to_hash
-
- Title   : json_to_hash
- 
- Usage   : my $hash = json_to_hash($json);
-          
- Function: Creates an easy to parse data structure out of
-           a JSON file. Helpful for going back and forth
-           between Perl and some serialized data form.
-
-                                                    Data_type
- Returns : A Perl data structure comprised of       HashRef
-           all the JSON contents
-
- Args    : A valid JSON file                        Scalar
-
-=cut
-
-sub json_to_hash {
-    my ($self, $json) = @_;
-   
-    my $json_text;
-    local $/;
-    open my $in, '<', $json;
-    $json_text = <$in>;
-    close $in;
-
-    my $repeats = JSON->new->utf8->space_after->decode($json_text);
-    return $repeats;
-}
-
 =head2 get_config
 
  Title    : get_config
@@ -141,7 +109,6 @@ sub get_config {
     $config{blast_evalue} = $self->configuration->{annotation_options}->[1]->{blast_evalue};
 
     $config{repeat_database}   = $self->configuration->{annotation_input}->[0]->{repeat_database};
-    $config{repeat_json_file} = $self->configuration->{annotation_input}->[1]->{repeat_json_file};
 
     $config{report_file} = $self->configuration->{output}->[0]->{report_file};
 
