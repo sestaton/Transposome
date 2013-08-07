@@ -105,7 +105,7 @@ sub next_seq {
 	die unless (substr($hline, 0, 1) eq '>' || substr($hline, 0, 1) eq '@');
     }
     catch {
-	warn "\n[ERROR]: '$hline' does not look like Fasta or Fastq.\nHere is the exception: $_\n" and exit;
+	warn "\n[ERROR]: '$hline' does not look like Fasta or Fastq.\nHere is the exception: $_\n" and exit(1);
     };
     if (substr($hline, 0, 1) eq '>') {
 	my $name = _set_id_per_encoding($hline);
@@ -118,7 +118,7 @@ sub next_seq {
 	    die if !length($sline);
 	}
 	catch {
-	    warn "\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n" and exit;
+	    warn "\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n" and exit(1);
 	};
 	$seq .= $sline;
         $self->set_seq($seq);
@@ -136,7 +136,7 @@ sub next_seq {
 	    die if !length($sline);
 	}
 	catch {
-	    warn "\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n" and exit;
+	    warn "\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
 	};
 	$seq .= $sline;
         $self->set_seq($seq);
@@ -148,7 +148,7 @@ sub next_seq {
 	    die unless length($cline) && substr($cline, 0, 1) eq '+';
 	}
 	catch {
-	    warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit;
+	    warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
 	};
 
 	my $qline = <$fh>;
@@ -165,7 +165,7 @@ sub next_seq {
 	    die unless length($qual) >= length($seq);
 	}
 	catch {
-	    warn "\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n" and exit;
+	    warn "\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n" and exit(1);
 	};
 	$self->set_qual($qual);
 	return $self;
@@ -175,15 +175,16 @@ sub next_seq {
 =head2 _set_id_per_encoding
 
 Title   : _set_id_per_encoding
+
 Usage   : This is a private method, don't use it directly.
           
 Function: Try to determine format of sequence files
           and preserve paired-end information.
-                                                               Data_type
+                                                               Return_type
 Returns : A corrected sequence header if Illumina              Scalar
           Illumina 1.8+ is detected                           
         
-
+                                                               Arg_type
 Args    : A sequence header                                    Scalar
 
 =cut

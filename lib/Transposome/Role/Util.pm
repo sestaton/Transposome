@@ -41,10 +41,11 @@ our $VERSION = '0.01';
            Perl's charnames(), though these characters are available
            by default as of Perl v5.16.
 
-                                                   Data_type
- Returns : A string comprising the input           Scalar
+                                                           Return_type
+ Returns : A string comprising the input                   Scalar
 
- Args    : An array of strings                     Array
+                                                           Arg_type
+ Args    : An array of strings                             Array
 
 =cut
 
@@ -60,11 +61,12 @@ sub mk_key {
           
  Function: Creates an array out of a string.
                   
-                                                   Data_type                                  
- Returns : An array comprised of the elements      Array
+                                                           Return_type                                  
+ Returns : An array comprised of the elements              Array
            joined in the input string
 
- Args    : A string                                Scalar
+                                                           Arg_type
+ Args    : A string                                        Scalar
 
 =cut
 
@@ -81,7 +83,7 @@ sub mk_vec {
 
  Function : The parsed configuration for Transposome.
 
-                                                           Data_type
+                                                           Return_type
  Returns  : A hash containing the user-set configuration   HashRef
             for how transposome is to be executed
 

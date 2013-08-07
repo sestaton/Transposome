@@ -109,7 +109,7 @@ has 'max_mismatch' => (
            data using mgblast. The output of this blast
            is the input to the clustering methods.
            
-                                                          Data_type
+                                                          Return_type
  Returns : File name of the blast_results                 Scalar
 
  Args    : None. This is a class method called
@@ -229,7 +229,7 @@ sub _make_mgblastdb {
                                                                    Return_type
  Returns : In order, 1) the blast output file                      Scalar
 
-                                                                   Return_type
+                                                                   Arg_type
  Args    : In order, 1) the file to run mgblast on                 Scalar
                      2) the database name                          Scalar
                      3) the number of CPUs for each mgblast job    Scalar
@@ -288,12 +288,12 @@ sub _run_blast {
            that mgblast can be run concurrently on 
            each subset.
            
-                                                          Data_type
- Returns : In order, 1) an array of the split file names  ArrayRef
-                     2) the total sequence count          Scalar
+                                                                   Return_type
+ Returns : In order, 1) an array of the split file names           ArrayRef
+                     2) the total sequence count                   Scalar
 
-                                                          Data_type
- Args    : The number of sequences to go into each        Scalar
+                                                                   Arg_type
+ Args    : The number of sequences to go into each                 Scalar
            subset 
 
 =cut

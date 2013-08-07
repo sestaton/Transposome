@@ -58,7 +58,7 @@ has 'report' => (
  Function: Gets a filehandle for the associated
            file.
 
-                                                   Data_type
+                                                   Return_type
  Returns : An open filehandle for reading          Scalar
 
  Args    : None. This is a role that can

@@ -73,7 +73,7 @@ has 'fraction_coverage' => (
 
  Function: Find the best scoring matches for each pair of sequences. 
 
-                                                                            Data_type
+                                                                            Return_type
  Returns : In order, 1) an index mapping the sequence ID and the            Scalar
                         sequence index used for clustering
                      2) a file containing the index of each sequence        Scalar

@@ -81,11 +81,12 @@ has 'no_store' => (
            to a data structure containing the sequences, along
            with the total sequence count.
 
-                                                              Data_type
-Returns : In order, 1) a hash containing the id, sequence     HashRef 
+                                                               Return_type
+Returns : In order, 1) a hash containing the id, sequence      HashRef 
                         mappings for each Fasta/q record
                      2) the sequence count                     Scalar
 
+                                                               Arg_type
  Args    : A sequence file                                     Scalar
 
 
@@ -125,11 +126,15 @@ sub store_seq {
            to a data structure containing the sequences, along
            with the total sequence count.
 
-                                                               Data_type
+                                                               Return_type
  Returns : In order, 1) a hash containing the id, sequence     HashRef 
                         mappings for each Fasta/q record
                      2) the sequence count                     Scalar
 
+           If the object is created with the argument
+           "no_store => 1" then calling this method causes
+           the sequences to simply be written to STDOUT.
+                                                               Arg_type
  Args    : A sequence file                                     Scalar
 
 =cut

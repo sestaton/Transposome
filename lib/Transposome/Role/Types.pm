@@ -5,7 +5,6 @@ use Moose::Role;
 use namespace::autoclean;
 use utf8;
 use charnames qw(:full :short);
-use JSON;
 
 =head1 NAME
 

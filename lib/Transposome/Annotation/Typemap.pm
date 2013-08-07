@@ -6,7 +6,7 @@ use Storable qw(freeze);
 
 =head1 NAME
 
-Transposome::Annotation::Typemap - Create a map of repeats to the family level
+Transposome::Annotation::Typemap - Create a map of repeats to the family level.
 
 =head1 VERSION
 
