@@ -44,12 +44,13 @@ using. For example,
 
 Available classes are: 
 
-    Transposome
     Transposome::Annotation
+    Transposome::Annotation::Typemap
     Transposome::Cluster
     Transposome::PairFinder
     Transposome::SeqIO
-    Transposome::SeqStore
+    Transposome::SeqUtil
+    Transposome::Run::Blast
                       
 
 **SUPPORT AND DOCUMENTATION**
