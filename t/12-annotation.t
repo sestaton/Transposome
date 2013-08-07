@@ -21,7 +21,6 @@ my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
 my $report = 't/cluster_test_rep.txt';
 my $db_fas = 't/test_data/t_db.fas';
-my $json   = 't/test_data/t_repeats.json';
 my $db     = 't/test_data/t_db_blastdb';
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
@@ -72,7 +71,6 @@ ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
 #diag("Starting cluster annotation...");
 my $annotation = Transposome::Annotation->new( database  => $db_fas,
-					       rb_json   => $json,
 					       dir       => $outdir,
 					       file      => $report );
 
