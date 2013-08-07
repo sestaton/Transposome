@@ -4,10 +4,30 @@ use 5.012;
 use Moose;
 use MooseX::Types::Path::Class;
 use File::Temp;
-use Cwd;
 use namespace::autoclean;
 
 with 'TestUtils::TestConfig';
+
+=head1 NAME
+
+TestUtils - Methods for mocking data or data structures for testing Transposome.
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+=head1 SYNOPSIS
+
+    use TestUtils;
+
+    my $test = TestUtils->new( build_all => 1, destroy => 0 );
+    my $proper_fa_arr = $test_proper->fasta_constructor;
+
+=cut
 
 has 'destroy' => (
     traits    => ['Bool'],
@@ -36,6 +56,22 @@ has 'build_all' => (
     isa       => 'Bool',
     default   => 0,
     );
+
+=head2 fasta_constructor
+
+ Title   : fasta_constructor
+
+ Usage   : my $test = TestUtils->new( build_all => 1, destroy => 0 );                                                                                                         
+           my $fa_arr = $test->fasta_constructor; 
+           
+ Function: Create temporary sequence files for testing Transposome.
+
+                                                                            Return_type
+ Returns : An array of sequences.                                           ArrayRef
+           
+ Args    : None. This is a class method called on TestUtils object.
+
+=cut
 
 sub fasta_constructor {
     my ($self) = @_;
@@ -70,6 +106,22 @@ sub fasta_constructor {
     }
 }
 
+=head2 fastq_constructor
+
+ Title   : fastq_constructor
+
+ Usage   : my $test = TestUtils->new( build_all => 1, destroy => 0 );                                                                                                         
+           my $fq_arr = $test->fastq_constructor; 
+           
+ Function: Create temporary sequence files for testing Transposome.
+
+                                                                            Return_type
+ Returns : An array of sequences.                                           ArrayRef
+           
+ Args    : None. This is a class method called on TestUtils object.
+
+=cut
+
 sub fastq_constructor {
     my ($self) = @_;
     if ($self->build_all) {
@@ -103,6 +155,22 @@ sub fastq_constructor {
     }
 }
 
+=head2 blast_constructor
+
+ Title   : blast_constructor
+
+ Usage   : my $test = TestUtils->new( build_proper => 1, destroy => 0 );                                                                                                         
+           my $bl_arr = $test->blast_constructor; 
+           
+ Function: Create temporary blast files for testing Transposome.
+
+                                                                            Return_type
+ Returns : An array containing a single blast file.                         ArrayRef
+           
+ Args    : None. This is a class method called on TestUtils object.
+
+=cut
+
 sub blast_constructor {
     my ($self) = @_;
     if ($self->build_proper) {
@@ -116,9 +184,24 @@ sub blast_constructor {
     }
 }
 
-# private methods
+=head2 _build_proper_fa_data
+
+ Title   : _build_proper_fa_data
+
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Create properly formatted Fasta data for testing Transposome.
+
+                                                                            Return_type
+ Returns : A properly formatted Fasta file.                                 Scalar
+
+                                                                            Arg_type
+ Args    : None. This is a method called on a TestUtils object.
+
+=cut
+
 sub _build_proper_fa_data {
-    my $cwd = getcwd();
+
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fasta",
@@ -136,8 +219,24 @@ sub _build_proper_fa_data {
     return $tmpfa_name;
 }
 
+=head2 _build_proper_fq_data
+
+ Title   : _build_proper_fq_data
+
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Create properly formatted Fastq data for testing Transposome.
+
+                                                                            Return_type
+ Returns : A properly formatted Fastq file.                                 Scalar
+
+                                                                            Arg_type
+ Args    : None. This is a method called on a TestUtils object.
+
+=cut
+
 sub _build_proper_fq_data {
-    my $cwd = getcwd();
+
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fastq",
@@ -161,8 +260,24 @@ sub _build_proper_fq_data {
     return $tmpfq_name;
 }
 
+=head2 _build_problematic_fa_data
+
+ Title   : _build_problematic_fa_data
+
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Create improperly formatted Fasta data for testing Transposome.
+
+                                                                            Return_type
+ Returns : An improperly formatted Fasta file.                              Scalar
+
+                                                                            Arg_type
+ Args    : None. This is a method called on a TestUtils object.
+
+=cut
+
 sub _build_problematic_fa_data {
-    my $cwd = getcwd();
+
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fasta",
@@ -180,8 +295,24 @@ sub _build_problematic_fa_data {
     return $tmpfa_name;
 }
 
+=head2 _build_problematic_fq_data
+
+Title   : _build_problematic_fq_data
+
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Create improperly formatted Fastq data for testing Transposome.
+
+                                                                            Return_type
+ Returns : A improperly formatted Fastq file.                               Scalar
+
+                                                                            Arg_type
+ Args    : None. This is a method called on a TestUtils object.
+
+=cut
+
 sub _build_problematic_fq_data {
-    my $cwd = getcwd();
+
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fastq",
@@ -205,8 +336,24 @@ sub _build_problematic_fq_data {
     return $tmpfq_name;
 }
 
+=head2 _build_blast_data
+
+ Title   : _build_blast_data
+
+ Usage   : This is a private method, don't use it directly.
+           
+ Function: Create properly formatted mgblast data for testing Transposome.
+
+                                                                            Return_type
+ Returns : A properly formatted mgblast file in "-D 4" format.              Scalar
+
+                                                                            Arg_type
+ Args    : None. This is a method called on a TestUtils object.
+
+=cut
+
 sub _build_blast_data {
-    my $cwd = getcwd();
+
     my $tmpbl = File::Temp->new( TEMPLATE => "transposome_mgblast_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".bln",
@@ -257,5 +404,54 @@ sub _build_blast_data {
     
     return $tmpbl_name;
 }
+
+=head1 AUTHOR
+
+S. Evan Staton, C<< <statonse at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc TestUtils
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 S. Evan Staton.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut
 
 __PACKAGE__->meta->make_immutable;
