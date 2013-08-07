@@ -15,7 +15,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
@@ -70,6 +70,9 @@ ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-
 ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
 
 #diag("Starting cluster annotation...");
+ok( system("makeblastdb"), 'Can create database for annotating clusters' );
+ok( system("blastn"), 'Can run blast for annotating clusters' );
+
 my $annotation = Transposome::Annotation->new( database  => $db_fas,
 					       dir       => $outdir,
 					       file      => $report );
