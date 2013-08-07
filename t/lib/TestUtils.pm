@@ -25,7 +25,7 @@ our $VERSION = '0.01';
     use TestUtils;
 
     my $test = TestUtils->new( build_all => 1, destroy => 0 );
-    my $proper_fa_arr = $test_proper->fasta_constructor;
+    my $fa_arr = $test->fasta_constructor;
 
 =cut
 
