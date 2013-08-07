@@ -3,7 +3,11 @@ Transposome/src
 
 This directory contains the source code for the community clustering. 
 
-TODO: Add citation/web link
+The code was obtained from the [findcommunities](https://sites.google.com/site/findcommunities/) google project site.
+
+This algorithm is described in The Journal of Statistical Mechanics:
+
+    Vincent D Blondel, Jean-Loup Guillaume, Renaud Lambiotte, Etienne Lefebvre. Fast unfolding of communities in large networks. Journal of Statistical Mechanics: Theory and Experiment 2008 (10), P1000.
 
 
 
