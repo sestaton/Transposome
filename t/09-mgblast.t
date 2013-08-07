@@ -8,7 +8,7 @@ use Transposome;
 use Transposome::Run::Blast;
 use TestUtils;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas', 
@@ -21,6 +21,8 @@ my ($conf_file) = @$conf;
 my $trans_obj = Transposome->new( config => $conf_file );
 ok ( $trans_obj->get_config, 'Configuration data loaded from file correctly' );
 my $config = $trans_obj->get_config;
+
+ok( system("mgblast"), 'Can execute mgblast');
 
 my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					  dir       => $config->{output_directory},
