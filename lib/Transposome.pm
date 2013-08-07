@@ -5,7 +5,7 @@ use Moose;
 use YAML;
 use namespace::autoclean;
 
-with 'MooseX::Getopt',
+with 'MooseX::Getopt::Usage',
      'Transposome::Role::Util';
 
 =head1 NAME
@@ -22,17 +22,15 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use Transposome;
-
-    my $trans_obj = Transposome->new( config => 'transposome.yml' );
-    ...
+    transposome --config transposome_config.yml
 
 =cut 
 
 has 'config' => (
     is       => 'ro',
     isa      => 'Str',
-    required => 1
+    required => 1,
+    documentation => qq{ The Transposome configuration file},
     );
 
 has 'configuration' => (
