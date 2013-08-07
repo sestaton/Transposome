@@ -206,7 +206,7 @@ sub annotate_clusters {
  Returns : No data returned. This is the final step in the Transposome analysis
            pipeline.
 
-                                                                           Arg_type
+                                                                            Arg_type
  Args    : In order, 1) the cluster annotation file                         Scalar
                      2) the annotation summary file                         Scalar
                      3) the total number of reads with a blast hit          Scalar
@@ -292,11 +292,11 @@ sub clusters_annotation_to_summary  {
            
  Function: Creates a BLAST database of the repeat types being used
            for annotation.
-                                                                   Return_type
- Returns : In order, 1) the blast database                         Scalar
+                                                                            Return_type
+ Returns : In order, 1) the blast database                                  Scalar
 
-                                                                   Arg_type
- Args    : In order, 1) the Fasta file of repeats being            Scalar
+                                                                            Arg_type
+ Args    : In order, 1) the Fasta file of repeats being                     Scalar
                         used for annotation
 
 =cut 
@@ -333,15 +333,15 @@ sub _make_blastdb {
            
  Function: Calculates the top blast hit for each cluster.
  
-                                                                   Return_type
- Returns : In order, 1) the total hit count                        ScalarRef
-                     2) the top blast hit                          ScalarRef
-                     3) the top blast hit percentage               ScalarRef
-                     4) a hash of all the hits and their counts    HashRef
+                                                                            Return_type
+ Returns : In order, 1) the total hit count                                 ScalarRef
+                     2) the top blast hit                                   ScalarRef
+                     3) the top blast hit percentage                        ScalarRef
+                     4) a hash of all the hits and their counts             HashRef
 
-                                                                   Arg_type
- Args    : In order, 1) the blast hits for the cluster             ArrayRef
-                     2) the blast output file                      Scalar
+                                                                            Arg_type
+ Args    : In order, 1) the blast hits for the cluster                      ArrayRef
+                     2) the blast output file                               Scalar
            
 
 =cut
@@ -388,18 +388,18 @@ sub _parse_blast_to_top_hit {
  Function: This method takes the blast hits and uses a key of repeat
            types to determine the taxonomic lineage for each repeat.
 
-                                                                           Return_type
- Returns : In order, 1) the repeat annotation for each                     HashRef
+                                                                            Return_type
+ Returns : In order, 1) the repeat annotation for each                      HashRef
                         top hit (per cluster)
-                     2) a hash containing all hits and counts per          HashRef
+                     2) a hash containing all hits and counts per           HashRef
                         superfamily
-                                                                           Arg_type
- Args    : In order, 1) a JSON file containing taxonomic                   Scalar
+                                                                            Arg_type
+ Args    : In order, 1) a JSON file containing taxonomic                    Scalar
                         relationships for all repeat types
-                     2) the name of the (cluster?) file being annotated    Scalar
-                     3) the total number of reads with a blast hit         Scalar
-                     4) the top blast hit                                  ScalarRef
-                     5) the top blast hit percentage                       ScalarRef
+                     2) the name of the (cluster?) file being annotated     Scalar
+                     3) the total number of reads with a blast hit          Scalar
+                     4) the top blast hit                                   ScalarRef
+                     5) the top blast hit percentage                        ScalarRef
 
 =cut
 
