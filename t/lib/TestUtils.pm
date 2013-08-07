@@ -6,7 +6,6 @@ use MooseX::Types::Path::Class;
 use File::Temp;
 use Cwd;
 use namespace::autoclean;
-#use Data::Dump qw(dd);
 
 with 'TestUtils::TestConfig';
 

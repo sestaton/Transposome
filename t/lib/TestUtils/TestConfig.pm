@@ -22,13 +22,6 @@ has 'repeat_db' => (
     coerce   => 1,
     );
 
-has 'repeat_json' => (
-    is       => 'ro',
-    isa      => 'Path::Class::File',
-    required => 0,
-    coerce   => 1,
-    );
-
 sub config_constructor {
     my ($self) = @_;
     if ($self->build_proper) {
@@ -54,7 +47,6 @@ sub _build_config_data {
 
     my $seq_file = $self->seq_file;
     my $repeat_db = $self->repeat_db;
-    my $repeat_json = $self->repeat_json;
     my $test = TestUtils->new( build_proper => 1, destroy => 0 );
     my $blast = $test->blast_constructor;
     my ($blfl) = @$blast;
@@ -72,7 +64,6 @@ sub _build_config_data {
     say $tmpyml "  - merge_threshold:   2";
     say $tmpyml "annotation_input:";
     say $tmpyml "  - repeat_database:  $repeat_db";
-    say $tmpyml "  - repeat_json_file: $repeat_json";
     say $tmpyml "annotation_options:";
     say $tmpyml "  - cluster_size:     1";
     say $tmpyml "  - blast_evalue:     10";
