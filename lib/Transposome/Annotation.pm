@@ -8,8 +8,10 @@ use IPC::System::Simple qw(system capture EXIT_ANY);
 use File::Path qw(make_path);
 use File::Basename;
 use Try::Tiny;
+use Storable qw(thaw);
 
-with 'Transposome::Role::File', 
+with 'Transposome::Annotation::Typemap', 
+     'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME
@@ -33,7 +35,6 @@ our $VERSION = '0.01';
     my $cls_tot = 'total_reads_clustered'; # Integer
 
     my $annotation = Transposome::Annotation->new( database  => 'repeat_db.fas',
-                                                   rb_json   => 'repeats.json',
                                                    dir       => 'outdir',
                                                    file      => 'report.txt' );
 
@@ -48,13 +49,6 @@ our $VERSION = '0.01';
 =cut
 
 has 'database' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 1,
-      coerce   => 1,
-    );
-
-has 'rb_json' => (
       is       => 'ro',
       isa      => 'Path::Class::File',
       required => 1,
@@ -128,6 +122,9 @@ sub annotate_clusters {
     my $top_hit_superfam = {};
     my $cluster_annot = {};
 
+    my $repeat_typemap = $self->map_repeat_types($database);
+    my %repeats = %{ thaw($repeat_typemap) };
+
     ## get input files
     opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
     my @clus_fas_files = grep /\.fa.*$/, readdir $dir;
@@ -177,7 +174,7 @@ sub annotate_clusters {
         next unless defined $top_hit && defined $hit_ct;
                                                            
         push @blasts, $blhits;
-        ($top_hit_superfam, $cluster_annot) = $self->_blast_to_annotation($json, $filebase, $readct, $top_hit, $top_hit_perc); 
+        ($top_hit_superfam, $cluster_annot) = $self->_blast_to_annotation(\%repeats, $filebase, $readct, $top_hit, $top_hit_perc); 
         push @superfams, $top_hit_superfam unless !%$top_hit_superfam;
 	push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
     }
@@ -408,11 +405,12 @@ sub _parse_blast_to_top_hit {
 =cut
 
 sub _blast_to_annotation {
-    my ($self, $json, $filebase, $readct, $top_hit, $top_hit_perc) = @_;
+    my ($self, $repeats, $filebase, $readct, $top_hit, $top_hit_perc) = @_;
 
     my %top_hit_superfam;
     my %cluster_annot;
-    my $repeats = $self->json_to_hash($json);
+    #my $repeats = $self->json_to_hash($json);
+    #my $repeats = %{ thaw($repeat_typemap) };
 
     for my $type (keys %$repeats) {
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
