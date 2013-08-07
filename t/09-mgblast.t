@@ -11,7 +11,6 @@ use TestUtils;
 use Test::More tests => 2;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
-                           repeat_json  => 't/test_data/t_repeats.json',
 			   repeat_db    => 't/test_data/t_db.fas', 
 			   destroy      => 0,
                            build_proper => 1 );
