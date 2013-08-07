@@ -104,7 +104,6 @@ sub annotate_clusters {
     my $database = $self->database->absolute;
     my $db_path = $self->_make_blastdb($database);
     my $out_dir = $self->dir->relative;
-    my $json = $self->rb_json->relative;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
