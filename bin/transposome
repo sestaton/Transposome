@@ -28,6 +28,18 @@ our $VERSION = '0.01';
 
 =cut 
 
+has 'usage' => (
+    default => sub { 
+	say "\nUSAGE: transposome --config transposome_config.yml\n";
+    },
+);
+
+has 'help' => (
+    default => sub {
+	system("perldoc $0");
+    },
+);
+
 #
 # get configuration using Transposome class
 #
