@@ -57,6 +57,89 @@ has 'bin_dir' => (
     },
 );
 
+has 'blastn_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_blastn_exec',
+    writer    => 'set_blastn_exec',
+    predicate => 'has_blastn_exec',
+    );
+
+has 'makeblastdb_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_makeblastdb_exec',
+    writer    => 'set_makeblastdb_exec',
+    predicate => 'has_makeblastdb_exec',
+    );
+
+has 'formatdb_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_formatdb_exec',
+    writer    => 'set_formatdb_exec',
+    predicate => 'has_formatdb_exec',
+    );
+
+has 'mgblast_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_mgblast_exec',
+    writer    => 'set_mgblast_exec',
+    predicate => 'has_mgblast_exec',
+    );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my @path = split /:|;/, $ENV{PATH};
+
+    for my $p (@path) {
+	my $mg = $p."/"."mgblast";
+	my $bl = $p."/"."blastn";
+	my $fd = $p."/"."formatdb";
+	my $mb = $p."/"."makeblastdb";
+
+	if (-e $mg && -x $mg) {
+	    $self->set_mgblast_exec($mg);
+	}
+	elsif (-e $bl && -x $bl && $bl =~ /ncbi/ && -e $mb) {
+	    $self->set_blastn_exec($bl);
+	    $self->set_makeblastdb_exec($mb);
+	}
+	elsif (-e $fd && -x $fd) {
+	    $self->set_formatdb_exec($fd);
+	}
+    }
+    try {
+	die unless $self->has_mgblast_exec;
+    }
+    catch {
+	warn "\n[ERROR]: Unable to find mgblast. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+
+    try {
+	die unless $self->has_formatdb_exec;
+    }
+    catch {
+	warn "\n[ERROR]: Unable to find formatdb. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+
+    try {
+	die unless $self->has_makeblastdb_exec;
+    }
+    catch {
+	warn "\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+
+    try {
+	die unless $self->has_blastn_exec;
+    }
+    catch {
+	warn "\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+}
+
 =head1 METHODS
 
 =head2 louvain_method
@@ -80,12 +163,6 @@ sub louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-    #my $path = module_path("Transposome::Cluster");
-    #my $file = Path::Class::File->new($path);
-    #my $pdir = $file->dir;
-    #my $bdir = Path::Class::Dir->new("$pdir/../../bin");
-    #my $bdir = Path::Class::Dir->new($Config{sitebin});
-    #my $realbin = $bdir->resolve;
     my $realbin = $self->bin_dir->resolve;
     my $cls_bin = $iname.".bin";                    # Community "bin" format
     my $cls_tree = $iname.".tree";                  # hierarchical tree of clustering results
