@@ -95,6 +95,53 @@ has 'max_mismatch' => (
     default   => 30,
     );
 
+has 'formatdb_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_formatdb_exec',
+    writer    => 'set_formatdb_exec',
+    predicate => 'has_formatdb_exec',
+    );
+
+has 'mgblast_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_mgblast_exec',
+    writer    => 'set_mgblast_exec',
+    predicate => 'has_mgblast_exec',
+    );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my @path = split /:|;/, $ENV{PATH};
+
+    for my $p (@path) {
+        my $mg = $p."/"."mgblast";
+        my $fd = $p."/"."formatdb";
+
+        if (-e $mg && -x $mg) {
+            $self->set_mgblast_exec($mg);
+        }
+        elsif (-e $fd && -x $fd) {
+            $self->set_formatdb_exec($fd);
+        }
+    }
+    try {
+        die unless $self->has_mgblast_exec;
+    }
+    catch {
+        warn "\n[ERROR]: Unable to find mgblast. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+
+    try {
+        die unless $self->has_formatdb_exec;
+    }
+    catch {
+        warn "\n[ERROR]: Unable to find formatdb. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+}
+
 =head1 METHODS
 
 =cut
@@ -200,13 +247,14 @@ sub _make_mgblastdb {
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
+    my $formatdb = $self->get_formatdb_exec;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
     my $exit_value;
     try {
-        $exit_value = system([0..5],"formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
+        $exit_value = system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
         warn "\n[ERROR]: Unable to make mgblast database. Exited with exit value: $exit_value.";
@@ -248,9 +296,10 @@ sub _run_blast {
     my $pid = $self->percent_identity;
     my $desc_num = $self->desc_num;
     my $aln_num = $self->aln_num;
+    my $mgblast = $self->get_mgblast_exec;
 
     my $exit_value;
-    my $blast_cmd = "mgblast ".            # program
+    my $blast_cmd = "$mgblast ".            # program
                     "-i $subseq_file ".    # query
                     "-d $database ".       # db
                     "-F \"m D\" ".         # filter with dust
