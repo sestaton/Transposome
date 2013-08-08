@@ -67,6 +67,49 @@ has 'report' => (
       required => 0,
       coerce   => 1,
     );
+
+has 'blastn_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_blastn_exec',
+    writer    => 'set_blastn_exec',
+    predicate => 'has_blastn_exec',
+    );
+
+has 'makeblastdb_exec' => (
+    is        => 'rw',
+    isa       => 'Str',
+    reader    => 'get_makeblastdb_exec',
+    writer    => 'set_makeblastdb_exec',
+    predicate => 'has_makeblastdb_exec',
+    );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my @path = split /:|;/, $ENV{PATH};
+
+    for my $p (@path) {
+	my $bl = $p."/"."blastn";
+	my $mb = $p."/"."makeblastdb";
+        if (-e $bl && -x $bl && $bl =~ /ncbi/ && -e $mb) {
+            $self->set_blastn_exec($bl);
+            $self->set_makeblastdb_exec($mb);
+        }
+    }
+    try {
+        die unless $self->has_makeblastdb_exec;
+    }
+    catch {
+        warn "\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+    try {
+        die unless $self->has_blastn_exec;
+    }
+    catch {
+        warn "\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+    };
+}
     
 =head1 METHODS
 
@@ -104,6 +147,7 @@ sub annotate_clusters {
     my $database = $self->database->absolute;
     my $db_path = $self->_make_blastdb($database);
     my $out_dir = $self->dir->relative;
+    my $blastn = $self->get_blastn_exec;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
@@ -154,7 +198,7 @@ sub annotate_clusters {
         $blast_res .= "_blast_$evalue.tsv";
         my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
 
-        my @blastcmd = "blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 | ".
+        my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 | ".
                        "sort -k1,1 -u | ".                       # count each read in the report only once                                                 
                        "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
@@ -166,7 +210,7 @@ sub annotate_clusters {
 	    @blast_out = capture(EXIT_ANY, @blastcmd);
 	}
 	catch {
-	    warn "\n[ERROR]: blastn failed. Caught error: $_" and exit;
+	    warn "\n[ERROR]: blastn failed. Caught error: $_" and exit(1);
 	};
 
         my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blast_out, $blast_file_path);
@@ -304,6 +348,7 @@ sub clusters_annotation_to_summary  {
 sub _make_blastdb {
     my ($self, $db_fas) = @_;
 
+    my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
     #my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
 
@@ -314,7 +359,7 @@ sub _make_blastdb {
 
     my $exit_value;
     try {
-	$exit_value = system([0..5],"makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	$exit_value = system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
 	warn "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
