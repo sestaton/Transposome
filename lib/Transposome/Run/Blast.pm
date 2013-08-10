@@ -248,16 +248,16 @@ sub _make_mgblastdb {
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
     my $formatdb = $self->get_formatdb_exec;
+    $fname =~ s/\.fa.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
-    my $exit_value;
     try {
-        $exit_value = system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
+        system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-        warn "\n[ERROR]: Unable to make mgblast database. Exited with exit value: $exit_value.";
+        warn "\n[ERROR]: Unable to make mgblast database.\n";
         warn "[ERROR]: Here is the exception: $_\nCheck your Legacy BLAST installation. Exiting.\n";
         exit(1);
     };
