@@ -275,7 +275,7 @@ sub clusters_annotation_to_summary  {
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
 
     for my $f (keys %top_hit_superfam) {
-	if ($f =~ /(^RL[CG][-_][a-zA-Z]+[-_]\d+)) {
+	if ($f =~ /(^RL[CG][-_][a-zA-Z]+)) {
             my $fam = $1;
             $top_hit_superfam{$fam} = $top_hit_superfam{$f};
             delete $top_hit_superfam{$f};
@@ -292,7 +292,7 @@ sub clusters_annotation_to_summary  {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
             $total_ct += $blast->{$fam};
-	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+[-_]\d+)/) {
+	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+/) {
                 my $famname = $1;
 #		if (not defined $famname) { say "\nERROR: $fam is not defined after regex"; next; }
                 if (exists $fams{$famname}) {
