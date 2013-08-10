@@ -275,7 +275,7 @@ sub clusters_annotation_to_summary  {
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
 
     for my $f (keys %top_hit_superfam) {
-	if ($f =~ /(^RL[CG][-_][a-zA-Z]+)) {
+	if ($f =~ /(^RL[CG][-_][a-zA-Z]+)/) {
             my $fam = $1;
             $top_hit_superfam{$fam} = $top_hit_superfam{$f};
             delete $top_hit_superfam{$f};
@@ -292,7 +292,7 @@ sub clusters_annotation_to_summary  {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
             $total_ct += $blast->{$fam};
-	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+/) {
+	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
                 my $famname = $1;
 #		if (not defined $famname) { say "\nERROR: $fam is not defined after regex"; next; }
                 if (exists $fams{$famname}) {
@@ -516,10 +516,10 @@ sub _blast_to_annotation {
                     }
 		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam; 
-                        if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+/) {
+                        if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+\-I|LTR/) {
+                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+\-I|LTR)/) {
                             $gypsy_fam = $1;
                         }
                         elsif ($$top_hit =~ /(^Gyp.*\d+-[LTR|I]_w{2})/i) {
