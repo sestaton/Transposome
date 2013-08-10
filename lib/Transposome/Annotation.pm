@@ -149,12 +149,15 @@ sub annotate_clusters {
     my $out_dir = $self->dir->relative;
     my $blastn = $self->get_blastn_exec;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
+    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
+    my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
     my $anno_rep = $rpname."_annotations.tsv";
     my $anno_summary_rep = $rpname."_annotations_summary.tsv";
-    my $anno_rp_path = File::Spec->rel2abs($rppath.$anno_rep);
-    my $anno_sum_rep_path = File::Spec->rel2abs($rppath.$anno_summary_rep);
+    #my $anno_rp_path = File::Spec->rel2abs($rppath.$anno_rep);
+    #my $anno_sum_rep_path = File::Spec->rel2abs($rppath.$anno_summary_rep);
+    my $anno_rp_path = Path::Class::File->new($out_dir, $anno_rep);
+    my $anno_sum_rep_path = Path::Class::File->new($out_dir, $anno_summary_rep);
     my $total_readct = 0;
     my $evalue = $self->evalue;
     my $rep_frac = $cls_tot / $seqct;
