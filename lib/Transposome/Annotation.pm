@@ -357,13 +357,12 @@ sub _make_blastdb {
     my $db_path = Path::Class::File->new($self->dir, $db);
     unlink $db_path if -e $db_path;
 
-    my $exit_value;
     try {
-	$exit_value = system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-	warn "\n[ERROR]: Unable to make blast database. Exited with exit value: $exit_value.";
-	warn "[ERROR]: Here is the exception: $_\nCheck your blast installation. Exiting.\n";
+	warn "\n[ERROR]: Unable to make blast database. Here is the exception: $_.";
+	warn "[ERROR]: Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.\n";
 	exit(1);
     };
 
