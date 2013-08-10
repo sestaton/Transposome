@@ -5,6 +5,7 @@ use Moose;
 use namespace::autoclean;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
+use Path::Class::File;
 use File::Path qw(make_path);
 use File::Basename;
 use Try::Tiny;
