@@ -275,7 +275,7 @@ sub clusters_annotation_to_summary  {
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
 
     for my $f (keys %top_hit_superfam) {
-	if ($f =~ /(^RL(C|G)(\-|\_)\w+)\-|\_\d+/) {
+	if ($f =~ /(^RL[CG][-_][a-zA-Z]+[-_]\d+)) {
             my $fam = $1;
             $top_hit_superfam{$fam} = $top_hit_superfam{$f};
             delete $top_hit_superfam{$f};
@@ -292,7 +292,7 @@ sub clusters_annotation_to_summary  {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
             $total_ct += $blast->{$fam};
-	    if ($fam =~ /(^RL(C|G)(\-|\_)\w+)\-|\_\d+/) {
+	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+[-_]\d+)/) {
                 my $famname = $1;
 #		if (not defined $famname) { say "\nERROR: $fam is not defined after regex"; next; }
                 if (exists $fams{$famname}) {
@@ -516,22 +516,22 @@ sub _blast_to_annotation {
                     }
 		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam; 
-                        if ($$top_hit =~ /(^RLG(\_|\-)\w+)/) {
+                        if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gypsy\-\d+\_\w+)\-I|LTR/) {
+                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+\-I|LTR/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gyp.*\d+\-(LTR|I)\_w{2})/i) {
+                        elsif ($$top_hit =~ /(^Gyp.*\d+-[LTR|I]_w{2})/i) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /((^\w+)\-(I|LTR)(\_\w+))/) {
-                            $gypsy_fam = $2.$4;
+                        elsif ($$top_hit =~ /^([a-zA-Z])+-[I|LTR](_\w+)/) {
+                            $gypsy_fam = $1.$2;
                         }
-                        elsif ($$top_hit =~ /(^RLG\_\w+\d+\_\d+)/) {
+                        elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^\S+)\_/) {
+                        elsif ($$top_hit =~ /(^\S+)_/) {
                             $gypsy_fam = $1;
                         }
                         else {
@@ -544,19 +544,16 @@ sub _blast_to_annotation {
                     }
                     elsif ($superfam_h =~ /copia/i && $$top_hit =~ /^RLC|Cop/i) {
                         my $copia_fam;
-                        if ($$top_hit =~ /(^RLC(\_|\-)\w+)/) {
+                        if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Copia\-\d+\_\w+)\-I|LTR/) {
+                        elsif ($$top_hit =~ /(^Copia-\d+_[a-zA-Z]+)-[I|LTR]/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^(COP\d+)\_(I|LTR)(\_\w+))/) {
+                        elsif ($$top_hit =~ /(^COP\d+_[I|LTR]_[a-zA-Z]+)/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Copia\-\d+\_\w+)\-(I|LTR)/) {
-                            $copia_fam = $1;
-                        }
-                        elsif ($$top_hit =~ /(^\S+)\_/) {
+                        elsif ($$top_hit =~ /(^\S+)_/) {
                             $copia_fam = $1;
                         }
                         else {
