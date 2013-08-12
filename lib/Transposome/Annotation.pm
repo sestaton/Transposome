@@ -185,7 +185,7 @@ sub annotate_clusters {
     ## set path to output dir
     my $annodir = $cls_with_merges_dir."_annotations";
     my $out_path = File::Spec->rel2abs($annodir);
-    make_path($annodir, {verbose => 0, mode => 0711,}); # allows for recursively making paths                                                                 
+    make_path($annodir, {verbose => 0, mode => 0711,});
     my @blasts;    # container for each report (hash) 
     my @blast_out; # container for blastn output
     my @superfams;
@@ -298,7 +298,6 @@ sub clusters_annotation_to_summary  {
             $total_ct += $blast->{$fam};
 	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
                 my $famname = $1;
-#		if (not defined $famname) { say "\nERROR: $fam is not defined after regex"; next; }
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
                 }
@@ -442,7 +441,7 @@ sub _parse_blast_to_top_hit {
                      2) a hash containing all hits and counts per           HashRef
                         superfamily
                                                                             Arg_type
- Args    : In order, 1) a JSON file containing taxonomic                    Scalar
+ Args    : In order, 1) a hash containing taxonomic                         HashRef
                         relationships for all repeat types
                      2) the name of the (cluster?) file being annotated     Scalar
                      3) the total number of reads with a blast hit          Scalar
