@@ -456,37 +456,31 @@ sub _blast_to_annotation {
     for my $type (keys %$repeats) {
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
             if ($type eq 'pseudogene' && $$top_hit =~ /rrna|trna|snrna/i) {
-                #say join "\t", $filebase, $type, $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
             }
             elsif ($type eq 'simple_repeat' && $$top_hit =~ /msat/i) {
-                #say join "\t", $filebase, $type, "Satellite", "MSAT", $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, "Satellite", "MSAT", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
             }
             elsif ($type eq 'simple_repeat' && $$top_hit =~ /sat/i) {
-                #say join "\t", $filebase, $type, "Satellite", "SAT", $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, "Satellite", "SAT", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
             }
             elsif ($type eq 'integrated_virus' && $$top_hit =~ /caul/i) {
-		#say join "\t", $filebase, $type, "Caulimoviridae", $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, "Caulimoviridae", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
             }
             elsif ($type eq 'integrated_virus' && ($$top_hit eq 'PIVE' || $$top_hit eq 'DENSOV_HM')) {
-                #say join "\t", $filebase, $type, "DNA Virus", $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, "DNA Virus", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
             }
             elsif ($type eq 'endogenous_retrovirus' && $$top_hit =~ /erv/i) {
-                #say join "\t", $filebase, $type, "Endogenous Retrovirus", $$top_hit, $$top_hit_perc;
                 my $anno_key = $self->mk_key($filebase, $type, "Endogenous Retrovirus", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
@@ -503,8 +497,7 @@ sub _blast_to_annotation {
                                     for my $sine (@$sines) {
                                         if ($sine =~ /$$top_hit/) {
                                             ## only include the same level of depth as others
-					    #say join "\t", $filebase, $type, $class, $superfam_h, $sine_fam_mem, $$top_hit, $$top_hit_perc;
-                                            $top_hit_superfam{$$top_hit} = $sine_fam_mem;
+				            $top_hit_superfam{$$top_hit} = $sine_fam_mem;
                                             my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $sine_fam_mem, $$top_hit, $$top_hit_perc);
                                             $cluster_annot{$readct} = $anno_key;
                                             last;
@@ -568,7 +561,7 @@ sub _blast_to_annotation {
                             for my $mem (@$fam) {
                                 if ($mem =~ /$$top_hit/i) {
                                     $top_hit_superfam{$$top_hit} = $superfam_h;
-				    my $unk_fam = " ";
+				    my $unk_fam = q{ };
                                     my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $unk_fam, $$top_hit, $$top_hit_perc);
                                     $cluster_annot{$readct} = $anno_key;
                                     last;
@@ -582,7 +575,7 @@ sub _blast_to_annotation {
     }
     return(\%top_hit_superfam, \%cluster_annot);
 }
-			
+
 =head1 AUTHOR
 
 S. Evan Staton, C<< <statonse at gmail.com> >>
