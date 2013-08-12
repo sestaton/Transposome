@@ -150,13 +150,10 @@ sub annotate_clusters {
     my $out_dir = $self->dir->relative;
     my $blastn = $self->get_blastn_exec;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
     my $anno_rep = $rpname."_annotations.tsv";
     my $anno_summary_rep = $rpname."_annotations_summary.tsv";
-    #my $anno_rp_path = File::Spec->rel2abs($rppath.$anno_rep);
-    #my $anno_sum_rep_path = File::Spec->rel2abs($rppath.$anno_summary_rep);
     my $anno_rp_path = Path::Class::File->new($out_dir, $anno_rep);
     my $anno_sum_rep_path = Path::Class::File->new($out_dir, $anno_summary_rep);
     my $total_readct = 0;
@@ -443,7 +440,7 @@ sub _parse_blast_to_top_hit {
                                                                             Arg_type
  Args    : In order, 1) a hash containing taxonomic                         HashRef
                         relationships for all repeat types
-                     2) the name of the (cluster?) file being annotated     Scalar
+                     2) the name of the cluster file being annotated        Scalar
                      3) the total number of reads with a blast hit          Scalar
                      4) the top blast hit                                   ScalarRef
                      5) the top blast hit percentage                        ScalarRef
