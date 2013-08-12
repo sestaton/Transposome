@@ -15,7 +15,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
-use Test::More tests => 12;
+use Test::More tests => 17;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
@@ -60,28 +60,32 @@ ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
 my ($seqs, $seqct) = $memstore->store_seq;
-ok( $seqct == 70, 'Correct number of sequences stored' );
+is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $report, $uf);
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
-ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
-
-#diag("Starting cluster annotation...");
-#ok( system("makeblastdb"), 'Can create database for annotating clusters' ); # test loading attributes instead
-#ok( system("blastn"), 'Can run blast for annotating clusters' );
+is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $db_fas,
 					       dir       => $outdir,
 					       file      => $report );
 
+ok( defined($annotation), 'new() returned something correctly' );
+ok( $annotation->isa('Transposome::Annotation'), 'new() returned an object of the right class' );
+#ok( $annotation->file->isa('Path::Class::File'), 'file attribute set to the correct type' );
+
+ok( $annotation->has_makeblastdb_exec, 'Can make blast database for annotation' );
+ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
+
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
 
-ok( $total_readct == 46, 'Correct number of reads annotated' );
-ok( $total_readct == $cls_tot, 'Same number of reads clustered and annotated' );
+like( $total_readct, qr/\d+/, 'Returned the expected type for the total number of reads clustered' );
+is( $total_readct, 46, 'Correct number of reads annotated' );
+is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
 ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (1)' );
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
