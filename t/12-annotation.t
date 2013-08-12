@@ -15,7 +15,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
@@ -75,7 +75,9 @@ my $annotation = Transposome::Annotation->new( database  => $db_fas,
 
 ok( defined($annotation), 'new() returned something correctly' );
 ok( $annotation->isa('Transposome::Annotation'), 'new() returned an object of the right class' );
-#ok( $annotation->file->isa('Path::Class::File'), 'file attribute set to the correct type' );
+ok( $annotation->file->isa('Path::Class::File'), 'file attribute set to the correct type' );
+ok( $annotation->database->isa('Path::Class::File'), 'database attribute set to the correct type' );
+ok( $annotation->dir->isa('Path::Class::Dir'), 'file attribute set to the correct type' );
 
 ok( $annotation->has_makeblastdb_exec, 'Can make blast database for annotation' );
 ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
