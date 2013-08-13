@@ -21,7 +21,7 @@ BEGIN {
     }
     close $err;
     unlink("comm_make_errs");
-    system("cp convert ../bin; cp community ../bin; cp hierarchy ../bin;");
+    system("cp louvain_convert ../bin; cp louvain_community ../bin; cp louvain_hierarchy ../bin;");
     system("make clean 2>&1 > /dev/null");
     chdir("..");
     system("chmod +x bin/transposome");
