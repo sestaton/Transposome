@@ -116,9 +116,15 @@ sub get_config {
 
     for my $k (keys %config) {
 	my $v = $config{$k};
-	if ($v =~ /^~/) { 
-	    $v =~ s/^~/$ENV{"HOME"}/; 
-	    $config{$k} = $v;
+	if (not defined $v) {
+	    warn "\n[ERROR]: $k is not defined after parsing configuration file. Check your configuration file and try again. Exiting.\n";
+	    exit(1);
+	}
+	else {
+	    if ($v =~ /^~/) { 
+		$v =~ s/^~/$ENV{"HOME"}/; 
+		$config{$k} = $v;
+	    }
 	}
     }
     
