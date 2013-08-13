@@ -24,9 +24,9 @@ for my $fa (@$fa_arr) {
 	if ($seq->has_id && $seq->has_seq && !$seq->has_qual) {
 	    my $memstore = Transposome::SeqUtil->new( file => $fa, sample_size => 2 );
 	    ($seqs, $seqct) = $memstore->sample_seq;
-	    ok( $seqct == 2, 'There correct number of Fasta sequences were sampled');
+	    is( $seqct, 2, 'There correct number of Fasta sequences were sampled');
 	    my $idct = scalar (keys %$seqs);
-	    ok( $seqct == $idct, 'The same number of Fasta sequences were sampled and stored');
+	    is( $seqct, $idct, 'The same number of Fasta sequences were sampled and stored');
 	}
     }
 
@@ -39,7 +39,7 @@ for my $fa (@$fa_arr) {
     while (my $seq2 = $seqio2->next_seq($fh2)) {
 	$stdoutct++ if $seq2->has_seq;
     }
-    ok( $seqct == $stdoutct, 'The same number of Fasta sequences sampled and stored as written to STDOUT' );
+    is( $seqct, $stdoutct, 'The same number of Fasta sequences sampled and stored as written to STDOUT' );
     system("rm seqsample_t.out");
 
     unlink $fa;
@@ -54,9 +54,9 @@ for my $fq (@$fq_arr) {
         if ($seq->has_id && $seq->has_seq && $seq->has_qual) {
             my $memstore = Transposome::SeqUtil->new( file => $fq, sample_size => 2 );
 	    ($seqs, $seqct) = $memstore->sample_seq;
-	    ok( $seqct == 2, 'There correct number of Fastq sequences were sampled');
+	    is( $seqct, 2, 'There correct number of Fastq sequences were sampled');
 	    my $idct = scalar (keys %$seqs);
-	    ok( $seqct == $idct, 'The same number of Fastq sequences were sampled and stored');
+	    is( $seqct, $idct, 'The same number of Fastq sequences were sampled and stored');
         }
     }
     my $memstore2 = Transposome::SeqUtil->new( file => $fq, sample_size => 2 , no_store => 1);
