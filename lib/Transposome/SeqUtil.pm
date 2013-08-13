@@ -60,6 +60,15 @@ has 'sample_size' => (
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_sample',
+    required  => 1,
+    );
+
+has 'seed' => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_seed',
+    lazy      => 1,
+    default   => 11,
     );
 
 has 'no_store' => (
@@ -144,14 +153,15 @@ sub sample_seq {
 
     my $filename = $self->file->relative;
     my $k = $self->sample_size;
-    my $n      = 0;
+    my $seed = $self->seed;
+    my $n = 0;
     my @sample;
     my %seqhash;
 
     my $seqio_fa = Transposome::SeqIO->new( file => $filename );
     my $seqfh = $seqio_fa->get_fh;
 
-    srand();
+    srand($seed);
     while (my $seq = $seqio_fa->next_seq($seqfh)) {
 	$n++;
 	push @sample, {$seq->get_id => $seq->get_seq};
