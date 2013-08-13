@@ -9,13 +9,13 @@ OBJ2= graph.o
 
 all: $(EXEC)
 
-community : $(OBJ1) main_community.o
+louvain_community : $(OBJ1) main_community.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-convert : $(OBJ2) main_convert.o
+louvain_convert : $(OBJ2) main_convert.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-hierarchy : main_hierarchy.o
+louvain_hierarchy : main_hierarchy.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 ##########################################
