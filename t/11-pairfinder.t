@@ -9,7 +9,7 @@ use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 
-use Test::More tests => 498;
+use Test::More tests => 504;
 
 my $outdir = 't/transposome_pairfinder_t';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
@@ -30,6 +30,10 @@ ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
 
 my ($mem_idx_file, $mem_int_file, $mem_hs_file) = $mem_test->parse_blast;
 
+ok( defined($mem_idx_file), 'Can parse blast to index in memory' );
+ok( defined($mem_int_file), 'Can parse blast to integer file in memory ' );
+ok( defined($mem_hs_file), 'Can parse blast to edge file in memory' );
+
 my ($mem_idx_recct, $mem_int_recct, $mem_hs_recct, 
     $file_idx_recct, $file_int_recct, $file_hs_recct) = (0, 0, 0, 0, 0, 0);
 open my $mem_idx, '<', $mem_idx_file;
@@ -39,41 +43,41 @@ open my $mem_hs, '<', $mem_hs_file;
 while (<$mem_idx>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 2, 'Index file has the right number of fields' );
-    ok( $f[1] =~ /\d+/, 'Parsed score correctly for blast pairs' );
+    is( scalar @f, 2, 'Index file has the right number of fields' );
+    like( $f[1], qr/\d+/, 'Parsed score correctly for blast pairs' );
     #TODO: Test for unique pairs
     $mem_idx_recct++;
 }
 close $mem_idx;
 
-ok( $mem_idx_recct == 46, 'Correct number of unique pairs found in index' );
+is( $mem_idx_recct, 46, 'Correct number of unique pairs found in index' );
 
 while (<$mem_int>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 3, 'Integer mapping of pairs has the right number of fields' );
-    ok($f[0] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
-    ok($f[1] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
-    ok($f[2] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
+    is( scalar @f, 3, 'Integer mapping of pairs has the right number of fields' );
+    like($f[0], qr/\d+/,'Blast pairs mapped correctly to integer form' );
+    like($f[1], qr/\d+/,'Blast pairs mapped correctly to integer form' );
+    like($f[2], qr/\d+/,'Blast pairs mapped correctly to integer form' );
     #TODO: Test for unique pairs
     $mem_int_recct++;
 }
 close $mem_int;
 
-ok( $mem_int_recct == 25, 'Correct number of unique pairs found in integer mapping' );
+is( $mem_int_recct, 25, 'Correct number of unique pairs found in integer mapping' );
 
 while (<$mem_hs>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 3, 'Integer mapping of pairs has the right number of fields' );
-    ok($f[2] =~ /\d+/,'Blast pair score mapped parsed correctly' );
+    is( scalar @f, 3, 'Integer mapping of pairs has the right number of fields' );
+    like($f[2], qr/\d+/,'Blast pair score mapped parsed correctly' );
     #TODO: Test for unique pairs
     $mem_hs_recct++;
 }
 close $mem_hs;
 
-ok( $mem_hs_recct == 25, 'Correct number of unique pairs found in ID mapping' );
-ok( $mem_hs_recct == $mem_int_recct, 'Index and integer mapping files contain the same records' );
+is( $mem_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
+is( $mem_hs_recct, $mem_int_recct, 'Index and integer mapping files contain the same records' );
 
 system("rm -rf t/$outdir");
 
@@ -88,6 +92,10 @@ ok( $file_test->parse_blast, 'Can build database on file and parse blast' );
 
 my ($onfile_idx_file, $onfile_int_file, $onfile_hs_file) = $file_test->parse_blast;
 
+ok( defined($onfile_idx_file), 'Can parse blast to index on file' );
+ok( defined($onfile_int_file), 'Can parse blast to integer file on file' );
+ok( defined($onfile_hs_file), 'Can parse blast to edge file on file' );
+
 open my $file_idx, '<', $onfile_idx_file;
 open my $file_int, '<', $onfile_int_file;
 open my $file_hs, '<', $onfile_hs_file;
@@ -95,46 +103,46 @@ open my $file_hs, '<', $onfile_hs_file;
 while (<$file_idx>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 2, 'Index file has the right number of fields' );
-    ok( $f[1] =~ /\d+/, 'Parsed score correctly for blast pairs' );
+    is( scalar @f, 2, 'Index file has the right number of fields' );
+    like( $f[1], qr/\d+/, 'Parsed score correctly for blast pairs' );
     #TODO: Test for unique pairs
     $file_idx_recct++;
 }
 close $file_idx;
 
-ok( $file_idx_recct == 46, 'Correct number of unique pairs found in index' );
+is( $file_idx_recct, 46, 'Correct number of unique pairs found in index' );
 
 while (<$file_int>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 3, 'Integer mapping of pairs has the right number of fields' );
-    ok($f[0] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
-    ok($f[1] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
-    ok($f[2] =~ /\d+/,'Blast pairs mapped correctly to integer form' );
+    is( scalar @f, 3, 'Integer mapping of pairs has the right number of fields' );
+    like($f[0], qr/\d+/,'Blast pairs mapped correctly to integer form' );
+    like($f[1], qr/\d+/,'Blast pairs mapped correctly to integer form' );
+    like($f[2], qr/\d+/,'Blast pairs mapped correctly to integer form' );
     #TODO: Test for unique pairs
     $file_int_recct++;
 }
 close $file_int;
 
-ok( $file_int_recct == 25, 'Correct number of unique pairs found in integer mapping' );
+is( $file_int_recct, 25, 'Correct number of unique pairs found in integer mapping' );
 
 while (<$file_hs>) {
     chomp;
     my @f = split;
-    ok( scalar @f == 3, 'Integer mapping of pairs has the right number of fields' );
-    ok($f[2] =~ /\d+/,'Blast pair score mapped parsed correctly' );
+    is( scalar @f, 3, 'Integer mapping of pairs has the right number of fields' );
+    like($f[2], qr/\d+/,'Blast pair score mapped parsed correctly' );
     #TODO: Test for unique pairs
     $file_hs_recct++;
 }
 close $file_hs;
 
-ok( $file_hs_recct == 25, 'Correct number of unique pairs found in ID mapping' );
-ok( $file_hs_recct == $file_int_recct, 'Index and integer mapping files contain the same records' );
+is( $file_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
+is( $file_hs_recct, $file_int_recct, 'Index and integer mapping files contain the same records' );
 
 ## check both processing methods agree
-ok( $mem_idx_recct == $file_idx_recct, 'In-memory and on-file processing methods generated the same index' );
-ok( $mem_int_recct == $file_int_recct, 'In-memory and on-file processing methods generated the integer mapping files' );
-ok( $mem_hs_recct == $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
+is( $mem_idx_recct, $file_idx_recct, 'In-memory and on-file processing methods generated the same index' );
+is( $mem_int_recct, $file_int_recct, 'In-memory and on-file processing methods generated the integer mapping files' );
+is( $mem_hs_recct, $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
 
 END {
     system("rm -rf $outdir $blfl");
