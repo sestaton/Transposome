@@ -15,7 +15,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
