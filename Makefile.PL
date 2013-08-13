@@ -59,7 +59,7 @@ WriteMakefile(
 	'File::Path'                 => 0,
     },
     INST_SCRIPT => 'blib/bin',
-    EXE_FILES => [ 'bin/convert', 'bin/community', 'bin/hierarchy', 'bin/transposome' ],
+    EXE_FILES => [ 'bin/louvain_convert', 'bin/louvain_community', 'bin/louvain_hierarchy', 'bin/transposome' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-*' },
     test  => { TESTS => 't/*.t t/Transposome/*.t' },
