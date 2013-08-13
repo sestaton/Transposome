@@ -3,7 +3,7 @@
 CC=g++
 CFLAGS= -ansi -O5 -Wall
 LDFLAGS= -ansi -lm -Wall
-EXEC=community convert hierarchy
+EXEC=louvain_community louvain_convert louvain_hierarchy
 OBJ1= graph_binary.o community.o
 OBJ2= graph.o
 
