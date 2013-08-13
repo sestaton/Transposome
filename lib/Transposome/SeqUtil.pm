@@ -60,7 +60,6 @@ has 'sample_size' => (
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_sample',
-    required  => 1,
     );
 
 has 'seed' => (
