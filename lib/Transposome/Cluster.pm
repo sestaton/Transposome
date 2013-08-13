@@ -95,14 +95,14 @@ sub louvain_method {
     my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
 
     try {
-	system([0..5], "$realbin/convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
+	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
 	warn "\n[ERROR]: Louvain 'convert' failed. Caught error: $_" and exit(1);
     };
 
     try {
-	system([0..5],"$realbin/community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
+	system([0..5],"$realbin/louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
 	warn "\n[ERROR]: Louvain 'community' failed. Caught error: $_" and exit(1);
@@ -122,7 +122,7 @@ sub louvain_method {
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
-	    system([0..5],"$realbin/hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
+	    system([0..5],"$realbin/louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
 	    warn "\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_" and exit(1);
