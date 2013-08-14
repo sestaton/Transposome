@@ -66,7 +66,7 @@ has 'threads' => (
 
 has 'seq_num' => (
     is        => 'ro',
-    isa       => 'Int',
+    isa       => 'Num',
     predicate => 'has_seq_num',
     required  => 1,
     );
