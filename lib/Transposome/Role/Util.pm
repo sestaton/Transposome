@@ -114,23 +114,48 @@ sub get_config {
 
     $config{report_file} = $self->configuration->{output}->[0]->{report_file};
 
-    for my $k (keys %config) {
-	my $v = $config{$k};
-	if (not defined $v) {
-	    warn "\n[ERROR]: $k is not defined after parsing configuration file. Check your configuration file and try again. Exiting.\n";
-	    exit(1);
-	}
-	else {
-	    if ($v =~ /^~/) { 
-		$v =~ s/^~/$ENV{"HOME"}/; 
-		$config{$k} = $v;
-	    }
-	}
-    }
-    
-    return \%config;
+    my $valid_config = $self->_validate_params(\%config);
+
+    return $valid_config;
 }
 
+=head2 _validate_params
+
+ Title    : _validate_params
+
+ Usage    : This is a private method, don't use it directly.
+
+ Function : Valiadate whether all of the slots in config file
+            have been set.
+
+                                                           Return_type
+ Returns  : A hash containing the user-set configuration   HashRef
+            for how transposome is to be executed
+
+ Args     : None. This is a role that can be consumed.
+
+=cut 
+
+sub _validate_params { 
+    my ($self, $config) = @_;
+
+    for my $k (keys %$config) {
+	my $v = $config->{$k};
+        if (not defined $v) {
+            warn "\n[ERROR]: '$k' is not defined after parsing configuration file. This indicates there may be a blank line your configuration file.\n";
+	    warn "Please check your configuration file and try again. Exiting.\n";
+            exit(1);
+        }
+        else {
+            if ($v =~ /^~/) {
+                $v =~ s/^~/$ENV{"HOME"}/;
+                $config->{$k} = $v;
+            }
+        }
+    }
+    return $config;
+}
+    
 =head1 AUTHOR
 
 S. Evan Staton, C<< <statonse at gmail.com> >>
