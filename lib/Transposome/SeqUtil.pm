@@ -49,9 +49,13 @@ use Transposome::SeqUtil;
 
 =cut
 
-coerce 'Num',
-      from 'Str',
-      via { s/\_//g };
+subtype 'ModNum'
+    => as 'Str'
+    => where { /\_/ || /\d+/ };
+
+coerce 'ModNum',
+    from 'Str',
+    via { s/\_//g };
 
 has 'in_memory' => (
     is         => 'ro',
@@ -63,7 +67,7 @@ has 'in_memory' => (
 
 has 'sample_size' => (
     is        => 'ro',
-    isa       => 'Num',
+    isa       => 'ModNum',
     predicate => 'has_sample',
     coerce    => 1,
     );
