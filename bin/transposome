@@ -75,7 +75,7 @@ my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($
                                                                                $read_pairs, $config->{report_file}, $uf);
 
 #
-# annotation clusters and generate whole-genome summary of results
+# annotate clusters and generate whole-genome summary of results
 #
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       dir       => $config->{output_directory},
