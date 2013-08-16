@@ -80,7 +80,7 @@ has 'no_store' => (
     is        => 'ro',
     isa       => 'Bool',
     predicate => 'has_no_store',
-    lazy      => 'no_store',
+    lazy      => 1,
     default   => 0,
     );
 
