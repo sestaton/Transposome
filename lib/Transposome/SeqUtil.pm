@@ -2,6 +2,7 @@ package Transposome::SeqUtil;
 
 use 5.012;
 use Moose;
+use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use DB_File;
 use vars qw($DB_BTREE &R_DUP);  
@@ -36,7 +37,7 @@ For storing all sequences:
 
     ...
 
-For storing a sample of a sequence file:
+For sampling a sequence file:
 
 use Transposome::SeqUtil;
 
@@ -44,9 +45,13 @@ use Transposome::SeqUtil;
                                              sample_size => 500_000,
                                            );
 
-    my ($seqs, $seqct) = $sequtil->sample_seq;
+    $sequtil->sample_seq;
 
 =cut
+
+coerce 'Num',
+      from 'Str',
+      via { s/\_//g };
 
 has 'in_memory' => (
     is         => 'ro',
@@ -60,6 +65,7 @@ has 'sample_size' => (
     is        => 'ro',
     isa       => 'Num',
     predicate => 'has_sample',
+    coerce    => 1,
     );
 
 has 'seed' => (
