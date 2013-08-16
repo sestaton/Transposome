@@ -58,7 +58,7 @@ has 'in_memory' => (
 
 has 'sample_size' => (
     is        => 'ro',
-    isa       => 'Int',
+    isa       => 'Num',
     predicate => 'has_sample',
     );
 
