@@ -50,12 +50,12 @@ use Transposome::SeqUtil;
 =cut
 
 subtype 'ModNum'
-    => as 'Str'
+    => as 'Num'
     => where { /\_/ || /\d+/ };
 
 coerce 'ModNum',
     from 'Str',
-    via { s/\_//g };
+    via { $_ =~ s/\_//g; 0+$_ };
 
 has 'in_memory' => (
     is         => 'ro',
