@@ -221,6 +221,7 @@ sub run_allvall_blast {
 
     say $rep "\n========> Finished running mgblast on $seqct sequences in $final_time minutes";
     close $rep;
+    unlink glob("$database*");
     return $out_path;
 }
 
