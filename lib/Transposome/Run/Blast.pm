@@ -156,8 +156,8 @@ sub BUILD {
            data using mgblast. The output of this blast
            is the input to the clustering methods.
            
-                                                          Return_type
- Returns : File name of the blast_results                 Scalar
+                                                                   Return_type
+ Returns : File name of the blast_results                          Scalar
 
  Args    : None. This is a class method called
            on a Transposome::Run::Blast object.
