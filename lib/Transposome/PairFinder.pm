@@ -109,9 +109,9 @@ sub parse_blast {
     my $index = 0;
 
     my $fh = $self->file->openr;
-    open my $int, '>', $int_path;
-    open my $idx, '>', $idx_path;
-    open my $hs, '>', $hs_path;
+    open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+    open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
+    open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
 
     if ($self->in_memory) {
 	my %match_pairs;
@@ -119,6 +119,7 @@ sub parse_blast {
 
 	while (<$fh>) {
 	    chomp;
+	    $self->_validate_format($_);
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 	    
@@ -319,6 +320,31 @@ sub parse_blast {
 
 	return($idx_path, $int_path, $hs_path);
 
+    }
+}
+
+=head2 _validate_format
+
+ Title   : _validate_format
+ Usage   : This is a private method, don't use it directly.
+
+ Function: Ensure the data is in the correct format and exit
+           with a clear message.
+
+ Returns : Nothing. This is a Transposome::Class method to be called
+           on a line.
+
+                                                                            Arg_type
+ Args    : Receives a line from an open filehandle.                         Scalar
+
+=cut
+
+sub _validate_format {
+    my ($self, $line) = @_;
+    my @f = split, /\t/, $line;
+    unless (scalar @f == 12) {
+	warn "\n[ERROR]: '$line' is not the correct format in file: ",$self->file,". Exiting.\n";
+	exit(1);
     }
 }
 
