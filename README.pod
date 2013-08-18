@@ -1,13 +1,12 @@
-Transposome
-===========
+=head1 NAME
 
-Annotation of transposable element families from unassembled sequence reads
+Transposome - Investigate the repeat strucuture of a genome through unassembled sequence reads.
 
+=head1 VERSION
 
+Version 0.01
 
-
-
-**INSTALLATION**
+=head1 INSTALLATION
 
 To install this package, you will first need to install some Perl dependencies. The recommened method is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and run the following commands (requires git):
 
@@ -19,7 +18,7 @@ To install this package, you will first need to install some Perl dependencies. 
     make test
     make install
 
-**BASIC USAGE**
+=head1 BASIC USAGE
 
 Following installation, fill out the sample configuration file in the 'config' directory
 in the Transposome distribution, specifying the location of data files and parameters for analysis.
@@ -30,7 +29,7 @@ Then, simply run the `transposome` program, specifying your configuration file:
 
 The name of the configuration file does not matter, this is just an example. Though, the format is important. See the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) wiki page for more details.
 
-**ADVANCED USAGE**
+=head1 ADVANCED USAGE
 
 It is possible to run only one part of the Transposome package, the clustering methods for example, or create 
 your own analysis methods to plug into Transposome. In addition, you can extend existing methods.
@@ -50,7 +49,7 @@ Available classes are:
     Transposome::SeqStore
                       
 
-**SUPPORT AND DOCUMENTATION**
+=head1 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for the Transposome package with the
 `perldoc` command.
@@ -72,7 +71,7 @@ You can also look for information at:
     Transposome issue tracker
         https://github.com/sestaton/Transposome/issues
 
-**LICENSE AND COPYRIGHT**
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2013 S. Evan Staton
 
@@ -99,3 +98,5 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+=cut
