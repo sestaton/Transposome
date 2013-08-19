@@ -234,6 +234,7 @@ sub annotate_clusters {
 	say $out join "\t", $cluster, $readct, join "\t", @annots;
     }
     close $out;
+    unlink glob("$db_path*");
 
     return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
 }
