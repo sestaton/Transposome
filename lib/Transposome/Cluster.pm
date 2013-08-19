@@ -133,6 +133,7 @@ sub louvain_method {
 
 	push @comm, $cls_graph_comm;
     }
+    unlink $cls_tree_path;
     return \@comm;
 }
 
