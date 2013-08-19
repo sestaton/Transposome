@@ -341,7 +341,7 @@ sub parse_blast {
 
 sub _validate_format {
     my ($self, $line) = @_;
-    my @f = split, /\t/, $line;
+    my @f = split /\t/, $line;
     unless (scalar @f == 12) {
 	warn "\n[ERROR]: '$line' is not the correct format in file: ",$self->file,". Exiting.\n";
 	exit(1);
