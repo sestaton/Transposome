@@ -327,7 +327,7 @@ sub make_clusters {
     }
     close $cls_out;
     close $mem;
-    unlink $_ for @$graph_comm;
+    unlink $out_dir."/".$_ for @$graph_comm;
 
     return $cluster_file;
 }
