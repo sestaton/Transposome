@@ -108,6 +108,9 @@ sub louvain_method {
 	warn "\n[ERROR]: Louvain 'community' failed. Caught error: $_" and exit(1);
     };
 
+    unlink $cls_bin_path;
+    unlink $cls_tree_weights_path;
+
     try {
 	$levels = capture(EXIT_ANY, "grep -c level $cls_tree_log_path");
 	chomp $levels;
@@ -118,7 +121,7 @@ sub louvain_method {
 
     my @comm;
     for (my $i = 0; $i <= $levels-1; $i++) {
-        my $cls_graph_comm = $cls_tree.".graph_node2comm_level_".$i; #
+        my $cls_graph_comm = $cls_tree.".graph_node2comm_level_".$i; 
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
@@ -184,10 +187,9 @@ sub find_pairs {
             next if !length($line);
             my ($clsid, $seqids) = split /\n/, $line;
             $clsid =~ s/\s/\_/;
-            my @ids = split /\s+/, $seqids;
-            #if (scalar(@ids) >= $cluster_size) {       # limit cluster size in .cls file here, if desired
+            my @ids = split /\s+/, $seqids;       
+            # limit cluster size in .cls file here, if desired
             push @{$read_pairs{$clsid}}, $_ for @ids;
-            #}
         }
         close $in;
     }
@@ -238,6 +240,7 @@ sub find_pairs {
         }
     }
     close $rep;
+    unlink $cls_file_path;
     return(\%read_pairs, \%vertex, \$uf);
 }
 
@@ -278,7 +281,7 @@ sub make_clusters {
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
     my $graph = shift @graph_comm_sort;
-    die "\n[ERROR]: Community clustering failed. Exiting.\n" unless defined $graph; ## can probably remove this statement
+    die "\n[ERROR]: Community clustering failed. Exiting.\n" unless defined $graph;
     my $graph_path = File::Spec->catfile($out_dir, $graph);
     my %clus;
     my %index;
@@ -323,6 +326,7 @@ sub make_clusters {
     }
     close $cls_out;
     close $mem;
+    unlink $_ for @$graph_comm;
 
     return $cluster_file;
 }
