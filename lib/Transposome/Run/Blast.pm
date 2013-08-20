@@ -219,7 +219,7 @@ sub run_allvall_blast {
     my $total_elapsed = $t2 - $t0;
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
-    say $rep "\n========> Finished running mgblast on $seqct sequences in $final_time minutes";
+    say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
     close $rep;
     unlink glob("$database*");
     return $out_path;
