@@ -31,8 +31,7 @@ for my $fa (@$fa_arr) {
     }
 
     my $memstore2 = Transposome::SeqUtil->new( file => $fa, sample_size => 2 , no_store => 1);
-    open STDOUT, '>', 'seqsample_t.out';
-    $memstore2->sample_seq;
+    { local *STDOUT; open STDOUT, '>', 'seqsample_t.out'; $memstore2->sample_seq; }
 
     my $seqio2 = Transposome::SeqIO->new( file => 'seqsample_t.out' );
     my $fh2 = $seqio2->get_fh;
@@ -60,8 +59,7 @@ for my $fq (@$fq_arr) {
         }
     }
     my $memstore2 = Transposome::SeqUtil->new( file => $fq, sample_size => 2 , no_store => 1);
-    open STDOUT, '>', 'seqsample_t.out';
-    $memstore2->sample_seq;
+    { local *STDOUT; open STDOUT, '>', 'seqsample_t.out'; $memstore2->sample_seq; }
 
     my $seqio2 = Transposome::SeqIO->new( file => 'seqsample_t.out' );
     my $fh2 = $seqio2->get_fh;
