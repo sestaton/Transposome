@@ -300,7 +300,7 @@ sub _run_blast {
     my $mgblast = $self->get_mgblast_exec;
 
     my $exit_value;
-    my $blast_cmd = "$mgblast ".            # program
+    my $blast_cmd = "$mgblast ".           # program
                     "-i $subseq_file ".    # query
                     "-d $database ".       # db
                     "-F \"m D\" ".         # filter with dust

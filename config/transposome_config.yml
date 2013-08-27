@@ -5,14 +5,14 @@ blast_input:
   - thread:             1
   - output_directory:   transposome_results_out
 clustering_options:
-  - in_memory:         1
-  - percent_identity:  90
-  - fraction_coverage: 0.55
-  - merge_threshold:   2
+  - in_memory:          1
+  - percent_identity:   90
+  - fraction_coverage:  0.55
+  - merge_threshold:    2
 annotation_input:
-  - repeat_database:  t_bldb
+  - repeat_database:    repeats.fas
 annotation_options:
-  - cluster_size:     1
-  - blast_evalue:     10
+  - cluster_size:       1
+  - blast_evalue:       10
 output:
-  - report_file:      t_rep.out
+  - report_file:        t_report.txt
