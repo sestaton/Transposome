@@ -513,7 +513,7 @@ sub _blast_to_annotation {
                         if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+\-I|LTR)/) {
+                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+)-[I|LTR]/) {
                             $gypsy_fam = $1;
                         }
                         elsif ($$top_hit =~ /(^Gyp.*\d+-[LTR|I]_w{2})/i) {
@@ -544,8 +544,8 @@ sub _blast_to_annotation {
                         elsif ($$top_hit =~ /(^Copia-\d+_[a-zA-Z]+)-[I|LTR]/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^COP\d+_[I|LTR]_[a-zA-Z]+)/) {
-                            $copia_fam = $1;
+                        elsif ($$top_hit =~ /^(COP\d+_)[I|LTR]_([a-zA-Z]+)/) {
+                            $copia_fam = $1.$2;
                         }
                         elsif ($$top_hit =~ /(^\S+)_/) {
                             $copia_fam = $1;
