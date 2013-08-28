@@ -30,7 +30,7 @@ has 'config' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
-    documentation => qq{ The Transposome configuration file},
+    documentation => qq{The Transposome configuration file},
     );
 
 has 'configuration' => (
