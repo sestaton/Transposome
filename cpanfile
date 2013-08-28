@@ -12,6 +12,7 @@ requires 'DBM::Deep', '>= 2.0008';
 requires 'DB_File', '>= 1.826';
 requires 'File::Path';
 requires 'Graph::UnionFind';
+#requires 'Devel::PartialDump'; # stringify exceptions
 
 on 'test' => sub {
    requires 'Test::More', '>= 0.96';
