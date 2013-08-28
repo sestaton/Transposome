@@ -26,6 +26,24 @@ our $VERSION = '0.01';
     with 'Transposome::Role::Util'
     ...
 
+=cut
+
+has 'cpus' => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_cpus',
+    lazy      => 1,
+    default   => 1,
+    );
+
+has 'threads' => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => 'has_threads',
+    lazy      => 1,
+    default   => 1,
+    );
+
 =head1 METHODS
 
 =head2 mk_key

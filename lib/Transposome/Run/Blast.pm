@@ -48,22 +48,6 @@ has 'desc_num' => (
     default   => 90000000,
     );
 
-has 'cpus' => (
-    is        => 'ro',
-    isa       => 'Int',
-    predicate => 'has_cpus',
-    lazy      => 1,
-    default   => 1,
-    );
-
-has 'threads' => (
-    is        => 'ro',
-    isa       => 'Int',
-    predicate => 'has_threads',
-    lazy      => 1,
-    default   => 1,
-    );
-
 has 'seq_num' => (
     is        => 'ro',
     isa       => 'Num',
