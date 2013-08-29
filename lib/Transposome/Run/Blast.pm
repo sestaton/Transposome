@@ -15,7 +15,8 @@ use Transposome::SeqIO;
 use Cwd;
 
 with 'Transposome::Role::File', 
-     'Transposome::Role::Types';
+     'Transposome::Role::Types',
+     'Transposome::Role::Util';
 
 =head1 SYNOPSIS
 
