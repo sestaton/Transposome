@@ -71,7 +71,9 @@ is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $db_fas,
 					       dir       => $outdir,
-					       file      => $report );
+					       file      => $report,
+                                               threads   => 1,
+                                               cpus      => 1 );
 
 ok( defined($annotation), 'new() returned something correctly' );
 ok( $annotation->isa('Transposome::Annotation'), 'new() returned an object of the right class' );

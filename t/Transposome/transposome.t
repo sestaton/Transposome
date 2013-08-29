@@ -103,7 +103,9 @@ ok( $cls_tot == 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       dir       => $config->{output_directory},
-					       file      => $config->{report_file} );
+					       file      => $config->{report_file},
+                                               threads   => 1,
+                                               cpus      => 1 );
 
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
