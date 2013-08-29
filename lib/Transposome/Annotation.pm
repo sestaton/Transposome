@@ -149,6 +149,7 @@ sub annotate_clusters {
     my $db_path = $self->_make_blastdb($database);
     my $out_dir = $self->dir->relative;
     my $blastn = $self->get_blastn_exec;
+    my $thread_range = sprintf("%.0f", $self->threads * $self->cpus);
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
@@ -199,7 +200,7 @@ sub annotate_clusters {
         $blast_res .= "_blast_$evalue.tsv";
         my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
 
-        my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 | ".
+        my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
                        "sort -k1,1 -u | ".                       # count each read in the report only once                                                 
                        "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
