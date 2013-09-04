@@ -164,7 +164,6 @@ sub next_seq {
             warn "\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
         };
         $self->set_seq($seq);
-
         
         my $cline = <$fh>;
         chomp $cline;
@@ -198,7 +197,6 @@ sub next_seq {
         catch {
             warn "\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n" and exit(1);
         };
-
         $self->set_qual($qual);
 
         return $self;
