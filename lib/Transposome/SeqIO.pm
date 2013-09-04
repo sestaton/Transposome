@@ -188,7 +188,7 @@ sub next_seq {
 	    die if !length($qual);
 	}
         catch {
-            warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit;
+            warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit(1);
         };
 
         try {
