@@ -5,7 +5,7 @@ use warnings;
 use lib qw(../blib/lib t/lib);
 use TestUtils;
 use Transposome::SeqIO;
-use Test::More tests => 18;
+use Test::More tests => 27;
 
 my $test_proper = TestUtils->new( build_proper => 1, destroy => 0 );
 my $seq_num = 1;
