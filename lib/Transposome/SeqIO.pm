@@ -221,7 +221,7 @@ Args    : A sequence header                                    Scalar
 =cut
 
 sub _set_id_per_encoding {
-    my $hline = shift;
+    my ($self, $hline) = @_;
     if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
 	return $1."/".$2;
     }
