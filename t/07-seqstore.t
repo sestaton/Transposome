@@ -8,7 +8,7 @@ use TestUtils;
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
-use Test::More tests => 24;
+use Test::More tests => 48;
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 
@@ -23,14 +23,14 @@ for my $fa (@$fa_arr) {
 	    my $memstore = Transposome::SeqUtil->new( file => $fa, in_memory => 1 );
 	    {
 		my ($seqs, $seqct) = $memstore->store_seq;
-		is( $seqct, 3, 'There are exactly three Fasta sequences being stored in memory');
+		is( $seqct, 6, 'There are exactly six Fasta sequences being stored in memory');
 		my $idct = scalar (keys %$seqs);
 		is( $seqct, $idct, 'The same number of Fasta sequences were read and stored in memory');
 	    }
 	    my $diskstore = Transposome::SeqUtil->new( file => $fa, in_memory => 0 );
 	    {
 		my ($seqs, $seqct) = $diskstore->store_seq;
-		is( $seqct, 3, 'There are exactly three Fasta sequences being stored on file');
+		is( $seqct, 6, 'There are exactly six Fasta sequences being stored on file');
 		my $idct = scalar (keys %$seqs);
 		is( $seqct, $idct, 'The same number of Fasta sequences were read and stored on file');
 		system("rm transposome_seqstore.dbm");
@@ -48,14 +48,14 @@ for my $fq (@$fq_arr) {
             my $memstore = Transposome::SeqUtil->new( file => $fq, in_memory => 1 );
             {
                 my ($seqs, $seqct) = $memstore->store_seq;
-                is( $seqct, 3, 'There are exactly three Fastq sequences being stored in memory');
+                is( $seqct, 6, 'There are exactly six Fastq sequences being stored in memory');
                 my $idct = scalar (keys %$seqs);
                 is( $seqct, $idct, 'The same number of Fastq sequences were read and stored in memory');
             }
             my $diskstore = Transposome::SeqUtil->new( file => $fq, in_memory => 0 );
             {
                 my ($seqs, $seqct) = $diskstore->store_seq;
-                is( $seqct, 3, 'There are exactly three Fastq sequences being stored on file');
+                is( $seqct, 6, 'There are exactly six Fastq sequences being stored on file');
                 my $idct = scalar (keys %$seqs);
                 is( $seqct, $idct, 'The same number of Fastq sequences were read and stored on file');
 		system("rm transposome_seqstore.dbm");
