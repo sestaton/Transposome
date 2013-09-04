@@ -14,13 +14,13 @@ eval "use Test::Pod::Coverage $min_tpc; use Pod::Coverage $min_pc";
 plan skip_all => "Test::Pod::Coverage $min_tpc and Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-my $trustme = { trustme => [qr/^(EXIT_ANY)$/] };
+my $trustme = { trustme => [qr/^(EXIT_ANY|BUILD)$/] };
 pod_coverage_ok("Transposome");
-pod_coverage_ok("Transposome::Annotation", $trustme);
+pod_coverage_ok("Transposome::Annotation", $trustme); 
 pod_coverage_ok("Transposome::Cluster", $trustme);
 pod_coverage_ok("Transposome::PairFinder");
 pod_coverage_ok("Transposome::SeqIO");
 pod_coverage_ok("Transposome::SeqUtil");
-pod_coverage_ok("Transposome::Run::Blast");
+pod_coverage_ok("Transposome::Run::Blast", $trustme);
 
 done_testing();
