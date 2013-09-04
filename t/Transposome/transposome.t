@@ -30,19 +30,19 @@ my $config = $trans_obj->get_config;
 ok( defined($config->{sequence_file}), 'Can set sequence data for configuration' );
 ok( defined($config->{output_directory}), 'Can set ouput directory for configuration' );
 ok( defined($config->{in_memory}), 'Can set memory conditions for configuration' );
-ok( $config->{in_memory} == 1, 'Can correctly set memory conditions for analysis' );
+is( $config->{in_memory}, 1, 'Can correctly set memory conditions for analysis' );
 
 ok( defined($config->{percent_identity}), 'Can set percent identity for configuration' );
 ok( defined($config->{fraction_coverage}), 'Can set fraction coverage for configuration' );
 ok( defined($config->{merge_threshold}), 'Can set merge threshold for configuration' );
-ok( $config->{percent_identity} == 90, 'Can correctly set percent identity for analysis' );
-ok( $config->{fraction_coverage} == 0.55, 'Can correctly set fraction coverage for analysis' );
-ok( $config->{merge_threshold} == 2, 'Can correctly set merge threshold for analysis' );
+is( $config->{percent_identity}, 90, 'Can correctly set percent identity for analysis' );
+is( $config->{fraction_coverage}, 0.55, 'Can correctly set fraction coverage for analysis' );
+is( $config->{merge_threshold}, 2, 'Can correctly set merge threshold for analysis' );
 
 ok( defined($config->{cluster_size}), 'Can set cluster size for configuration' );
 ok( defined($config->{blast_evalue}), 'Can set blast evalue for configuration' );
-ok( $config->{cluster_size} == 1, 'Can correctly set cluster size for analysis' );
-ok( $config->{blast_evalue} == 10, 'Can correctly set blast evalue for analysis' );
+is( $config->{cluster_size}, 1, 'Can correctly set cluster size for analysis' );
+is( $config->{blast_evalue}, 10, 'Can correctly set blast evalue for analysis' );
 
 ok( defined($config->{repeat_database}), 'Can set repeat database for configuration' );
 
@@ -92,14 +92,14 @@ ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
 my ($seqs, $seqct) = $memstore->store_seq;
-ok( $seqct == 70, 'Correct number of sequences stored' );
+is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
                                                                                $read_pairs, $config->{report_file}, $uf);
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
-ok( $cls_tot == 48, 'The expected number of reads went into clusters' );
+is( $cls_tot, 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       dir       => $config->{output_directory},
@@ -110,8 +110,8 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
 
-ok( $total_readct == 48, 'Correct number of reads annotated' );
-ok( $total_readct == $cls_tot, 'Same number of reads clustered and annotated' );
+is( $total_readct, 48, 'Correct number of reads annotated' );
+is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
 ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (1)' );
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
