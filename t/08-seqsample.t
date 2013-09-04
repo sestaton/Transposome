@@ -8,7 +8,7 @@ use TestUtils;
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
-use Test::More tests => 14;
+use Test::More tests => 26;
 
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 
