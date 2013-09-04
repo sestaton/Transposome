@@ -95,12 +95,18 @@ has 'qual' => (
 
 sub next_seq {
     my ($self, $fh) = @_;
+    my (@seqs, @quals);
 
     my $line = <$fh>;
     return unless defined $line;
     chomp $line;
+    try {
+        die unless (substr($line, 0, 1) eq '>' || substr($line, 0, 1) eq '@');
+    }
+    catch {
+        warn "\n[ERROR]: '$line' does not look like Fasta or Fastq.\nHere is the exception: $_\n" and exit(1);
+    };
 
-    my (@seqs, @quals);
     if (substr($line, 0, 1) eq '>') {
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
@@ -120,6 +126,12 @@ sub next_seq {
         my $seq = join '', @seqs;
         $seq =~ s/>.*// if $seq =~ />/;
         $seq =~ s/\s//g;
+        try {
+            die if !length($seq);
+        }
+        catch {
+            warn "\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n" and exit(1);
+        };
         $self->set_seq($seq);
 
         return $self;
@@ -145,11 +157,25 @@ sub next_seq {
         my $seq = join '', @seqs;
         $seq =~ s/\+.*// if $seq =~ /\+/;
         $seq =~ s/\s//g;
+        try {
+            die if !length($seq);
+        }
+        catch {
+            warn "\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
+        };
         $self->set_seq($seq);
 
         
         my $cline = <$fh>;
-        my $qline;
+        chomp $cline;
+        try {
+            die unless length($cline) && substr($cline, 0, 1) eq '+';
+        }
+        catch {
+            warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
+        };
+
+	my $qline;
         while ($qline = <$fh>) {
             chomp $qline;
             last if $qline =~ /$pat/;
@@ -158,7 +184,21 @@ sub next_seq {
         seek $fh, -length($qline)-1, 1 if length $qline;
         my $qual = join '', @quals;
         $qual =~ s/${pat}.*// if $qual =~ /${pat}/;
-        $qual =~ s/\s//g;
+	$qual =~ s/\s//g;
+	try {
+	    die if !length($qual);
+	}
+        catch {
+            warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit;
+        };
+
+        try {
+            die unless length($qual) >= length($seq);
+        }
+        catch {
+            warn "\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n" and exit(1);
+        };
+
         $self->set_qual($qual);
 
         return $self;
