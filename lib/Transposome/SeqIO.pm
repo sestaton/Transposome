@@ -182,7 +182,13 @@ sub next_seq {
         }
         seek $fh, -length($qline)-1, 1 if length $qline;
         my $qual = join '', @quals;
-        $qual =~ s/${pat}.*// if $qual =~ /${pat}/;
+	try {
+	    die if $qual !~ /${pat}/;
+	}
+	catch {
+	    warn "\n[ERROR]: Different IDs found for record at line $. not matching '$name'.\nHere is the exception: $_\n" and exit(1);
+	};
+        $qual =~ s/${pat}.*//;# if $qual =~ /${pat}/;
 	$qual =~ s/\s//g;
 	try {
 	    die if !length($qual);
