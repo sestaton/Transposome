@@ -562,7 +562,7 @@ sub _blast_to_annotation {
                                     for my $sine (@$sines) {
                                         if ($sine =~ /$$top_hit/) {
                                             ## only include the same level of depth as others
-				            $top_hit_superfam{$$top_hit} = $sine_fam_mem;
+				                            $top_hit_superfam{$$top_hit} = $sine_fam_mem;
                                             my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $sine_fam_mem, $$top_hit, $$top_hit_perc);
                                             $cluster_annot{$readct} = $anno_key;
                                             last;
@@ -572,7 +572,7 @@ sub _blast_to_annotation {
                             }
                         }
                     }
-		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
+		             elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam; 
                         if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
                             $gypsy_fam = $1;
@@ -594,9 +594,9 @@ sub _blast_to_annotation {
                         }
                         else {
                             $gypsy_fam = $$top_hit;
-			}
-                        $gypsy_fam =~ s/_I$// if $gypsy_fam =~ /_I$/;                                                                                                    
-                        $gypsy_fam =~ s/_LTR$// if $gypsy_fam =~ /_LTR$/;
+                        }
+                        $gypsy_fam =~ s/\_I$// if $gypsy_fam =~ /\_I$/;                                                                                                    
+                        $gypsy_fam =~ s/\_LTR$// if $gypsy_fam =~ /\_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $gypsy_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
@@ -619,18 +619,20 @@ sub _blast_to_annotation {
                         else {
                             $copia_fam = $$top_hit;
                         }
-                        $copia_fam =~ s/_I$// if $copia_fam =~ /_I$/;                                                                                                    
-                        $copia_fam =~ s/_LTR$// if $copia_fam =~ /_LTR$/;
+                        $copia_fam =~ s/\_I$// if $copia_fam =~ /\_I$/;                                                                                                    
+                        $copia_fam =~ s/\_LTR$// if $copia_fam =~ /\_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
                     }
                     else {
-			for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
+			            for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
                             for my $mem (@$fam) {
                                 if ($mem =~ /$$top_hit/i) {
+                                    $$top_hit =~ s/\_I$// if $$top_hit =~ /\_I$/;                                                                                                    
+                                    $$top_hit =~ s/\_LTR$// if $$top_hit =~ /\_LTR$/;
                                     $top_hit_superfam{$$top_hit} = $superfam_h;
-				    my $unk_fam = q{ };
+				                    my $unk_fam = q{ };
                                     my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $unk_fam, $$top_hit, $$top_hit_perc);
                                     $cluster_annot{$readct} = $anno_key;
                                     last;
