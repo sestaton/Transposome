@@ -531,9 +531,9 @@ sub _blast_to_annotation {
                         }
                         else {
                             $gypsy_fam = $$top_hit;
-			    $gypsy_fam =~ s/_I$// if $gypsy_fam =~ /_I$/;
-			    $gypsy_fam =~ s/_LTR$// if $gypsy_fam =~ /_LTR$/;
 			}
+                        $gypsy_fam =~ s/_I$// if $gypsy_fam =~ /_I$/;                                                                                                    
+                        $gypsy_fam =~ s/_LTR$// if $gypsy_fam =~ /_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $gypsy_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
@@ -555,9 +555,9 @@ sub _blast_to_annotation {
                         }
                         else {
                             $copia_fam = $$top_hit;
-			    $copia_fam =~ s/_I$// if $copia_fam =~ /_I$/;
-			    $copia_fam =~ s/_LTR$// if $copia_fam =~ /_LTR$/
                         }
+                        $copia_fam =~ s/_I$// if $copia_fam =~ /_I$/;                                                                                                    
+                        $copia_fam =~ s/_LTR$// if $copia_fam =~ /_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
