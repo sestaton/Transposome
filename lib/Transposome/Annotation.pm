@@ -295,7 +295,7 @@ sub clusters_annotation_to_summary  {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
             $total_ct += $blast->{$fam};
-	        if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
+	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
                 my $famname = $1;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
@@ -322,16 +322,16 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-	        elsif ($fam =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
-    		    my $famname = $1.$2;
+	    elsif ($fam =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+		my $famname = $1.$2;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
                 }
                 else {
                     $fams{$famname} = $blast->{$fam};
                 }
-	        }
-	        elsif ($fam =~ /(^RL[CG]_\w+\d+_\d+)/) {
+	    }
+	    elsif ($fam =~ /(^RL[CG]_\w+\d+_\d+)/) {
     	        my $famname = $1;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
@@ -339,7 +339,7 @@ sub clusters_annotation_to_summary  {
                 else {
                     $fams{$famname} = $blast->{$fam};
                 }
-	        }
+	    }
             elsif ($fam =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                 my $famname = $1;
                 if (exists $fams{$famname}) {
@@ -358,8 +358,8 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-	        elsif ($fam =~ /(^[A-Za-z]+)_/) {
-    		    my $famname = $1;
+	    elsif ($fam =~ /(^[A-Za-z]+)_/) {
+		my $famname = $1;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
                 }
@@ -385,6 +385,8 @@ sub clusters_annotation_to_summary  {
 	    my $hit_perc = sprintf("%.12f",$fams{$k}/$total_ct);
 	    my $gperc_corr = $hit_perc * $rep_frac;
             $total_gcov += $gperc_corr;
+	    $k =~ s/\_I$// if $k =~ /\_I$/;
+	    $k =~ s/\_LTR$// if $k =~ /\_LTR$/;
             say $outsum join "\t", $seqct, $top_hit_superfam{$k}, $k, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
         }
     }
