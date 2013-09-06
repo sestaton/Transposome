@@ -304,13 +304,76 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
+        }
+        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+            my $famname = $1;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
             else {
-                if (exists $fams{$fam}) {
-                    $fams{$fam} += $blast->{$fam};
-                }
-                else {
-                    $fams{$fam} = $blast->{$fam};
-                }
+                $fams{$famname} = $blast->{$fam};
+            }
+        }
+        elsif ($$top_hit =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
+            my $famname = $1;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+        }
+	    elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+    		my $famname = $1.$2;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+	    }
+	    elsif ($$top_hit =~ /(^RL[CG]_\w+\d+_\d+)/) {
+    	    my $famname = $1;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+	    }
+        elsif ($$top_hit =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+            my $famname = $1;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+        }
+        elsif ($$top_hit =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
+            my $famname = $1.$2;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+        }
+	    elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
+    		my $famname = $1;
+            if (exists $fams{$famname}) {
+                $fams{$famname} += $blast->{$fam};
+            }
+            else {
+                $fams{$famname} = $blast->{$fam};
+            }
+        }
+        else {
+            if (exists $fams{$fam}) {
+                $fams{$fam} += $blast->{$fam};
+            }
+            else {
+                $fams{$fam} = $blast->{$fam};
             }
         }
     }
@@ -517,16 +580,16 @@ sub _blast_to_annotation {
                         elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gyp.*\d+-(?:LTR|I)_w{2})/i) {
+                        elsif ($$top_hit =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /^([a-zA-Z])+-(?:I|LTR)(_\w+)/) {
+                        elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
                             $gypsy_fam = $1.$2;
                         }
                         elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^\S+)_/) {
+                        elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
                             $gypsy_fam = $1;
                         }
                         else {
@@ -550,7 +613,7 @@ sub _blast_to_annotation {
                         elsif ($$top_hit =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
                             $copia_fam = $1.$2;
                         }
-                        elsif ($$top_hit =~ /(^\S+)_/) {
+                        elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
                             $copia_fam = $1;
                         }
                         else {
