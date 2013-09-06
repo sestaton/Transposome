@@ -305,7 +305,7 @@ sub clusters_annotation_to_summary  {
                 }
             }
         }
-        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+        elsif ($fam =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
             my $famname = $1;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -314,7 +314,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
         }
-        elsif ($$top_hit =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
+        elsif ($fam =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
             my $famname = $1;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -323,7 +323,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
         }
-	    elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+	    elsif ($fam =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
     		my $famname = $1.$2;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -332,7 +332,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
 	    }
-	    elsif ($$top_hit =~ /(^RL[CG]_\w+\d+_\d+)/) {
+	    elsif ($fam =~ /(^RL[CG]_\w+\d+_\d+)/) {
     	    my $famname = $1;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -341,7 +341,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
 	    }
-        elsif ($$top_hit =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+        elsif ($fam =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
             my $famname = $1;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -350,7 +350,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
         }
-        elsif ($$top_hit =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
+        elsif ($fam =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
             my $famname = $1.$2;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
@@ -359,7 +359,7 @@ sub clusters_annotation_to_summary  {
                 $fams{$famname} = $blast->{$fam};
             }
         }
-	    elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
+	    elsif ($fam =~ /(^[A-Za-z]+)_/) {
     		my $famname = $1;
             if (exists $fams{$famname}) {
                 $fams{$famname} += $blast->{$fam};
