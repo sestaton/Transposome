@@ -295,7 +295,7 @@ sub clusters_annotation_to_summary  {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
             $total_ct += $blast->{$fam};
-	    if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
+	        if ($fam =~ /(^RL[CG][-_][a-zA-Z]+)/) {
                 my $famname = $1;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
@@ -304,76 +304,76 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-        }
-        elsif ($fam =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-            my $famname = $1;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
+            elsif ($fam =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                my $famname = $1;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+            }
+            elsif ($fam =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
+                my $famname = $1;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+            }
+	        elsif ($fam =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+    		    my $famname = $1.$2;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+	        }
+	        elsif ($fam =~ /(^RL[CG]_\w+\d+_\d+)/) {
+    	        my $famname = $1;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }   
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+	        }
+            elsif ($fam =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                my $famname = $1;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+            }
+            elsif ($fam =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
+                my $famname = $1.$2;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+            }
+	        elsif ($fam =~ /(^[A-Za-z]+)_/) {
+    		    my $famname = $1;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
             }
             else {
-                $fams{$famname} = $blast->{$fam};
-            }
-        }
-        elsif ($fam =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
-            my $famname = $1;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-        }
-	    elsif ($fam =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
-    		my $famname = $1.$2;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-	    }
-	    elsif ($fam =~ /(^RL[CG]_\w+\d+_\d+)/) {
-    	    my $famname = $1;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-	    }
-        elsif ($fam =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-            my $famname = $1;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-        }
-        elsif ($fam =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
-            my $famname = $1.$2;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-        }
-	    elsif ($fam =~ /(^[A-Za-z]+)_/) {
-    		my $famname = $1;
-            if (exists $fams{$famname}) {
-                $fams{$famname} += $blast->{$fam};
-            }
-            else {
-                $fams{$famname} = $blast->{$fam};
-            }
-        }
-        else {
-            if (exists $fams{$fam}) {
-                $fams{$fam} += $blast->{$fam};
-            }
-            else {
-                $fams{$fam} = $blast->{$fam};
+                if (exists $fams{$fam}) {
+                    $fams{$fam} += $blast->{$fam};
+                }
+                else {
+                    $fams{$fam} = $blast->{$fam};
+                }
             }
         }
     }
