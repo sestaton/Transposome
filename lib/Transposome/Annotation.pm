@@ -374,7 +374,6 @@ sub clusters_annotation_to_summary  {
                 else {
                     $fams{$fam} = $blast->{$fam};
                 }
-		say $fam;
             }
         }
     }
@@ -386,9 +385,10 @@ sub clusters_annotation_to_summary  {
 	    my $hit_perc = sprintf("%.12f",$fams{$k}/$total_ct);
 	    my $gperc_corr = $hit_perc * $rep_frac;
             $total_gcov += $gperc_corr;
-	    $k =~ s/\_I$// if $k =~ /\_I$/;
-	    $k =~ s/\_LTR$// if $k =~ /\_LTR$/;
-            say $outsum join "\t", $seqct, $top_hit_superfam{$k}, $k, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
+	    my $fam = $k;
+	    $fam =~ s/\_I$// if $fam =~ /\_I$/;
+	    $fam =~ s/\_LTR$// if $fam =~ /\_LTR$/;
+            say $outsum join "\t", $seqct, $top_hit_superfam{$k}, $fam, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
         }
     }
     close $outsum;
