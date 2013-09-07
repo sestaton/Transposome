@@ -109,9 +109,6 @@ sub parse_blast {
     my $index = 0;
 
     my $fh = $self->file->openr;
-    open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
-    open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
-    open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
 
     if ($self->in_memory) {
 	my %match_pairs;
@@ -173,10 +170,15 @@ sub parse_blast {
         }
         close $fh;
 
+	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
+
         for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
             say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
         }
         close $idx;
+
+	open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
 
         while (my ($match, $scores) = each %match_pairs) {
             my $match_score = max(@$scores);
@@ -282,11 +284,16 @@ sub parse_blast {
 	}
 	close $fh;
 
+	open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
+
 	for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
 	    say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
 	}
 	close $idx;
-	
+
+	open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";	
+
 	while (my ($match, $scores) = each %$db) {
 	    my $match_score = max(@$scores);
 	    my ($qry, $sbj) = $self->mk_vec($match);
