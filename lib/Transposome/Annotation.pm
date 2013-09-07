@@ -374,12 +374,13 @@ sub clusters_annotation_to_summary  {
                 else {
                     $fams{$fam} = $blast->{$fam};
                 }
+		say $fam;
             }
         }
     }
     my $total_gcov = 0;
 
-    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", "HitPerc", "GPerc";
+    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", "HitPerc", "GenomePerc";
     for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
         if (exists $top_hit_superfam{$k}) {
 	    my $hit_perc = sprintf("%.12f",$fams{$k}/$total_ct);
@@ -609,7 +610,7 @@ sub _blast_to_annotation {
                         if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Copia-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                        elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                             $copia_fam = $1;
                         }
                         elsif ($$top_hit =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
@@ -626,6 +627,7 @@ sub _blast_to_annotation {
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
+                        last;
                     }
                     else {
                         for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
