@@ -160,8 +160,8 @@ sub _validate_params {
     for my $k (keys %$config) {
 	my $v = $config->{$k};
         if (not defined $v) {
-            warn "\n[ERROR]: '$k' is not defined after parsing configuration file. This indicates there may be a blank line your configuration file.\n";
-	    warn "Please check your configuration file and try again. Exiting.\n";
+            warn "\n[ERROR]: '$k' is not defined after parsing configuration file. This indicates there may be a blank line in your configuration file.\n";
+	    warn "           Please check your configuration file and try again. Exiting.\n";
             exit(1);
         }
         else {
