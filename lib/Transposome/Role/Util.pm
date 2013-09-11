@@ -128,7 +128,7 @@ sub get_config {
     $config{cluster_size} = $self->configuration->{annotation_options}->[0]->{cluster_size};
     $config{blast_evalue} = $self->configuration->{annotation_options}->[1]->{blast_evalue};
 
-    $config{repeat_database}   = $self->configuration->{annotation_input}->[0]->{repeat_database};
+    $config{repeat_database} = $self->configuration->{annotation_input}->[0]->{repeat_database};
 
     $config{report_file} = $self->configuration->{output}->[0]->{report_file};
 
