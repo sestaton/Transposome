@@ -6,6 +6,7 @@ use YAML;
 use namespace::autoclean;
 
 with 'MooseX::Getopt::Usage',
+     'MooseX::Log::Log4perl',
      'Transposome::Role::Util';
 
 =head1 NAME
