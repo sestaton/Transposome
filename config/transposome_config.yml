@@ -15,4 +15,5 @@ annotation_options:
   - cluster_size:       1
   - blast_evalue:       10
 output:
-  - report_file:        t_report.txt
+  - log_file:            t_log.txt
+  - cluster_file:        t_cluster_report.txt
