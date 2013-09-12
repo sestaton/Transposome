@@ -130,7 +130,8 @@ sub get_config {
 
     $config{repeat_database} = $self->configuration->{annotation_input}->[0]->{repeat_database};
 
-    $config{report_file} = $self->configuration->{output}->[0]->{report_file};
+    $config{run_log_file}     = $self->configuration->{output}->[0]->{run_log_file};
+    $config{cluster_log_file} = $self->configuration->{output}->[1]->{cluster_log_file};
 
     my $valid_config = $self->_validate_params(\%config);
 
