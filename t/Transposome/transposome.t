@@ -4,6 +4,7 @@ use 5.012;
 use strict;
 use warnings;
 use Module::Path qw(module_path);
+use Log::Log4perl qw(:easy);
 use lib qw(../../blib/lib t/lib);
 use Transposome;
 use Transposome::PairFinder;
@@ -13,7 +14,7 @@ use Transposome::Annotation;
 use Transposome::Run::Blast;
 use TestUtils;
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 my $test = TestUtils->new( seq_file     => 't/test_data/t_reads.fas',
 			   repeat_db    => 't/test_data/t_db.fas',
@@ -46,7 +47,11 @@ is( $config->{blast_evalue}, 10, 'Can correctly set blast evalue for analysis' )
 
 ok( defined($config->{repeat_database}), 'Can set repeat database for configuration' );
 
-ok( defined($config->{report_file}), 'Can generate report file for configuration' );
+ok( defined($config->{run_log_file}), 'Can generate run log file for configuration' );
+ok( defined($config->{cluster_log_file}), 'Can generate cluster log file for configuration' );
+
+## init logger
+Log::Log4perl->easy_init( { file => ">>$config->{run_log_file" } );
 
 my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
                                           dir       => $config->{output_directory},
