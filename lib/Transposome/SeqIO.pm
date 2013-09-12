@@ -3,7 +3,6 @@ package Transposome::SeqIO;
 use 5.012;
 use Moose;
 use Try::Tiny;
-use Carp;
 use namespace::autoclean;
 
 with 'Transposome::Role::File';
@@ -98,7 +97,7 @@ sub next_seq {
     my (@seqs, @quals);
 
     my $line = <$fh>;
-    return unless defined $line;
+    return unless defined $line && $line =~ /\S/;
     chomp $line;
     try {
         die unless (substr($line, 0, 1) eq '>' || substr($line, 0, 1) eq '@');
@@ -137,9 +136,8 @@ sub next_seq {
         return $self;
     }
     if (substr($line, 0, 1) eq '@') {
+	my $id = $1 if $line =~ /^@(\w+|\d+)(?::|-)/;
         my $name = $self->_set_id_per_encoding($line);
-        my $id = $1 if $line =~ /^@(\w+|\d+)(?::|-)/;
-        my $pat = qr/$id/;
         $self->set_id($name);
 
         my $sline = <$fh>;
@@ -149,13 +147,13 @@ sub next_seq {
         if ($sline =~ /[ATCGNatcgn]/) {
             push @seqs, $sline;
             while ($seqline = <$fh>) {
-                last if $seqline =~ /\+/;
+                last if $seqline =~ /^\+$id|\+/;
                 push @seqs, $seqline;
             }
         }
         seek $fh, -length($seqline), 1 if length $seqline;
         my $seq = join '', @seqs;
-        $seq =~ s/\+.*// if $seq =~ /\+/;
+        $seq =~ s/\+.*// if $seq =~ /^\+$id|\+/;
         $seq =~ s/\s//g;
         try {
             die if !length($seq);
@@ -174,22 +172,18 @@ sub next_seq {
             warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
         };
 
-	my $qline;
-        while ($qline = <$fh>) {
+	my $qual;
+        while (my $qline = <$fh>) {
             chomp $qline;
-            last if $qline =~ /$pat/;
-            push @quals, $qline;
+            $qual .= $qline;
+            try {
+                die if !length($qual);
+            }
+            catch {
+                warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit(1);
+            };
+            last if length($qual) >= length($seq);
         }
-        seek $fh, -length($qline)-1, 1 if length $qline;
-        my $qual = join '', @quals;
-        $qual =~ s/${pat}.*// if $qual =~ /${pat}/;
-	$qual =~ s/\s//g;
-	try {
-	    die if !length($qual);
-	}
-        catch {
-            warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit(1);
-        };
 
         try {
             die unless length($qual) >= length($seq);
