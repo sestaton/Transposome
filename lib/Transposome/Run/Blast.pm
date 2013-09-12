@@ -14,7 +14,8 @@ use Try::Tiny;
 use Transposome::SeqIO;
 use Cwd;
 
-with 'Transposome::Role::File', 
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File', 
      'Transposome::Role::Types',
      'Transposome::Role::Util';
 

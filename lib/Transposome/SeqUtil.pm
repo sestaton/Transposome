@@ -9,7 +9,8 @@ use vars qw($DB_BTREE &R_DUP);
 use Carp;
 use Transposome::SeqIO;
 
-with 'Transposome::Role::File',
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File',
      'Transposome::Role::Types';
 
 =head1 NAME

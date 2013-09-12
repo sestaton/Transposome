@@ -13,7 +13,8 @@ use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
 
-with 'Transposome::Role::File', 
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME

@@ -11,7 +11,8 @@ use File::Basename;
 use Try::Tiny;
 use Storable qw(thaw);
 
-with 'Transposome::Annotation::Typemap', 
+with 'MooseX::Log::Log4perl',
+     'Transposome::Annotation::Typemap', 
      'Transposome::Role::File', 
      'Transposome::Role::Util';
 

@@ -13,7 +13,8 @@ use Path::Class::File;
 use POSIX qw(strftime);
 use Config;
 
-with 'Transposome::Role::File', 
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME

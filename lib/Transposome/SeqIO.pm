@@ -5,7 +5,8 @@ use Moose;
 use Try::Tiny;
 use namespace::autoclean;
 
-with 'Transposome::Role::File';
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File';
 
 =head1 NAME
 
