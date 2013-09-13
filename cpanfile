@@ -1,5 +1,6 @@
 requires 'Moose', '>= 2.0802';
 requires 'MooseX::Getopt', '>= 0.56';
+requires 'MooseX::Log::Log4perl' '>= 0.46';
 requires 'MooseX::Types::Path::Class', '>= 0.06';
 requires 'namespace::autoclean', '>= 0.13';
 requires 'Try::Tiny', '>= 0.12';
@@ -10,6 +11,7 @@ requires 'YAML', '>= 0.84';
 requires 'Parallel::ForkManager', '>= 0.7.0';
 requires 'DBM::Deep', '>= 2.0008';
 requires 'DB_File', '>= 1.826';
+requires 'Log::Log4perl', '>= 1.40';
 requires 'File::Path';
 requires 'Graph::UnionFind';
 #requires 'Devel::PartialDump'; # stringify exceptions
