@@ -5,8 +5,7 @@ use Moose;
 use Try::Tiny;
 use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::File';
+with 'Transposome::Role::File';
 
 =head1 NAME
 
@@ -111,21 +110,14 @@ sub next_seq {
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
         
-        my $sline = <$fh>;
-        chomp $sline;
+        my ($sline, $seq);
+	while ($sline = <$fh>) {
+	    chomp $sline;
+	    last if $sline =~ />/;
+	    $seq .= $sline;
+	}
+        seek $fh, -length($sline)-1, 1 if length $sline;
 
-        my $seqline;
-        if ($sline =~ /[ATCGNatcgn]/) {
-            push @seqs, $sline;
-            while ($seqline = <$fh>) {
-                last if $seqline =~ />/;
-                push @seqs, $seqline;
-            }
-        }
-        seek $fh, -length($seqline), 1 if length $seqline;
-        my $seq = join '', @seqs;
-        $seq =~ s/>.*// if $seq =~ />/;
-        $seq =~ s/\s//g;
         try {
             die if !length($seq);
         }
@@ -140,22 +132,14 @@ sub next_seq {
 	my $id = $1 if $line =~ /^@(\w+|\d+)(?::|-)/;
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
-
-        my $sline = <$fh>;
-        chomp $sline;
-
-        my $seqline;
-        if ($sline =~ /[ATCGNatcgn]/) {
-            push @seqs, $sline;
-            while ($seqline = <$fh>) {
-                last if $seqline =~ /^\+$id|\+/;
-                push @seqs, $seqline;
-            }
-        }
-        seek $fh, -length($seqline), 1 if length $seqline;
-        my $seq = join '', @seqs;
-        $seq =~ s/\+.*// if $seq =~ /^\+$id|\+/;
-        $seq =~ s/\s//g;
+	
+	my ($sline, $seq);
+	while ($sline = <$fh>) {
+	    chomp $sline;
+	    last if $sline =~ /^\+/;
+	    $seq .= $sline;
+	}
+        seek $fh, -length($sline)-1, 1 if length $sline;
         try {
             die if !length($seq);
         }
@@ -167,7 +151,7 @@ sub next_seq {
         my $cline = <$fh>;
         chomp $cline;
         try {
-            die unless length($cline) && substr($cline, 0, 1) eq '+';
+            die unless length($cline) && substr($cline, 0, 1) =~ /^\+/;
         }
         catch {
             warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
