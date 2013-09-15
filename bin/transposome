@@ -53,6 +53,7 @@ my $conf = q{
 Log::Log4perl::init( \$conf );
 #my $log = Log::Log4perl::get_logger("Transposome");
 # just print a string and add my own time stamp
+print POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime());
 
 #
 # perform the all vs. all blast
