@@ -117,14 +117,18 @@ sub BUILD {
         die unless $self->has_mgblast_exec;
     }
     catch {
-        warn "\n[ERROR]: Unable to find mgblast. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+        $self->log->info("\n[ERROR]: Unable to find mgblast. Check your PATH to see that it is installed. Exiting.\n")
+	    if Log::Log4perl::initialized();
+	exit(1);
     };
 
     try {
         die unless $self->has_formatdb_exec;
     }
     catch {
-        warn "\n[ERROR]: Unable to find formatdb. Check your PATH to see that it is installed. Exiting.\n"; exit(1);
+        $self->log->info("\n[ERROR]: Unable to find formatdb. Check your PATH to see that it is installed. Exiting.\n")
+	    if Log::Log4perl::intialized();
+	exit(1);
     };
 }
 
@@ -191,7 +195,8 @@ sub run_allvall_blast {
 			      my $time = sprintf("%.2f",$elapsed/60);
 			      my $base = basename($ident);
 			      #say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
-			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.");
+			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.") 
+				  if Log::Log4perl::intialized();
 			} );
 
     for my $seqs (@$seq_files) {
@@ -211,7 +216,8 @@ sub run_allvall_blast {
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
     #say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
-    $self->log->info("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.");
+    $self->log->info("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.")
+	if Log::Log4perl::initialized();
     #close $rep;
     unlink glob("$database*");
     return $out_path;
@@ -250,8 +256,10 @@ sub _make_mgblastdb {
         system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-        warn "\n[ERROR]: Unable to make mgblast database.\n";
-        warn "[ERROR]: Here is the exception: $_\nCheck your Legacy BLAST installation. Exiting.\n";
+        $self->log->info("\n[ERROR]: Unable to make mgblast database.\n")
+	    if Log::Log4perl::intialized();
+        $self->log->info("[ERROR]: Here is the exception: $_\nCheck your Legacy BLAST installation. Exiting.\n")
+	    if Log::Log4perl::intialized();
         exit(1);
     };
 
@@ -314,7 +322,8 @@ sub _run_blast {
         $exit_value = system([0..5],$blast_cmd);
     }
     catch {
-        "\n[ERROR]: BLAST exited with exit value $exit_value. Here is the exception: $_\n";
+        $self->log->info("\n[ERROR]: BLAST exited with exit value $exit_value. Here is the exception: $_\n")
+	    if Log::Log4perl::intialized();
     };
 
     return $subseq_out;
