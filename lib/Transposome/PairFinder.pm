@@ -12,6 +12,7 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
+use POSIX qw(strftime);
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File', 
@@ -88,8 +89,8 @@ has 'fraction_coverage' => (
 =cut
 
 sub parse_blast {
-     my ($self) = @_;
-
+    my ($self) = @_;
+    
     my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
@@ -103,13 +104,18 @@ sub parse_blast {
     my $int_path = File::Spec->catfile($self->dir, $int_file);
     my $idx_path = File::Spec->catfile($self->dir, $idx_file);
     my $hs_path = File::Spec->catfile($self->dir, $hs_file);
-
+    
     # counters
     my $total_hits = 0;
     my $parsed_hits = 0;
     my $index = 0;
-
+    
     my $fh = $self->file->openr;
+    
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::PairFinder::parse_blast started $st.")
+        if Log::Log4perl::initialized();
 
     if ($self->in_memory) {
 	my %match_pairs;
@@ -325,6 +331,10 @@ sub parse_blast {
 	untie %match_index;
 	unlink $dbi;
 	unlink $dbm;
+
+	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+	$self->log->info("======== Transposome::PairFinder::parse_blast completed at $ft. Final output files are: $int_file, $idx_file, and $hs_file")
+	    if Log::Log4perl::initialized();
 
 	return($idx_path, $int_path, $hs_path);
 
