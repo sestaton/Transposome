@@ -132,5 +132,5 @@ ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating an
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file}); #FIXME
 
-system("rm -rf $config->{output_directory} $config->{report_file} t/transposome_mgblast* t_rep** $conf_file");
+system("rm -rf $config->{output_directory} $config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file");
 
