@@ -10,6 +10,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Try::Tiny;
 use Storable qw(thaw);
+use POSIX qw(strftime);
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
@@ -167,6 +168,11 @@ sub annotate_clusters {
     my $total_readct = 0;
     my $evalue = $self->evalue;
     my $rep_frac = $cls_tot / $seqct;
+    
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Annotation::annotate_clusters started at $st.")
+        if Log::Log4perl::initialized();
 
     say $rep "======> Total seqs: ",$seqct;
     say $rep "======> Total clustered: ",$cls_tot;
@@ -248,6 +254,11 @@ sub annotate_clusters {
     close $out;
     unlink glob("$db_path*");
 
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Annotation::annotate_clusters completed at $ft.")
+        if Log::Log4perl::initialized();
+
     return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
 }
 
@@ -284,6 +295,11 @@ sub clusters_annotation_to_summary  {
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at $st.")
+        if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
@@ -405,6 +421,11 @@ sub clusters_annotation_to_summary  {
     close $outsum;
     say $rep "======> Total repeat fraction from annotations: ",$total_gcov;
     close $rep;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at $ft.")
+        if Log::Log4perl::initialized();
 }
 
 =head2 _make_blastdb
