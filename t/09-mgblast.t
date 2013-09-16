@@ -29,8 +29,8 @@ my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					  dir       => $config->{output_directory},
 					  threads   => 1,
 					  cpus      => 1,
-					  seq_num   => $config->{sequence_num},
-                                          report    => $config->{report_file} );
+					  seq_num   => $config->{sequence_num} );
+#                                          report    => $config->{report_file} );
 
 my $blastdb = $blast->run_allvall_blast;
 ok ( defined($blastdb), 'Can execute all vs. all blast correctly' );
