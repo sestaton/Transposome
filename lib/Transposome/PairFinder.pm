@@ -114,7 +114,7 @@ sub parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::PairFinder::parse_blast started $st.")
+    $self->log->info("======== Transposome::PairFinder::parse_blast started at: $st.")
         if Log::Log4perl::initialized();
 
     if ($self->in_memory) {
@@ -214,6 +214,11 @@ sub parse_blast {
 	close $int;
 	close $hs;
 
+	# log results
+	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
+	    if Log::Log4perl::initialized();
+
 	return($idx_path, $int_path, $hs_path);
     }
     else {
@@ -223,12 +228,11 @@ sub parse_blast {
 	unlink $dbm if -e $dbm;
 	unlink $dbi if -e $dbi;
 	
-	my $db = DBM::Deep->new(  file      => $dbm,
-				  locking   => 1,
-				  autoflush => 1,
-				  type      => DBM::Deep::TYPE_HASH
-	    );
-	
+	my $db = DBM::Deep->new( file      => $dbm,
+			         locking   => 1,
+				 autoflush => 1,
+				 type      => DBM::Deep::TYPE_HASH );
+
 	my %match_index;
 	$DB_BTREE->{cachesize} = 100000;
 	$DB_BTREE->{flags} = R_DUP;
@@ -332,8 +336,9 @@ sub parse_blast {
 	unlink $dbi;
 	unlink $dbm;
 
+	# log results
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::PairFinder::parse_blast completed at $ft. Final output files are: $int_file, $idx_file, and $hs_file")
+	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
 	    if Log::Log4perl::initialized();
 
 	return($idx_path, $int_path, $hs_path);
