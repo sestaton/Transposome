@@ -199,7 +199,7 @@ sub run_allvall_blast {
 			      my $base = basename($ident);
 			      #say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
 			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.") 
-				  if Log::Log4perl::intialized();
+				  if Log::Log4perl::initialized();
 			} );
 
     for my $seqs (@$seq_files) {
