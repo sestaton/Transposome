@@ -51,14 +51,14 @@ ok( defined($config->{run_log_file}), 'Can generate run log file for configurati
 ok( defined($config->{cluster_log_file}), 'Can generate cluster log file for configuration' );
 
 ## init logger
-Log::Log4perl->easy_init( { file => ">>$config->{run_log_file" } );
+Log::Log4perl->easy_init( { file => ">>$config->{run_log_file}" } );
 
 my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
                                           dir       => $config->{output_directory},
                                           threads   => 1,
                                           cpus      => 1,
-                                          seq_num   => $config->{sequence_num},
-                                          report    => $config->{report_file} );
+                                          seq_num   => $config->{sequence_num} );
+#                                          report    => $config->{report_file} );
 
 my $blastdb = $blast->run_allvall_blast;
 ok( defined($blastdb), 'Can run all vs. all blast correctly' );
@@ -92,7 +92,7 @@ ok( defined($comm), 'Can successfully perform clustering' );
 my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 ok( defined($cluster_file), 'Can successfully make communities following clusters' );
 
-my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{report_file});
+my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file}); #FIXME
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
@@ -101,14 +101,14 @@ is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
 my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
-                                                                               $read_pairs, $config->{report_file}, $uf);
+                                                                               $read_pairs, $config->{cluster_log_file}, $uf); #FIXME
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
 is( $cls_tot, 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       dir       => $config->{output_directory},
-					       file      => $config->{report_file},
+					       file      => $config->{cluster_log_file},       #FIXME
                                                threads   => 1,
                                                cpus      => 1 );
 
@@ -121,7 +121,7 @@ ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annot
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams, $config->{report_file});
+                                            $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file}); #FIXME
 
 system("rm -rf $config->{output_directory} $config->{report_file} t/transposome_mgblast* t_rep** $conf_file");
 
