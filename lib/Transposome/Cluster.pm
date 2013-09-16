@@ -99,14 +99,18 @@ sub louvain_method {
 	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
-	warn "\n[ERROR]: Louvain 'convert' failed. Caught error: $_" and exit(1);
+	$self->log->warn("\n[ERROR]: Louvain 'convert' failed. Caught error: $_")
+	    if Log::Log4perl::initialized();
+	exit(1);
     };
 
     try {
 	system([0..5],"$realbin/louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
-	warn "\n[ERROR]: Louvain 'community' failed. Caught error: $_" and exit(1);
+	$self->log->warn("\n[ERROR]: Louvain 'community' failed. Caught error: $_")
+	    if Log::Log4perl::initialized();
+	exit(1);
     };
 
     unlink $cls_bin_path;
@@ -117,7 +121,9 @@ sub louvain_method {
 	chomp $levels;
     }
     catch {
-	warn "\n[ERROR]: grep failed. Caught error: $_" and exit(1);
+	$self->log->warn("\n[ERROR]: grep failed. Caught error: $_")
+	    if Log::Log4perl::initialized();
+	exit(1);
     };
 
     my @comm;
@@ -129,7 +135,9 @@ sub louvain_method {
 	    system([0..5],"$realbin/louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
-	    warn "\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_" and exit(1);
+	    $self->log->warn("\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_")
+		if Log::Log4perl::initialized();
+	    exit(1);
 	};
 
 	push @comm, $cls_graph_comm;
@@ -283,7 +291,9 @@ sub make_clusters {
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
     my $graph = shift @graph_comm_sort;
-    die "\n[ERROR]: Community clustering failed. Exiting.\n" unless defined $graph;
+    if(Log::Log4perl::initialized()){
+	$self->log->logdie("\n[ERROR]: Community clustering failed. Exiting.\n") unless defined $graph;
+    }
     my $graph_path = File::Spec->catfile($out_dir, $graph);
     my %clus;
     my %index;
@@ -347,11 +357,10 @@ sub make_clusters {
                      3) the total number of reads clustered                      Scalar
 
            The cluster file is in a format similar to Fasta, where the           
-           identifier specifies the cluster ID followed by the size. The                                                                                                         second line of each record contains each read ID separated by                                                                                              
+           identifier specifies the cluster ID followed by the size. The                                                                                               second line of each record contains each read ID separated by                                                                             
            a space. The 'G' indicates a group created by joining clusters.
-           E.g.,                                                                                                                                             
-                                                                                                                                                                      
-               >G1 3                                                                                                                                                                 read1 read2 read3 
+           E.g.,                                                                                                                                                                                                                                                                                                        
+               >G1 3                                                                                                                                                       read1 read2 read3 
                                                                                  Arg_type
  Args    : In order, 1) a hash of the vertices and their counts                  HashRef
                      2) the mapping of Fasta/q IDs and their sequence            HashRef
@@ -415,7 +424,7 @@ sub merge_clusters {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
 		    }
 		    else {
-			warn "[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.";
+			$self->log->warn("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.") if Log::Log4perl::initialized();
 		    }
 		}
 	    }
@@ -445,7 +454,7 @@ sub merge_clusters {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		}
 		else {
-		    warn "[WARNING]: $non_paired_read not found. This indicates something went wrong processing the input. Please check your input data.";
+		    $self->log->warn("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.") if Log::Log4perl::initialized();
 		}
 	    }
 	    close $clsout;
