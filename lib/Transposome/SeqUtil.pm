@@ -121,7 +121,7 @@ sub store_seq {
         my $seq_dbm = "transposome_seqstore.dbm";
         unlink $seq_dbm if -e $seq_dbm;
         tie %seqhash, 'DB_File', $seq_dbm, O_RDWR|O_CREAT, 0666, $DB_BTREE
-            or croak "\nERROR: Could not open DBM file $seq_dbm: $!\n";
+            or die "\nERROR: Could not open DBM file $seq_dbm: $!\n";
     }
 
     if (-e $self->file) {
