@@ -5,7 +5,8 @@ use Moose;
 use Try::Tiny;
 use namespace::autoclean;
 
-with 'Transposome::Role::File';
+with 'MooseX::Log::Log4perl',
+     'Transposome::Role::File';
 
 =head1 NAME
 
@@ -103,7 +104,9 @@ sub next_seq {
         die unless (substr($line, 0, 1) eq '>' || substr($line, 0, 1) eq '@');
     }
     catch {
-        warn "\n[ERROR]: '$line' does not look like Fasta or Fastq.\nHere is the exception: $_\n" and exit(1);
+        $self->log->info("\n[ERROR]: '$line' does not look like Fasta or Fastq.\nHere is the exception: $_\n")
+	    if Log::Log4perl::initialized();
+	exit(1);
     };
 
     if (substr($line, 0, 1) eq '>') {
@@ -122,7 +125,9 @@ sub next_seq {
             die if !length($seq);
         }
         catch {
-            warn "\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n" and exit(1);
+            $self->log->info("\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n")
+		if Log::Log4perl::initialized();
+	    exit(1);
         };
         $self->set_seq($seq);
 
@@ -144,7 +149,9 @@ sub next_seq {
             die if !length($seq);
         }
         catch {
-            warn "\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
+            $self->log->info("\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n")
+		if Log::Log4perl::initialized();
+	    exit(1);
         };
         $self->set_seq($seq);
         
@@ -154,7 +161,9 @@ sub next_seq {
             die unless length($cline) && substr($cline, 0, 1) =~ /^\+/;
         }
         catch {
-            warn "\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n" and exit(1);
+	    $self->log->info("\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n")
+		if Log::Log4perl::initialized();
+	    exit(1);
         };
 
 	my $qual;
@@ -165,7 +174,9 @@ sub next_seq {
                 die if !length($qual);
             }
             catch {
-                warn "\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n" and exit(1);
+                $self->log->info("\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n")
+		    if Log::Log4perl::initialized();
+		exit(1);
             };
             last if length($qual) >= length($seq);
         }
@@ -174,10 +185,12 @@ sub next_seq {
             die unless length($qual) >= length($seq);
         }
         catch {
-            warn "\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n" and exit(1);
+            $self->log->info("\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n")
+		if Log::Log4perl::initialized();
+	    exit(1);
         };
         $self->set_qual($qual);
-
+	
         return $self;
     }
 }
