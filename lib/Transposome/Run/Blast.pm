@@ -167,7 +167,7 @@ sub run_allvall_blast {
     my $report_path = Path::Class::File->new($dir, $self->report);
 
     # log results
-    $self->logwarn("Transposome::Run::Blast started. Final output file is: $outfile");
+    $self->log->info("Transposome::Run::Blast started. Final output file is: $outfile") if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
     
@@ -191,7 +191,7 @@ sub run_allvall_blast {
 			      my $time = sprintf("%.2f",$elapsed/60);
 			      my $base = basename($ident);
 			      #say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
-			      $self->log("$base just finished with PID $pid and exit code: $exit_code in $time minutes.");
+			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.");
 			} );
 
     for my $seqs (@$seq_files) {
@@ -211,7 +211,7 @@ sub run_allvall_blast {
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
     #say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
-    $self->logwarn("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.");
+    $self->log->info("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.");
     #close $rep;
     unlink glob("$database*");
     return $out_path;
