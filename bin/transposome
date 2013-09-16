@@ -11,6 +11,7 @@ use Transposome::Annotation;
 use Transposome::Run::Blast;
 use Log::Log4perl; # qw(:levels );
 use POSIX qw(strftime);
+use File::Path qw(make_path);
 
 =head1 NAME
 
@@ -36,6 +37,10 @@ our $VERSION = '0.01';
 my $trans_obj = Transposome->new_with_options();
 
 my $config = $trans_obj->get_config;
+
+unless (-d $config->{output_directory}) {
+    make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
+}
 
 my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
