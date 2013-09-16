@@ -51,14 +51,23 @@ ok( defined($config->{run_log_file}), 'Can generate run log file for configurati
 ok( defined($config->{cluster_log_file}), 'Can generate cluster log file for configuration' );
 
 ## init logger
-Log::Log4perl->easy_init( { file => ">>$config->{run_log_file}" } );
+#Log::Log4perl->easy_init( { file => ">>$config->{run_log_file}" } );
+my $log_conf = qq{
+    log4perl.category.Transposome       = INFO, Logfile
+
+    log4perl.appender.Logfile           = Log::Log4perl::Appender::File
+    log4perl.appender.Logfile.filename  = t/$config->{run_log_file}
+    log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.Logfile.layout.ConversionPattern = %m%n
+  };
+
+Log::Log4perl::init( \$log_conf );
 
 my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
                                           dir       => $config->{output_directory},
                                           threads   => 1,
                                           cpus      => 1,
                                           seq_num   => $config->{sequence_num} );
-#                                          report    => $config->{report_file} );
 
 my $blastdb = $blast->run_allvall_blast;
 ok( defined($blastdb), 'Can run all vs. all blast correctly' );
@@ -108,7 +117,7 @@ is( $cls_tot, 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 					       dir       => $config->{output_directory},
-					       file      => $config->{cluster_log_file},       #FIXME
+					       file      => $config->{cluster_log_file},      
                                                threads   => 1,
                                                cpus      => 1 );
 
