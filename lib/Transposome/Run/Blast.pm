@@ -166,6 +166,9 @@ sub run_allvall_blast {
     my $out_path = Path::Class::File->new($dir, $outfile);
     my $report_path = Path::Class::File->new($dir, $self->report);
 
+    # log results
+    $self->logwarn("Transposome::Run::Blast started. Final output file is: $outfile");
+
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
     
     my $database = $self->_make_mgblastdb;
@@ -173,7 +176,7 @@ sub run_allvall_blast {
     my %blasts;
 
     open my $out, '>>', $out_path or die "\n[ERROR]: Could not open file: $out_path\n";
-    open my $rep, '>', $report_path or die "\n[ERROR]: Could not open file: $report_path\n"; 
+    #open my $rep, '>', $report_path or die "\n[ERROR]: Could not open file: $report_path\n"; 
 
     my $pm = Parallel::ForkManager->new($thread);
     $pm->run_on_finish( sub { my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_ref) = @_;
@@ -186,7 +189,9 @@ sub run_allvall_blast {
 			      my $t1 = gettimeofday();
 			      my $elapsed = $t1 - $t0;
 			      my $time = sprintf("%.2f",$elapsed/60);
-			      say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
+			      my $base = basename($ident);
+			      #say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
+			      $self->log("$base just finished with PID $pid and exit code: $exit_code in $time minutes.");
 			} );
 
     for my $seqs (@$seq_files) {
@@ -205,8 +210,9 @@ sub run_allvall_blast {
     my $total_elapsed = $t2 - $t0;
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
-    say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
-    close $rep;
+    #say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
+    $self->logwarn("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.");
+    #close $rep;
     unlink glob("$database*");
     return $out_path;
 }
