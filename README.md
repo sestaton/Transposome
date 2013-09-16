@@ -45,7 +45,6 @@ using. For example,
 Available classes are: 
 
     Transposome::Annotation
-    Transposome::Annotation::Typemap
     Transposome::Cluster
     Transposome::PairFinder
     Transposome::SeqIO
