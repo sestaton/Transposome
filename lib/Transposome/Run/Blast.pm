@@ -6,6 +6,7 @@ use File::Basename;
 use namespace::autoclean;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes qw(gettimeofday);
+use POSIX qw(strftime);
 use File::Temp;
 use File::Path qw(make_path);
 use Path::Class::File;
@@ -171,7 +172,9 @@ sub run_allvall_blast {
     my $report_path = Path::Class::File->new($dir, $self->report);
 
     # log results
-    $self->log->info("Transposome::Run::Blast started. Final output file is: $outfile") if Log::Log4perl::initialized();
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started $st.")
+	if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
     
@@ -216,9 +219,14 @@ sub run_allvall_blast {
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
     #say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
-    $self->log->info("Transposome::Run::Blast finished running mgblast on $seqct sequences in $final_time minutes.")
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.")
 	if Log::Log4perl::initialized();
     #close $rep;
+
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at $ft. Final output file is: $outfile.\n")
+	if Log::Log4perl::initialized();
+    
     unlink glob("$database*");
     return $out_path;
 }
