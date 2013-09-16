@@ -171,7 +171,7 @@ sub parse_blast {
         }
         close $fh;
 
-	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
+	open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
 
         for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
             say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
