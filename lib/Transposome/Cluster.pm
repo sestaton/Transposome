@@ -95,6 +95,11 @@ sub louvain_method {
     my $cls_tree_log_path = File::Spec->catfile($out_dir, $cls_tree_log);
     my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
 
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::louvain_method started at $st.")
+        if Log::Log4perl::initialized();
+
     try {
 	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
@@ -143,6 +148,12 @@ sub louvain_method {
 	push @comm, $cls_graph_comm;
     }
     unlink $cls_tree_path;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::louvain_method completed at $ft.")
+        if Log::Log4perl::initialized();
+
     return \@comm;
 }
 
@@ -183,6 +194,10 @@ sub find_pairs {
     my $uf = Graph::UnionFind->new;
 
     say $rep "=====> Cluster connections above threshold";
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::find_pairs started at $st.")
+        if Log::Log4perl::initialized();
 
     my %vertex;
     my %read_pairs;
@@ -251,6 +266,12 @@ sub find_pairs {
     }
     close $rep;
     unlink $cls_file_path;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::find_pairs completed at $ft.")
+        if Log::Log4perl::initialized();
+
     return(\%read_pairs, \%vertex, \$uf);
 }
 
@@ -298,6 +319,11 @@ sub make_clusters {
     my %clus;
     my %index;
 
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::make_clusters started at $st.")
+        if Log::Log4perl::initialized();
+
     open my $idx, '<', $idx_file or die "\n[ERROR]: Could not open file: $idx_file\n";
     while (my $idpair = <$idx>) {
         chomp $idpair;
@@ -339,6 +365,11 @@ sub make_clusters {
     close $cls_out;
     close $mem;
     unlink $out_dir."/".$_ for @$graph_comm;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::make_clusters completed at $ft.")
+        if Log::Log4perl::initialized();
 
     return $cluster_file;
 }
@@ -396,6 +427,11 @@ sub merge_clusters {
 
     my $cls_tot = 0;
 
+    # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::merge_clusters started at $st.")
+        if Log::Log4perl::initialized();
+    
     my %cluster;
     for my $v (keys %$vertex) {
 	my $b = $$uf->find($v);
@@ -464,6 +500,11 @@ sub merge_clusters {
     }
     close $rep;
     close $clsnew;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::Cluster::merge_clusters completed at $ft.")
+        if Log::Log4perl::initialized();
 
     return ($cls_dir_path, $cls_with_merges_path, $cls_tot);
 }
