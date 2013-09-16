@@ -103,13 +103,17 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-        warn "\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+        $self->log->warn("\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n") 
+	    if Log::Log4perl::initialized(); 
+	exit(1);
     };
     try {
         die unless $self->has_blastn_exec;
     }
     catch {
-        warn "\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n"; exit(1);
+        $self->log->warn("\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n")
+	    if Log::Log4perl::initialized(); 
+	exit(1);
     };
 }
     
@@ -153,7 +157,9 @@ sub annotate_clusters {
     my $thread_range = sprintf("%.0f", $self->threads * $self->cpus);
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
+
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+
     my $anno_rep = $rpname."_annotations.tsv";
     my $anno_summary_rep = $rpname."_annotations_summary.tsv";
     my $anno_rp_path = Path::Class::File->new($out_dir, $anno_rep);
@@ -161,10 +167,12 @@ sub annotate_clusters {
     my $total_readct = 0;
     my $evalue = $self->evalue;
     my $rep_frac = $cls_tot / $seqct;
+
     say $rep "======> Total seqs: ",$seqct;
     say $rep "======> Total clustered: ",$cls_tot;
     say $rep "======> Repeat fraction: ",$rep_frac;
     close $rep;
+
     my $top_hit_superfam = {};
     my $cluster_annot = {};
 
