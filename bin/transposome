@@ -9,7 +9,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
-use Log::Log4perl; # qw(:levels );
+use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
 
@@ -58,11 +58,9 @@ my $conf = qq{
 Log::Log4perl::init( \$conf );
 
 my $log = Log::Log4perl::get_logger("Transposome");
-
-# just print a string and add my own time stamp
 my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->log->info("======== Transposome started at: $ts ========");
-$log->log->info("Log file for monitoring progress and errors: $config->{run_log_file}\n");
+$log->info("======== Transposome started at: $ts ========");
+$log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}\n");
 
 #
 # perform the all vs. all blast
@@ -118,7 +116,7 @@ $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $
                                             $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file});
 
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->log->info("======== Transposome completed at: $fs ========");
+$log->info("======== Transposome completed at: $fs ========");
 
 =head1 AUTHOR
 
