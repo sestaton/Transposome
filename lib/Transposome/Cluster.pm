@@ -99,7 +99,7 @@ sub louvain_method {
 	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
-	$self->log->warn("\n[ERROR]: Louvain 'convert' failed. Caught error: $_")
+	$self->log->info("\n[ERROR]: Louvain 'convert' failed. Caught error: $_")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -108,7 +108,7 @@ sub louvain_method {
 	system([0..5],"$realbin/louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
-	$self->log->warn("\n[ERROR]: Louvain 'community' failed. Caught error: $_")
+	$self->log->info("\n[ERROR]: Louvain 'community' failed. Caught error: $_")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -121,7 +121,7 @@ sub louvain_method {
 	chomp $levels;
     }
     catch {
-	$self->log->warn("\n[ERROR]: grep failed. Caught error: $_")
+	$self->log->info("\n[ERROR]: grep failed. Caught error: $_")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -135,7 +135,7 @@ sub louvain_method {
 	    system([0..5],"$realbin/louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
-	    $self->log->warn("\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_")
+	    $self->log->info("\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_")
 		if Log::Log4perl::initialized();
 	    exit(1);
 	};
@@ -291,7 +291,7 @@ sub make_clusters {
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
     my $graph = shift @graph_comm_sort;
-    if(Log::Log4perl::initialized()){
+    if (Log::Log4perl::initialized()){
 	$self->log->logdie("\n[ERROR]: Community clustering failed. Exiting.\n") unless defined $graph;
     }
     my $graph_path = File::Spec->catfile($out_dir, $graph);
@@ -424,7 +424,8 @@ sub merge_clusters {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
 		    }
 		    else {
-			$self->log->warn("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.") if Log::Log4perl::initialized();
+			$self->log->info("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input.")
+			    if Log::Log4perl::initialized();
 		    }
 		}
 	    }
@@ -454,7 +455,8 @@ sub merge_clusters {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		}
 		else {
-		    $self->log->warn("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input data.") if Log::Log4perl::initialized();
+		    $self->log->warn("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input.")
+			if Log::Log4perl::initialized();
 		}
 	    }
 	    close $clsout;

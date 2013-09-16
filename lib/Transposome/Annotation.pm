@@ -103,7 +103,7 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-        $self->log->warn("\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n") 
+        $self->log->info("\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n") 
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -111,7 +111,7 @@ sub BUILD {
         die unless $self->has_blastn_exec;
     }
     catch {
-        $self->log->warn("\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n")
+        $self->log->info("\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n")
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -221,7 +221,9 @@ sub annotate_clusters {
 	    @blast_out = capture(EXIT_ANY, @blastcmd);
 	}
 	catch {
-	    warn "\n[ERROR]: blastn failed. Caught error: $_" and exit(1);
+	    $self->log->info("\n[ERROR]: blastn failed. Caught error: $_")
+		if Log::Log4perl::initialized();
+	    exit(1);
 	};
 
         my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blast_out, $blast_file_path);
@@ -438,8 +440,10 @@ sub _make_blastdb {
 	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-	warn "\n[ERROR]: Unable to make blast database. Here is the exception: $_.";
-	warn "[ERROR]: Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.\n";
+	$self->log->info("\n[ERROR]: Unable to make blast database. Here is the exception: $_.")
+	    if Log::Log4perl::initialized();
+	$self->log->info("[ERROR]: Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.\n")
+	    if Log::Log4perl::initialized();
 	exit(1);
     };
 
