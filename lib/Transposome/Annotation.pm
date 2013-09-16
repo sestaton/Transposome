@@ -171,7 +171,7 @@ sub annotate_clusters {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::annotate_clusters started at $st.")
+    $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.")
         if Log::Log4perl::initialized();
 
     say $rep "======> Total seqs: ",$seqct;
@@ -256,7 +256,7 @@ sub annotate_clusters {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::annotate_clusters completed at $ft.")
+    $self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.")
         if Log::Log4perl::initialized();
 
     return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
@@ -298,7 +298,7 @@ sub clusters_annotation_to_summary  {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at $st.")
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
         if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
@@ -424,7 +424,7 @@ sub clusters_annotation_to_summary  {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at $ft.")
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
         if Log::Log4perl::initialized();
 }
 

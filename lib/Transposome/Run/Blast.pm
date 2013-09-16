@@ -173,7 +173,7 @@ sub run_allvall_blast {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started $st.")
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started at: $st. Results from mgblast processes to follow.")
 	if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
@@ -224,7 +224,7 @@ sub run_allvall_blast {
     #close $rep;
 
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at $ft. Final output file is: $outfile.\n")
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is: $outfile.\n")
 	if Log::Log4perl::initialized();
     
     unlink glob("$database*");

@@ -97,7 +97,7 @@ sub louvain_method {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::louvain_method started at $st.")
+    $self->log->info("======== Transposome::Cluster::louvain_method started at: $st.")
         if Log::Log4perl::initialized();
 
     try {
@@ -151,7 +151,7 @@ sub louvain_method {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::louvain_method completed at $ft.")
+    $self->log->info("======== Transposome::Cluster::louvain_method completed at: $ft.")
         if Log::Log4perl::initialized();
 
     return \@comm;
@@ -196,7 +196,7 @@ sub find_pairs {
     say $rep "=====> Cluster connections above threshold";
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::find_pairs started at $st.")
+    $self->log->info("======== Transposome::Cluster::find_pairs started at: $st.")
         if Log::Log4perl::initialized();
 
     my %vertex;
@@ -269,7 +269,7 @@ sub find_pairs {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::find_pairs completed at $ft.")
+    $self->log->info("======== Transposome::Cluster::find_pairs completed at: $ft.")
         if Log::Log4perl::initialized();
 
     return(\%read_pairs, \%vertex, \$uf);
@@ -321,7 +321,7 @@ sub make_clusters {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::make_clusters started at $st.")
+    $self->log->info("======== Transposome::Cluster::make_clusters started at: $st.")
         if Log::Log4perl::initialized();
 
     open my $idx, '<', $idx_file or die "\n[ERROR]: Could not open file: $idx_file\n";
@@ -368,7 +368,7 @@ sub make_clusters {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::make_clusters completed at $ft.")
+    $self->log->info("======== Transposome::Cluster::make_clusters completed at: $ft.")
         if Log::Log4perl::initialized();
 
     return $cluster_file;
@@ -429,7 +429,7 @@ sub merge_clusters {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::merge_clusters started at $st.")
+    $self->log->info("======== Transposome::Cluster::merge_clusters started at: $st.")
         if Log::Log4perl::initialized();
     
     my %cluster;
@@ -503,7 +503,7 @@ sub merge_clusters {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Cluster::merge_clusters completed at $ft.")
+    $self->log->info("======== Transposome::Cluster::merge_clusters completed at: $ft.")
         if Log::Log4perl::initialized();
 
     return ($cls_dir_path, $cls_with_merges_path, $cls_tot);
