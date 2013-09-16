@@ -66,8 +66,8 @@ my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
                                           dir       => $config->{output_directory},
                                           threads   => $config->{thread},
                                           cpus      => $config->{cpu},
-                                          seq_num   => $config->{sequence_num},
-                                          report    => $config->{report_file} );
+                                          seq_num   => $config->{sequence_num} );
+#                                          report    => $config->{report_file} );
 
 my $blastdb = $blast->run_allvall_blast;
 
