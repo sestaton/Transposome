@@ -169,7 +169,7 @@ sub run_allvall_blast {
     my $dir   = $self->dir->absolute; 
     make_path($dir, {verbose => 0, mode => 0771,});
     my $out_path = Path::Class::File->new($dir, $outfile);
-    my $report_path = Path::Class::File->new($dir, $self->report);
+    #my $report_path = Path::Class::File->new($dir, $self->report);
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
