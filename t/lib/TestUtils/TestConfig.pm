@@ -119,7 +119,8 @@ sub _build_config_data {
     say $tmpyml "  - cluster_size:     1";
     say $tmpyml "  - blast_evalue:     10";
     say $tmpyml "output:";
-    say $tmpyml "  - report_file:      t_rep.out";
+    say $tmpyml "  - run_log_file:       t_log.txt";
+    say $tmpyml "  - cluster_log_file:   t_cluster_report.txt";
 
     return $tmpyml_name;
 }
