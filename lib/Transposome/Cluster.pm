@@ -185,7 +185,7 @@ sub find_pairs {
     my ($self, $cls_file, $report) = @_;
     
     my $out_dir = $self->dir->relative;
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    my ($rpname, $rppath, $rpsuffix) = fileparse($out_dir."/".$report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
     my $cls_file_path = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix);
@@ -193,7 +193,7 @@ sub find_pairs {
 
     my $uf = Graph::UnionFind->new;
 
-    say $rep "=====> Cluster connections above threshold";
+    say $rep "# Cluster connections above threshold";
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Cluster::find_pairs started at: $st.")
@@ -425,7 +425,7 @@ sub merge_clusters {
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
 
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    my ($rpname, $rppath, $rpsuffix) = fileparse($out_dir."/".$report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
 
@@ -444,7 +444,7 @@ sub merge_clusters {
     }
 
     # generate groups based on cluster union
-    say $rep "=====> Cluster groupings (group_index\tclusters)";
+    say $rep "# Cluster groupings (group_index\tclusters)";
     my $group_index = 0;
     for my $group (values %cluster) {
 	my $groupseqnum; my @grpcp;
@@ -478,7 +478,7 @@ sub merge_clusters {
     }
 
     # write out those clusters that weren't merged
-    say $rep "=====> Non-grouped clusters";
+    say $rep "# Non-grouped clusters";
     for my $non_paired_cls (keys %$read_pairs) {
 	my ($non_paired_clsid, $non_paired_clsseqnum) = split /\_/, $non_paired_cls, 2;
 	$cls_tot += $non_paired_clsseqnum;
