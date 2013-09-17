@@ -79,7 +79,7 @@ You can also look for information at:
 Copyright (C) 2013 S. Evan Staton
 
 This program is distributed under the MIT (X11) License:
-L<http://www.opensource.org/licenses/mit-license.php>
+http://www.opensource.org/licenses/mit-license.php
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
