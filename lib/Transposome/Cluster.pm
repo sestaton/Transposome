@@ -104,7 +104,7 @@ sub louvain_method {
 	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
-	$self->log->info("\n[ERROR]: Louvain 'convert' failed. Caught error: $_")
+	$self->log->error("Louvain 'convert' failed. Caught error: $_.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -113,7 +113,7 @@ sub louvain_method {
 	system([0..5],"$realbin/louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
-	$self->log->info("\n[ERROR]: Louvain 'community' failed. Caught error: $_")
+	$self->log->error("Louvain 'community' failed. Caught error: $_.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -126,7 +126,7 @@ sub louvain_method {
 	chomp $levels;
     }
     catch {
-	$self->log->info("\n[ERROR]: grep failed. Caught error: $_")
+	$self->log->error("grep failed. Caught error: $_.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -140,7 +140,7 @@ sub louvain_method {
 	    system([0..5],"$realbin/louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
-	    $self->log->info("\n[ERROR]: Louvain 'hierarchy' failed. Caught error: $_")
+	    $self->log->error("Louvain 'hierarchy' failed. Caught error: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
 	};
@@ -388,10 +388,14 @@ sub make_clusters {
                      3) the total number of reads clustered                      Scalar
 
            The cluster file is in a format similar to Fasta, where the           
-           identifier specifies the cluster ID followed by the size. The                                                                                               second line of each record contains each read ID separated by                                                                             
+           identifier specifies the cluster ID followed by the size. The
+           second line of each record contains each read ID separated by 
            a space. The 'G' indicates a group created by joining clusters.
-           E.g.,                                                                                                                                                                                                                                                                                                        
-               >G1 3                                                                                                                                                       read1 read2 read3 
+           
+           E.g., 
+        
+               >G1 3
+               read1 read2 read3 
                                                                                  Arg_type
  Args    : In order, 1) a hash of the vertices and their counts                  HashRef
                      2) the mapping of Fasta/q IDs and their sequence            HashRef
@@ -460,7 +464,7 @@ sub merge_clusters {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
 		    }
 		    else {
-			$self->log->info("[WARNING]: $read not found. This indicates something went wrong processing the input. Please check your input.")
+			$self->log->warn("$read not found. This indicates something went wrong processing the input. Please check your input.")
 			    if Log::Log4perl::initialized();
 		    }
 		}
@@ -491,7 +495,7 @@ sub merge_clusters {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		}
 		else {
-		    $self->log->warn("[WARNING]: $non_paired_read not found. This indicates something went wrong processing the input. Please check your input.")
+		    $self->log->warn("$non_paired_read not found. This indicates something went wrong processing the input. Please check your input.")
 			if Log::Log4perl::initialized();
 		}
 	    }
