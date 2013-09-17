@@ -17,7 +17,7 @@ use Test::More tests => 49;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
-my $report = 't/cluster_test_rep.txt';
+my $report = 'cluster_test_rep.txt';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
@@ -99,9 +99,11 @@ my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($
 }
 
 ok( defined($cls_dir_path), 'Can successfully merge communities based on paired-end information' );
-ok( $cls_tot == 46, 'The expected number of reads went into clusters' );
+is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
-open my $rep, '<', $report;
+my $repfile = File::Spec->catfile($outdir, $report);
+open my $rep, '<', $repfile;
+
 my ($g1, $g0, $cls11, $cls12, $cls21, $cls22, $reads1, $reads2, $mems1, $mems2);
 while (<$rep>) {
     chomp;
@@ -110,7 +112,7 @@ while (<$rep>) {
 	my $second = <$rep>; chomp $second;
 	($cls11, $cls12, $reads1) = split /\t/, $first;
 	($cls21, $cls22, $reads2) = split /\t/, $second;
-	ok( $reads1 == $reads2, 'Expected number of reads went into each cluster grouping' );
+	is( $reads1, $reads2, 'Expected number of reads went into each cluster grouping' );
     }
     if (/^# Cluster groupings/) {
 	my $first = <$rep>; chomp $first;
@@ -123,5 +125,5 @@ while (<$rep>) {
 }
 close $rep;
 END {
-    system("rm -rf $outdir $blfl $report");
+    system("rm -rf $outdir $blfl");
 }

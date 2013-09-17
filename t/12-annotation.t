@@ -19,7 +19,7 @@ use Test::More tests => 20;
 
 my $infile = 't/test_data/t_reads.fas';
 my $outdir = 't/pairfinder_t';
-my $report = 't/cluster_test_rep.txt';
+my $report = 'cluster_test_rep.txt';
 my $db_fas = 't/test_data/t_db.fas';
 my $db     = 't/test_data/t_db_blastdb';
 
