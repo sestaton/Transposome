@@ -6,7 +6,6 @@ use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use DB_File;
 use vars qw($DB_BTREE &R_DUP);  
-use Carp;
 use Transposome::SeqIO;
 
 with 'MooseX::Log::Log4perl',
@@ -121,7 +120,7 @@ sub store_seq {
         my $seq_dbm = "transposome_seqstore.dbm";
         unlink $seq_dbm if -e $seq_dbm;
         tie %seqhash, 'DB_File', $seq_dbm, O_RDWR|O_CREAT, 0666, $DB_BTREE
-            or die "\nERROR: Could not open DBM file $seq_dbm: $!\n";
+            or die "\n[ERROR]: Could not open DBM file $seq_dbm: $!\n";
     }
 
     if (-e $self->file) {
@@ -132,7 +131,7 @@ sub store_seq {
 	    $self->inc_counter if $seq->has_seq;
 	    $seqhash{$seq->get_id} = $seq->get_seq;
 	}
-	return(\%seqhash, $self->counter);
+	return (\%seqhash, $self->counter);
     }
 }
 
