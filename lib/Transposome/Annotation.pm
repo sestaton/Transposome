@@ -104,7 +104,7 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-        $self->log->info("\n[ERROR]: Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.\n") 
+        $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.") 
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -112,7 +112,7 @@ sub BUILD {
         die unless $self->has_blastn_exec;
     }
     catch {
-        $self->log->info("\n[ERROR]: Unable to find blastn. Check you PATH to see that it is installed. Exiting.\n")
+        $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -174,8 +174,8 @@ sub annotate_clusters {
     $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.")
         if Log::Log4perl::initialized();
 
-    say $rep "======> Total seqs: ",$seqct;
-    say $rep "======> Total clustered: ",$cls_tot;
+    say $rep "======> Total sequences: ",$seqct;
+    say $rep "======> Total sequences clustered: ",$cls_tot;
     say $rep "======> Repeat fraction: ",$rep_frac;
     close $rep;
 
@@ -189,7 +189,6 @@ sub annotate_clusters {
     opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
     my @clus_fas_files = grep /\.fa.*$/, readdir $dir;
     closedir $dir;
-
 
     if (scalar @clus_fas_files < 1) {
         warn "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n" and exit(1);
@@ -227,7 +226,7 @@ sub annotate_clusters {
 	    @blast_out = capture(EXIT_ANY, @blastcmd);
 	}
 	catch {
-	    $self->log->info("\n[ERROR]: blastn failed. Caught error: $_")
+	    $self->log->error("blastn failed. Caught error: $_")
 		if Log::Log4perl::initialized();
 	    exit(1);
 	};
@@ -461,9 +460,9 @@ sub _make_blastdb {
 	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-	$self->log->info("\n[ERROR]: Unable to make blast database. Here is the exception: $_.")
+	$self->log->error("Unable to make blast database. Here is the exception: $_.")
 	    if Log::Log4perl::initialized();
-	$self->log->info("[ERROR]: Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.\n")
+	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
