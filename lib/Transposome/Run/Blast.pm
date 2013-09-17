@@ -118,7 +118,7 @@ sub BUILD {
         die unless $self->has_mgblast_exec;
     }
     catch {
-        $self->log->info("\n[ERROR]: Unable to find mgblast. Check your PATH to see that it is installed. Exiting.\n")
+        $self->log->error("Unable to find mgblast. Check your PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -127,7 +127,7 @@ sub BUILD {
         die unless $self->has_formatdb_exec;
     }
     catch {
-        $self->log->info("\n[ERROR]: Unable to find formatdb. Check your PATH to see that it is installed. Exiting.\n")
+        $self->log->error("Unable to find formatdb. Check your PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::intialized();
 	exit(1);
     };
@@ -224,7 +224,7 @@ sub run_allvall_blast {
     #close $rep;
 
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is: $outfile.\n")
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is: $outfile.")
 	if Log::Log4perl::initialized();
     
     unlink glob("$database*");
@@ -264,9 +264,9 @@ sub _make_mgblastdb {
         system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-        $self->log->info("\n[ERROR]: Unable to make mgblast database.\n")
+        $self->log->error("Unable to make mgblast database.")
 	    if Log::Log4perl::intialized();
-        $self->log->info("[ERROR]: Here is the exception: $_\nCheck your Legacy BLAST installation. Exiting.\n")
+        $self->log->error("Here is the exception: $_\nCheck your Legacy BLAST installation. Exiting.")
 	    if Log::Log4perl::intialized();
         exit(1);
     };
@@ -330,7 +330,7 @@ sub _run_blast {
         $exit_value = system([0..5],$blast_cmd);
     }
     catch {
-        $self->log->info("\n[ERROR]: BLAST exited with exit value $exit_value. Here is the exception: $_\n")
+        $self->log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.")
 	    if Log::Log4perl::intialized();
     };
 
