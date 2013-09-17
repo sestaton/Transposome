@@ -195,7 +195,7 @@ sub annotate_clusters {
     closedir $dir;
 
     if (scalar @clus_fas_files < 1) {
-        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.");
+        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.")
             if Log::Log4perl::initialized();
         exit(1);
     }
