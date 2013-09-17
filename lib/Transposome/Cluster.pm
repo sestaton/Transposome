@@ -98,7 +98,6 @@ sub louvain_method {
     my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
     my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
 
-
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Cluster::louvain_method started at: $st.")
@@ -190,18 +189,14 @@ sub find_pairs {
     
     my $out_dir = $self->dir->relative;
     my $cls_log_path = File::Spec->catfile($out_dir, $cls_log_file);
-    #my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    #my $cls_file_path = File::Spec->catfile($clspath
     my $cls_file_path = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix);
     
-    open my $rep, '>', $cls_log_path or die "\n[ERROR]: Could not open file: $cls_log_path\n";
-
     my $uf = Graph::UnionFind->new;
 
-    say $rep "# Cluster connections above threshold";
     # log results
+    open my $rep, '>', $cls_log_path or die "\n[ERROR]: Could not open file: $cls_log_path\n";
+    say $rep "# Cluster connections above threshold";
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Cluster::find_pairs started at: $st.")
         if Log::Log4perl::initialized();
@@ -428,12 +423,13 @@ sub merge_clusters {
     my $cls_dir = $cls_dir_base."_cls_fasta_files_$str";
     $cls_with_merges .= "_merged_$str.cls";
     my $cls_dir_path = $ipath.$cls_dir;
-    make_path($cls_dir_path, {verbose => 0, mode => 0711,}); # allows for recursively making paths                                                                
+    make_path($cls_dir_path, {verbose => 0, mode => 0711,}); # allows for recursively making paths        
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
 
     my ($rpname, $rppath, $rpsuffix) = fileparse($cls_log_file, qr/\.[^.]*/);
-    my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
+    my $rp_path = File::Spec->catfile($out_dir, $rpname.$rpsuffix);
+
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
 
     my $cls_tot = 0;
