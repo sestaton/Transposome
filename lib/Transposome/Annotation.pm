@@ -159,7 +159,7 @@ sub annotate_clusters {
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
 
-    open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+    #open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
 
     my $anno_rep = $rpname."_annotations.tsv";
     my $anno_summary_rep = $rpname."_annotations_summary.tsv";
@@ -170,14 +170,18 @@ sub annotate_clusters {
     my $rep_frac = $cls_tot / $seqct;
     
     # log results
-    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.")
-        if Log::Log4perl::initialized();
+    if (Log::Log4perl::initialized()) {
+        my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+        $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
 
-    say $rep "======> Total sequences: ",$seqct;
-    say $rep "======> Total sequences clustered: ",$cls_tot;
-    say $rep "======> Repeat fraction: ",$rep_frac;
-    close $rep;
+        #say $rep "Total sequences: ",$seqct;
+        #say $rep "Total sequences clustered: ",$cls_tot;
+        #say $rep "Repeat fraction: ",$rep_frac;
+        ##close $rep;
+        $self->log->info("Total sequences: $seqct");
+        $self->log->info("Total sequences clustered: $cls_tot");
+        $self->log->info("Repeat fraction: $rep_frac");
+    }
 
     my $top_hit_superfam = {};
     my $cluster_annot = {};
@@ -191,7 +195,9 @@ sub annotate_clusters {
     closedir $dir;
 
     if (scalar @clus_fas_files < 1) {
-        warn "\n[ERROR]: Could not find any fasta files in $cls_with_merges_dir. Exiting.\n" and exit(1);
+        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.");
+            if Log::Log4perl::initialized();
+        exit(1);
     }
 
     ## set path to output dir
@@ -243,7 +249,7 @@ sub annotate_clusters {
     @all_cluster_annotations{keys %$_} = values %$_ for @cluster_annotations;
 
     open my $out, '>', $anno_rp_path or die "\n[ERROR]: Could not open file: $anno_rp_path\n";
-    say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfam", "Family","Top_hit","Top_hit_perc";
+    say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfamily", "Family","Top_hit","Top_hit_perc";
 
     for my $readct (reverse sort { $a <=> $b } keys %all_cluster_annotations) {
 	my @annots = $self->mk_vec($all_cluster_annotations{$readct});
@@ -293,7 +299,7 @@ sub clusters_annotation_to_summary  {
     my $report = $self->file->relative;
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
-    open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+    #open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -418,8 +424,9 @@ sub clusters_annotation_to_summary  {
         }
     }
     close $outsum;
-    say $rep "======> Total repeat fraction from annotations: ",$total_gcov;
-    close $rep;
+    $self->log->info("Total repeat fraction from annotations: $total_gcov")
+        if Log::Log4perl::initialized();
+    #close $rep;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
