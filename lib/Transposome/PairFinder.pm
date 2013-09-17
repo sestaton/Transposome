@@ -366,7 +366,7 @@ sub _validate_format {
     my ($self, $line) = @_;
     my @f = split /\t/, $line;
     unless (scalar @f == 12) {
-	$self->log->info("\n[ERROR]: '$line' is not the correct format in file: $self->file. Exiting.\n")
+	$self->log->error("'$line' is not the correct format in file: $self->file. Exiting.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     }
