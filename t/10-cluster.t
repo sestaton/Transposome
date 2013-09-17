@@ -105,14 +105,14 @@ open my $rep, '<', $report;
 my ($g1, $g0, $cls11, $cls12, $cls21, $cls22, $reads1, $reads2, $mems1, $mems2);
 while (<$rep>) {
     chomp;
-    if (/=====> Cluster connections/) {
+    if (/^# Cluster connections/) {
 	my $first = <$rep>; chomp $first;
 	my $second = <$rep>; chomp $second;
 	($cls11, $cls12, $reads1) = split /\t/, $first;
 	($cls21, $cls22, $reads2) = split /\t/, $second;
 	ok( $reads1 == $reads2, 'Expected number of reads went into each cluster grouping' );
     }
-    if (/=====> Cluster groupings/) {
+    if (/^# Cluster groupings/) {
 	my $first = <$rep>; chomp $first;
 	my $second = <$rep>; chomp $second;
 	($g0, $mems1) = split /\t/, $first;
