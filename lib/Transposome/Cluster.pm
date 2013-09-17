@@ -94,6 +94,10 @@ sub louvain_method {
     my $cls_tree_weights_path = File::Spec->catfile($out_dir, $cls_tree_weights);
     my $cls_tree_log_path = File::Spec->catfile($out_dir, $cls_tree_log);
     my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
+    my $lconvert = File::Spec->catfile($realbin, 'louvain_convert');
+    my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
+    my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
+
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -101,7 +105,7 @@ sub louvain_method {
         if Log::Log4perl::initialized();
 
     try {
-	system([0..5], "$realbin/louvain_convert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
+	system([0..5], "$lconvert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
 	$self->log->error("Louvain 'convert' failed. Caught error: $_.")
@@ -110,7 +114,7 @@ sub louvain_method {
     };
 
     try {
-	system([0..5],"$realbin/louvain_community $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
+	system([0..5],"$lcommunity $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
 	$self->log->error("Louvain 'community' failed. Caught error: $_.")
@@ -137,7 +141,7 @@ sub louvain_method {
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
-	    system([0..5],"$realbin/louvain_hierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
+	    system([0..5],"$lhierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
 	    $self->log->error("Louvain 'hierarchy' failed. Caught error: $_.")
@@ -182,14 +186,17 @@ sub louvain_method {
 =cut
 
 sub find_pairs {
-    my ($self, $cls_file, $report) = @_;
+    my ($self, $cls_file, $cls_log_file) = @_;
     
     my $out_dir = $self->dir->relative;
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
+    my $cls_log_path = File::Spec->catfile($out_dir, $cls_log_file);
+    #my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
+    #my $cls_file_path = File::Spec->catfile($clspath
     my $cls_file_path = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix);
-    open my $rep, '>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+    
+    open my $rep, '>', $cls_log_path or die "\n[ERROR]: Could not open file: $cls_log_path\n";
 
     my $uf = Graph::UnionFind->new;
 
@@ -410,7 +417,7 @@ sub make_clusters {
 =cut
 
 sub merge_clusters {
-    my ($self, $vertex, $seqs, $read_pairs, $report, $uf) = @_;
+    my ($self, $vertex, $seqs, $read_pairs, $cls_log_file, $uf) = @_;
 
     my $infile = $self->file->relative;
     my $out_dir = $self->dir->relative;
@@ -425,7 +432,7 @@ sub merge_clusters {
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
 
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    my ($rpname, $rppath, $rpsuffix) = fileparse($cls_log_file, qr/\.[^.]*/);
     my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
     open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
 
