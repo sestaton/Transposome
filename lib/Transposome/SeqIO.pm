@@ -95,7 +95,6 @@ has 'qual' => (
 
 sub next_seq {
     my ($self, $fh) = @_;
-    my (@seqs, @quals);
 
     my $line = <$fh>;
     return unless defined $line && $line =~ /\S/;
@@ -134,7 +133,6 @@ sub next_seq {
         return $self;
     }
     if (substr($line, 0, 1) eq '@') {
-	my $id = $1 if $line =~ /^@(\w+|\d+)(?::|-)/;
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
 	
