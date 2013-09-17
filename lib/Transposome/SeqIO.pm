@@ -104,7 +104,7 @@ sub next_seq {
         die unless (substr($line, 0, 1) eq '>' || substr($line, 0, 1) eq '@');
     }
     catch {
-        $self->log->info("\n[ERROR]: '$line' does not look like Fasta or Fastq.\nHere is the exception: $_\n")
+        $self->log->error("'$line' does not look like Fasta or Fastq.\nHere is the exception: $_.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -125,7 +125,7 @@ sub next_seq {
             die if !length($seq);
         }
         catch {
-            $self->log->info("\n[ERROR]: No sequence for Fasta record '$name'.\nHere is the exception: $_\n")
+            $self->log->error("No sequence for Fasta record '$name'.\nHere is the exception: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         };
@@ -149,7 +149,7 @@ sub next_seq {
             die if !length($seq);
         }
         catch {
-            $self->log->info("\n[ERROR]: No sequence for Fastq record '$name'.\nHere is the exception: $_\n")
+            $self->log->error("No sequence for Fastq record '$name'.\nHere is the exception: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         };
@@ -161,7 +161,7 @@ sub next_seq {
             die unless length($cline) && substr($cline, 0, 1) =~ /^\+/;
         }
         catch {
-	    $self->log->info("\n[ERROR]: No comment line for Fastq record '$name'.\nHere is the exception: $_\n")
+	    $self->log->error("No comment line for Fastq record '$name'.\nHere is the exception: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         };
@@ -174,7 +174,7 @@ sub next_seq {
                 die if !length($qual);
             }
             catch {
-                $self->log->info("\n[ERROR]: No quality scores for '$name'.\nHere is the exception: $_\n")
+                $self->log->error("No quality scores for '$name'.\nHere is the exception: $_.")
 		    if Log::Log4perl::initialized();
 		exit(1);
             };
@@ -185,7 +185,7 @@ sub next_seq {
             die unless length($qual) >= length($seq);
         }
         catch {
-            $self->log->info("\n[ERROR]: Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_\n")
+            $self->log->error("Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         };
