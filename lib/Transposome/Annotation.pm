@@ -329,7 +329,7 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-            elsif ($fam =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+            elsif ($fam =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                 my $famname = $1;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
