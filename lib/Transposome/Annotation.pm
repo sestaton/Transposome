@@ -159,8 +159,6 @@ sub annotate_clusters {
     my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
     my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
 
-    #open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
-
     my $anno_rep = $rpname."_annotations.tsv";
     my $anno_summary_rep = $rpname."_annotations_summary.tsv";
     my $anno_rp_path = Path::Class::File->new($out_dir, $anno_rep);
@@ -174,10 +172,6 @@ sub annotate_clusters {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
         $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
 
-        #say $rep "Total sequences: ",$seqct;
-        #say $rep "Total sequences clustered: ",$cls_tot;
-        #say $rep "Repeat fraction: ",$rep_frac;
-        ##close $rep;
         $self->log->info("Total sequences: $seqct");
         $self->log->info("Total sequences clustered: $cls_tot");
         $self->log->info("Repeat fraction: $rep_frac");
@@ -232,7 +226,7 @@ sub annotate_clusters {
 	    @blast_out = capture(EXIT_ANY, @blastcmd);
 	}
 	catch {
-	    $self->log->error("blastn failed. Caught error: $_")
+	    $self->log->error("blastn failed. Caught error: $_.")
 		if Log::Log4perl::initialized();
 	    exit(1);
 	};
@@ -296,10 +290,9 @@ sub clusters_annotation_to_summary  {
     my ($self, $anno_rp_path, $anno_sum_rep_path, $total_readct, 
 	$seqct, $rep_frac, $blasts, $superfams) = @_;
 
-    my $report = $self->file->relative;
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
-    #open my $rep, '>>', $rp_path or die "\n[ERROR]: Could not open file: $rp_path\n";
+    #my $report = $self->file->relative;
+    #my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -426,7 +419,6 @@ sub clusters_annotation_to_summary  {
     close $outsum;
     $self->log->info("Total repeat fraction from annotations: $total_gcov")
         if Log::Log4perl::initialized();
-    #close $rep;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -523,7 +515,7 @@ sub _parse_blast_to_top_hit {
             say $out join "\t", $hits, $blhits{$hits}, $hit_perc;
         }
         close $out;
-        return \$hit_ct, \$top_hit, \$top_hit_perc, \%blhits;
+        return (\$hit_ct, \$top_hit, \$top_hit_perc, \%blhits);
     }
     else { ## if (!%blhits) {
         unlink $blast_file_path;
@@ -620,9 +612,12 @@ sub _blast_to_annotation {
                         if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
                             $gypsy_fam = $1;
                         }
-                        elsif ($$top_hit =~ /(^Gypsy-\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                        elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                             $gypsy_fam = $1;
                         }
+#                        elsif ($$top_hit =~ /(^Gypsy_\d+_[a-zA-Z]+(?:[-|_][I|LTR]/) {
+#			    $gypsy_fam = $1;
+#					      }
                         elsif ($$top_hit =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
                             $gypsy_fam = $1;
                         }
