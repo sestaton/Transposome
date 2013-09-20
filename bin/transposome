@@ -68,7 +68,7 @@ my $log = Log::Log4perl::get_logger("Transposome");
 
 my $t0 = [Time::HiRes::gettimeofday];
 my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome started at: $ts ========");
+$log->info("======== Transposome started at: $ts. ========");
 $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
 
 #
@@ -129,8 +129,6 @@ $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $
 #
 my $t1 = [Time::HiRes::gettimeofday];
 my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
-#my %time = ( hr => sprintf("%.0f",$t0_t1 / 3600), min => sprintf("%.0f",$t0_t1 / 60), sec => sprintf("%.4f",$t0_t1));
-#my $timestr = Time::Seconds->new($t0_t1)->pretty;
 my $dt = DateTime->from_epoch( epoch => 0 );
 $dt = $dt->add( seconds => $t0_t1 );
 $dt = $dt - DateTime->from_epoch( epoch => 0 );
@@ -142,7 +140,7 @@ push @time, $dt->seconds . PL_N( ' second', $dt->seconds ) if $dt->seconds;
 my $timestr = join ', ', @time;
 
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome completed at: $fs. Elapsed time: $timestr ========");
+$log->info("======== Transposome completed at: $fs. Elapsed time: $timestr. ========");
 
 =head1 AUTHOR
 
