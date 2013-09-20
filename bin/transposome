@@ -10,6 +10,7 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
 use Time::HiRes qw(gettimeofday);
+use Time::Seconds;
 use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
@@ -127,9 +128,10 @@ $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $
 #
 my $t1 = [Time::HiRes::gettimeofday];
 my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
-my %time = ( hr => sprintf("%.0f",$t0_t1 / 3600), min => sprintf("%.0f",$t0_t1 / 60), sec => sprintf("%.4f",$t0_t1));
+#my %time = ( hr => sprintf("%.0f",$t0_t1 / 3600), min => sprintf("%.0f",$t0_t1 / 60), sec => sprintf("%.4f",$t0_t1));
+my $timestr = Time::Seconds->new($t0_t1)->pretty;
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome completed at: $fs. Elapsed time: $time{hr} hours, $time{min} minutes, $time{sec} seconds ========");
+$log->info("======== Transposome completed at: $fs. Elapsed time: $timestr ========");
 
 =head1 AUTHOR
 
