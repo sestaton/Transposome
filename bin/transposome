@@ -127,12 +127,9 @@ $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $
 #
 my $t1 = [Time::HiRes::gettimeofday];
 my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
-#my $hours = sprintf("%.0f",$t0_t1 / 3600);
-#my $minutes = sprintf("%.0f",$t0_t1 / 60);
-#my $seconds = sprintf("%.4f",$t0_t1);
-my @time = (sprintf("%.0f",$t0_t1 / 3600), sprintf("%.0f",$t0_t1 / 60), sprintf("%.4f",$t0_t1));
+my %time = ( hr => sprintf("%.0f",$t0_t1 / 3600), min => sprintf("%.0f",$t0_t1 / 60), sec => sprintf("%.4f",$t0_t1));
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome completed at: $fs. Elapsed time: $time[0] hours, $time[1] minutes, $time[2] seconds ========");
+$log->info("======== Transposome completed at: $fs. Elapsed time: $time{hr} hours, $time{min} minutes, $time{sec} seconds ========");
 
 =head1 AUTHOR
 
