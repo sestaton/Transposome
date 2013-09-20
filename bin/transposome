@@ -9,6 +9,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
+use Time::HiRes qw(gettimeofday);
 use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
@@ -43,6 +44,9 @@ unless (-d $config->{output_directory}) {
     make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
 }
 
+#
+# initialize log and timers
+#
 my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
 my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
@@ -59,6 +63,8 @@ my $conf = qq{
 Log::Log4perl::init( \$conf );
 
 my $log = Log::Log4perl::get_logger("Transposome");
+
+my $t0 = [Time::HiRes::gettimeofday];
 my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 $log->info("======== Transposome started at: $ts ========");
 $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
@@ -116,8 +122,17 @@ my ($anno_rp_path, $anno_sum_rep_path, $total_readct,
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file});
 
+#
+# log summary of results
+#
+my $t1 = [Time::HiRes::gettimeofday];
+my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
+#my $hours = sprintf("%.0f",$t0_t1 / 3600);
+#my $minutes = sprintf("%.0f",$t0_t1 / 60);
+#my $seconds = sprintf("%.4f",$t0_t1);
+my @time = (sprintf("%.0f",$t0_t1 / 3600), sprintf("%.0f",$t0_t1 / 60), sprintf("%.4f",$t0_t1));
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome completed at: $fs ========");
+$log->info("======== Transposome completed at: $fs. Elapsed time: $time[0] hours, $time[1] minutes, $time[2] seconds ========");
 
 =head1 AUTHOR
 
