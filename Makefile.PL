@@ -55,6 +55,8 @@ WriteMakefile(
 	'YAML'                       => 0.84,
 	'Parallel::ForkManager'      => 0.7,
 	'Log::Log4perl'              => 1.40,
+	'DateTime'                   => 1.03,
+	'Lingua::EN::Inflect'        => 0,
 	'DBM::Deep'                  => 0,
 	'File::Path'                 => 0,
 	'Graph::UnionFind'           => 0,

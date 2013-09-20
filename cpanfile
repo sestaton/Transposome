@@ -12,6 +12,8 @@ requires 'Parallel::ForkManager', '>= 0.7.0';
 requires 'DBM::Deep', '>= 2.0008';
 requires 'DB_File', '>= 1.826';
 requires 'Log::Log4perl', '>= 1.40';
+requires 'DateTime', '>= 1.03';
+requires 'Lingua::EN::Inflect';
 requires 'File::Path';
 requires 'Graph::UnionFind';
 #requires 'Devel::PartialDump'; # stringify exceptions
