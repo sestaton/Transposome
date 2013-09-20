@@ -10,7 +10,8 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
 use Time::HiRes qw(gettimeofday);
-use Time::Seconds;
+use DateTime;
+use Lingua::EN::Inflect qw(PL_N);
 use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
@@ -129,7 +130,17 @@ $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $
 my $t1 = [Time::HiRes::gettimeofday];
 my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
 #my %time = ( hr => sprintf("%.0f",$t0_t1 / 3600), min => sprintf("%.0f",$t0_t1 / 60), sec => sprintf("%.4f",$t0_t1));
-my $timestr = Time::Seconds->new($t0_t1)->pretty;
+#my $timestr = Time::Seconds->new($t0_t1)->pretty;
+my $dt = DateTime->from_epoch( epoch => 0 );
+$dt = $dt->add( seconds => $t0_t1 );
+$dt = $dt - DateTime->from_epoch( epoch => 0 );
+my @time;
+push @time, $dt->days . PL_N( ' day', $dt->days ) if $dt->days;
+push @time, $dt->hours . PL_N( ' hour', $dt->hours ) if $dt->hours;
+push @time, $dt->minutes . PL_N( ' minute', $dt->minutes ) if $dt->minutes;
+push @time, $dt->seconds . PL_N( ' second', $dt->seconds ) if $dt->seconds;
+my $timestr = join ', ', @time;
+
 my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 $log->info("======== Transposome completed at: $fs. Elapsed time: $timestr ========");
 
