@@ -44,6 +44,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moose'                      => 2.0802,
 	'MooseX::Getopt'             => 0.56,
+	'MooseX::Log::Log4perl'      => 0.46,
         'MooseX::Types::Path::Class' => 0.06,
 	'namespace::autoclean'       => 0.13,
 	'Try::Tiny'                  => 0.12,
@@ -53,6 +54,7 @@ WriteMakefile(
 	'Path::Class'                => 0.32,
 	'YAML'                       => 0.84,
 	'Parallel::ForkManager'      => 0.7,
+	'Log::Log4perl'              => 1.40,
 	'DBM::Deep'                  => 0,
 	'File::Path'                 => 0,
 	'Graph::UnionFind'           => 0,
