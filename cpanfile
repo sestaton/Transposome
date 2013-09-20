@@ -1,6 +1,6 @@
 requires 'Moose', '>= 2.0802';
 requires 'MooseX::Getopt', '>= 0.56';
-requires 'MooseX::Log::Log4perl' '>= 0.46';
+requires 'MooseX::Log::Log4perl', '>= 0.46';
 requires 'MooseX::Types::Path::Class', '>= 0.06';
 requires 'namespace::autoclean', '>= 0.13';
 requires 'Try::Tiny', '>= 0.12';
