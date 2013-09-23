@@ -2,7 +2,6 @@ package Transposome::SeqIO;
 
 use 5.012;
 use Moose;
-use Try::Tiny;
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -99,14 +98,6 @@ sub next_seq {
     my $line = <$fh>;
     return unless defined $line && $line =~ /\S/;
     chomp $line;
-    try {
-        die unless (substr($line, 0, 1) eq '>' || substr($line, 0, 1) eq '@');
-    }
-    catch {
-        $self->log->error("'$line' does not look like Fasta or Fastq.\nHere is the exception: $_.")
-	    if Log::Log4perl::initialized();
-	exit(1);
-    };
 
     if (substr($line, 0, 1) eq '>') {
         my $name = $self->_set_id_per_encoding($line);
@@ -120,19 +111,16 @@ sub next_seq {
 	}
         seek $fh, -length($sline)-1, 1 if length $sline;
 
-        try {
-            die if !length($seq);
-        }
-        catch {
-            $self->log->error("No sequence for Fasta record '$name'.\nHere is the exception: $_.")
+	if (!length($seq)) {
+	    $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-        };
+	}
         $self->set_seq($seq);
 
         return $self;
     }
-    if (substr($line, 0, 1) eq '@') {
+    elsif (substr($line, 0, 1) eq '@') {
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
 	
@@ -143,45 +131,47 @@ sub next_seq {
 	    $seq .= $sline;
 	}
         seek $fh, -length($sline)-1, 1 if length $sline;
-        try {
-            die if !length($seq);
-        }
-        catch {
-            $self->log->error("No sequence for Fastq record '$name'.\nHere is the exception: $_.")
+
+	if (!length($seq)) {
+	    $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-        };
+	}
         $self->set_seq($seq);
         
         my $cline = <$fh>;
         chomp $cline;
-        try {
-            die unless length($cline) && substr($cline, 0, 1) =~ /^\+/;
-        }
-        catch {
-	    $self->log->error("No comment line for Fastq record '$name'.\nHere is the exception: $_.")
+	unless (substr($cline, 0, 1) =~ /^\+/) {
+	    $self->log->error("No comment line for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-        };
-
+	}
 	my $qual;
         while (my $qline = <$fh>) {
             chomp $qline;
             $qual .= $qline;
             last if length($qual) >= length($seq);
         }
-
-        try {
-            die unless length($qual) >= length($seq);
-        }
-        catch {
-            $self->log->error("Unequal number of quality and scores and bases for '$name'.\nHere is the exception: $_.")
+	
+	if (!length($seq)) {
+	    $self->log->error("No quality scores for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-        };
+	}
+	
+	unless (length($qual) >= length($seq)) {
+	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
+		if Log::Log4perl::initialized();
+	    exit(1);
+	}
         $self->set_qual($qual);
 	
         return $self;
+    }
+    else {
+	$self->log->error("'$line' does not look like Fasta or Fastq.")
+	    if Log::Log4perl::initialized();
+	exit(1);
     }
 }
 
