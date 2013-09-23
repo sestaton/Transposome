@@ -168,14 +168,6 @@ sub next_seq {
         while (my $qline = <$fh>) {
             chomp $qline;
             $qual .= $qline;
-            try {
-                die if !length($qual);
-            }
-            catch {
-                $self->log->error("No quality scores for '$name'.\nHere is the exception: $_.")
-		    if Log::Log4perl::initialized();
-		exit(1);
-            };
             last if length($qual) >= length($seq);
         }
 
