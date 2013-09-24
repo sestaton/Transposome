@@ -16,7 +16,6 @@ requires 'DateTime', '>= 1.03';
 requires 'Lingua::EN::Inflect';
 requires 'File::Path';
 requires 'Graph::UnionFind';
-#requires 'Devel::PartialDump'; # stringify exceptions
 
 on 'test' => sub {
    requires 'Test::More', '>= 0.96';
