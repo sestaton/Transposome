@@ -123,15 +123,13 @@ sub store_seq {
             or die "\n[ERROR]: Could not open DBM file $seq_dbm: $!\n";
     }
 
-    if (-e $self->file) {
-	my $filename = $self->file->relative;
-	my $seqio = Transposome::SeqIO->new( file => $filename );
-	while (my $seq = $seqio->next_seq) {
-	    $self->inc_counter if $seq->has_seq;
-	    $seqhash{$seq->get_id} = $seq->get_seq;
-	}
-	return (\%seqhash, $self->counter);
+    my $filename = $self->file->relative;
+    my $seqio = Transposome::SeqIO->new( file => $filename );
+    while (my $seq = $seqio->next_seq) {
+	$self->inc_counter if $seq->has_seq;
+	$seqhash{$seq->get_id} = $seq->get_seq;
     }
+    return (\%seqhash, $self->counter);
 }
 
 =head2 sample_seq
@@ -175,7 +173,7 @@ sub sample_seq {
 	last if $n == $k;
     }
 
-    while (my $seq = $seqio_fa->next_seq($seqfh)) {
+    while (my $seq = $seqio_fa->next_seq) {
 	my $i = int rand $n++;
 	if ($i < scalar @sample) {
 	    $sample[$i] = {$seq->get_id => $seq->get_seq};
