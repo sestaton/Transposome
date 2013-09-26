@@ -93,9 +93,10 @@ has 'qual' => (
 =cut
 
 sub next_seq {
-    my ($self, $fh) = @_;
+    my ($self) = @_;
 
-    my $line = <$fh>;
+    my $fh = $self->fh;
+    my $line = $fh->getline;
     return unless defined $line && $line =~ /\S/;
     chomp $line;
 
@@ -104,68 +105,67 @@ sub next_seq {
         $self->set_id($name);
         
         my ($sline, $seq);
-	while ($sline = <$fh>) {
-	    chomp $sline;
-	    last if $sline =~ />/;
-	    $seq .= $sline;
-	}
+        while ($sline = <$fh>) {
+            chomp $sline;
+            last if $sline =~ />/;
+            $seq .= $sline;
+        }
         seek $fh, -length($sline)-1, 1 if length $sline;
 
-	if (!length($seq)) {
-	    $self->log->error("No sequence for Fastq record '$name'.")
+        if (!length($seq)) {
+            $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	}
+        }
         $self->set_seq($seq);
-
         return $self;
     }
     elsif (substr($line, 0, 1) eq '@') {
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
-	
-	my ($sline, $seq);
-	while ($sline = <$fh>) {
-	    chomp $sline;
-	    last if $sline =~ /^\+/;
-	    $seq .= $sline;
-	}
+
+        my ($sline, $seq);
+        while ($sline = <$fh>) {
+            chomp $sline;
+            last if $sline =~ /^\+/;
+            $seq .= $sline;
+        }
         seek $fh, -length($sline)-1, 1 if length $sline;
 
-	if (!length($seq)) {
-	    $self->log->error("No sequence for Fastq record '$name'.")
+        if (!length($seq)) {
+            $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	}
+        }
         $self->set_seq($seq);
         
         my $cline = <$fh>;
         chomp $cline;
-	unless (substr($cline, 0, 1) =~ /^\+/) {
+        unless (substr($cline, 0, 1) =~ /^\+/) {
 	    $self->log->error("No comment line for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	}
-	my $qual;
+        }
+        my $qual;
         while (my $qline = <$fh>) {
             chomp $qline;
             $qual .= $qline;
             last if length($qual) >= length($seq);
         }
-	
-	if (!length($seq)) {
-	    $self->log->error("No quality scores for '$name'.")
+
+        if (!length($seq)) {
+            $self->log->error("No quality scores for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	}
-	
-	unless (length($qual) >= length($seq)) {
+        }
+
+        unless (length($qual) >= length($seq)) {
 	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	}
+        }
         $self->set_qual($qual);
-	
+
         return $self;
     }
     else {
@@ -174,6 +174,7 @@ sub next_seq {
 	exit(1);
     }
 }
+
 
 =head2 _set_id_per_encoding
 
