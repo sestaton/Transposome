@@ -3,7 +3,7 @@ package Transposome::Role::File;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-use Fcntl qw(:flock);
+#use Fcntl qw(:flock);
 use namespace::autoclean;
 
 =head1 NAME
@@ -92,7 +92,7 @@ sub get_fh {
 sub _build_fh {
     my ($self) = @_;
     my $fh = $self->file->openr;
-    flock $fh, LOCK_EX;
+    #flock $fh, LOCK_EX;
     return $fh;
 }
 
