@@ -126,8 +126,7 @@ sub store_seq {
     if (-e $self->file) {
 	my $filename = $self->file->relative;
 	my $seqio = Transposome::SeqIO->new( file => $filename );
-	my $fh = $seqio->get_fh;
-	while (my $seq = $seqio->next_seq($fh)) {
+	while (my $seq = $seqio->next_seq) {
 	    $self->inc_counter if $seq->has_seq;
 	    $seqhash{$seq->get_id} = $seq->get_seq;
 	}
@@ -168,10 +167,9 @@ sub sample_seq {
     my %seqhash;
 
     my $seqio_fa = Transposome::SeqIO->new( file => $filename );
-    my $seqfh = $seqio_fa->get_fh;
 
     srand($seed);
-    while (my $seq = $seqio_fa->next_seq($seqfh)) {
+    while (my $seq = $seqio_fa->next_seq) {
 	$n++;
 	push @sample, {$seq->get_id => $seq->get_seq};
 	last if $n == $k;
