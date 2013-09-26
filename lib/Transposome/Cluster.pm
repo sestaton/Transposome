@@ -94,6 +94,7 @@ sub louvain_method {
     my $cls_tree_weights_path = File::Spec->catfile($out_dir, $cls_tree_weights);
     my $cls_tree_log_path = File::Spec->catfile($out_dir, $cls_tree_log);
     my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
+    ##TODO add test to see if this is is being run locally i.e., check local bin. could return these from a sub
     my $lconvert = File::Spec->catfile($realbin, 'louvain_convert');
     my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
     my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
