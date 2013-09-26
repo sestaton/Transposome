@@ -172,6 +172,7 @@ sub sample_seq {
 	push @sample, {$seq->get_id => $seq->get_seq};
 	last if $n == $k;
     }
+    ##TODO add test if $k > $n
 
     while (my $seq = $seqio_fa->next_seq) {
 	my $i = int rand $n++;
