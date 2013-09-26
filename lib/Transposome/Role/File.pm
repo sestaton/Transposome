@@ -3,6 +3,7 @@ package Transposome::Role::File;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
+use Fcntl qw(:flock);
 use namespace::autoclean;
 
 =head1 NAME
@@ -16,7 +17,6 @@ Version 0.01
 =cut
 
 our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,12 @@ has 'dir' => (
       coerce   => 1,
     );
 
+has 'fh' => (
+    is         => 'ro',
+    isa        => 'IO::File',
+    lazy_build => 1,
+    );
+
 =head1 METHODS
 
 =head2 get_fh
@@ -60,12 +66,36 @@ has 'dir' => (
 =cut
 
 sub get_fh {
-    my $self = shift;
+    my ($self) = @_;
     if (-e $self->file) {
-        my $fh = $self->file->openr;
-        return $fh
+	my $fh = $self->file->openr;
+	return $fh;
     }
 }
+
+=head2 _build_fh
+
+ Title   : _build_fh
+ Usage   : This is a private method, don't use it directly.
+          
+ Function: Gets a filehandle for the associated
+           file.
+
+                                                   Return_type
+ Returns : An open filehandle for reading          Scalar
+
+ Args    : None. This is a role that can
+           be consumed.
+
+=cut
+
+sub _build_fh {
+    my ($self) = @_;
+    my $fh = $self->file->openr;
+    flock $fh, LOCK_EX;
+    return $fh;
+}
+
 
 =head1 AUTHOR
 
