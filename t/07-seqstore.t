@@ -17,8 +17,7 @@ my $fq_arr = $test->fastq_constructor;
 
 for my $fa (@$fa_arr) {
     my $seqio = Transposome::SeqIO->new( file => $fa);
-    my $fh = $seqio->get_fh;
-    while (my $seq = $seqio->next_seq($fh)) {
+    while (my $seq = $seqio->next_seq) {
 	if ($seq->has_id && $seq->has_seq && !$seq->has_qual) {
 	    my $memstore = Transposome::SeqUtil->new( file => $fa, in_memory => 1 );
 	    {
@@ -42,8 +41,7 @@ for my $fa (@$fa_arr) {
 
 for my $fq (@$fq_arr) {
     my $seqio = Transposome::SeqIO->new( file => $fq);
-    my $fh = $seqio->get_fh;
-    while (my $seq = $seqio->next_seq($fh)) {
+    while (my $seq = $seqio->next_seq) {
         if ($seq->has_id && $seq->has_seq && $seq->has_qual) {
             my $memstore = Transposome::SeqUtil->new( file => $fq, in_memory => 1 );
             {

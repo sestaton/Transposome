@@ -19,8 +19,7 @@ my ($seqct, $stdoutct, $stdoutct2, $seqs) = (0, 0, 0, {});
 
 for my $fa (@$fa_arr) {
     my $seqio = Transposome::SeqIO->new( file => $fa);
-    my $fh = $seqio->get_fh;
-    while (my $seq = $seqio->next_seq($fh)) {
+    while (my $seq = $seqio->next_seq) {
 	if ($seq->has_id && $seq->has_seq && !$seq->has_qual) {
 	    my $memstore = Transposome::SeqUtil->new( file => $fa, sample_size => 2 );
 	    ($seqs, $seqct) = $memstore->sample_seq;
@@ -34,8 +33,7 @@ for my $fa (@$fa_arr) {
     { local *STDOUT; open STDOUT, '>', 'seqsample_t.out'; $memstore2->sample_seq; }
 
     my $seqio2 = Transposome::SeqIO->new( file => 'seqsample_t.out' );
-    my $fh2 = $seqio2->get_fh;
-    while (my $seq2 = $seqio2->next_seq($fh2)) {
+    while (my $seq2 = $seqio2->next_seq) {
 	$stdoutct++ if $seq2->has_seq;
     }
     is( $seqct, $stdoutct, 'The same number of Fasta sequences sampled and stored as written to STDOUT' );
@@ -48,8 +46,7 @@ for my $fa (@$fa_arr) {
 
 for my $fq (@$fq_arr) {
     my $seqio = Transposome::SeqIO->new( file => $fq);
-    my $fh = $seqio->get_fh;
-    while (my $seq = $seqio->next_seq($fh)) {
+    while (my $seq = $seqio->next_seq) {
         if ($seq->has_id && $seq->has_seq && $seq->has_qual) {
             my $memstore = Transposome::SeqUtil->new( file => $fq, sample_size => 2 );
 	    ($seqs, $seqct) = $memstore->sample_seq;
@@ -62,8 +59,7 @@ for my $fq (@$fq_arr) {
     { local *STDOUT; open STDOUT, '>', 'seqsample_t.out'; $memstore2->sample_seq; }
 
     my $seqio2 = Transposome::SeqIO->new( file => 'seqsample_t.out' );
-    my $fh2 = $seqio2->get_fh;
-    while (my $seq2 = $seqio2->next_seq($fh2)) {
+    while (my $seq2 = $seqio2->next_seq) {
         $stdoutct++ if $seq2->has_seq;
     }
     ok( $seqct == $stdoutct, 'The same number of Fastq sequences sampled and stored as written to STDOUT' );
