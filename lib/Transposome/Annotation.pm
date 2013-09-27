@@ -383,6 +383,15 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
+	    elsif ($fam =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
+                my $famname = $1.$2;
+                if (exists $fams{$famname}) {
+                    $fams{$famname} += $blast->{$fam};
+                }
+                else {
+                    $fams{$famname} = $blast->{$fam};
+                }
+            }
 	    elsif ($fam =~ /(^[A-Za-z]+)_/) {
 		my $famname = $1;
                 if (exists $fams{$famname}) {
@@ -650,6 +659,9 @@ sub _blast_to_annotation {
                         }
                         elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
                             $copia_fam = $1.$2;
+                        } 
+			elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
+                            $copia_fam = $1.$2;
                         }
                         elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
                             $copia_fam = $1;
@@ -657,7 +669,7 @@ sub _blast_to_annotation {
                         else {
                             $copia_fam = $$top_hit;
                         }
-                        $copia_fam =~ s/\_I$// if $copia_fam =~ /\_I$/;                                                                                                    
+                        $copia_fam =~ s/\_I$// if $copia_fam =~ /\_I$/;                                               
                         $copia_fam =~ s/\_LTR$// if $copia_fam =~ /\_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
