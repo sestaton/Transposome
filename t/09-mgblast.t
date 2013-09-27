@@ -43,4 +43,4 @@ my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 my $blastdb = $blast->run_allvall_blast;
 ok ( defined($blastdb), 'Can execute all vs. all blast correctly' );
 
-system("rm -rf t/test_transposome_cli_out t/transposome_config* t/transposome_mgblast* t/$config->{run_log_file} t_log.txt");
+system("rm -rf t/test_transposome_cli_out t/transposome_config* t/transposome_mgblast* t/$config->{run_log_file} t_log.txt formatdb.log");
