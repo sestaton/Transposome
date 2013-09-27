@@ -338,8 +338,8 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-            elsif ($fam =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
-                my $famname = $1;
+            elsif ($fam =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
+                my $famname = $1.$2;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
                 }
@@ -374,7 +374,7 @@ sub clusters_annotation_to_summary  {
                     $fams{$famname} = $blast->{$fam};
                 }
             }
-            elsif ($fam =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
+            elsif ($fam =~ /^(COP.*?\d+[-_])[I|LTR].?(\w+)/i) {
                 my $famname = $1.$2;
                 if (exists $fams{$famname}) {
                     $fams{$famname} += $blast->{$fam};
@@ -618,8 +618,8 @@ sub _blast_to_annotation {
 #                        elsif ($$top_hit =~ /(^Gypsy_\d+_[a-zA-Z]+(?:[-|_][I|LTR]/) {
 #			    $gypsy_fam = $1;
 #					      }
-                        elsif ($$top_hit =~ /(^Gyp.*\d+(?:-|_)(?:LTR|I)_w{2})/i) {
-                            $gypsy_fam = $1;
+                        elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
+                            $gypsy_fam = $1.$2;
                         }
                         elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
                             $gypsy_fam = $1.$2;
@@ -648,7 +648,7 @@ sub _blast_to_annotation {
                         elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                             $copia_fam = $1;
                         }
-                        elsif ($$top_hit =~ /^(COP\d+_)(?:I|LTR)_([a-zA-Z]+)/) {
+                        elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
                             $copia_fam = $1.$2;
                         }
                         elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
