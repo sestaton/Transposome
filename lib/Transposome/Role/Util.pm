@@ -6,6 +6,8 @@ use namespace::autoclean;
 use utf8;
 use charnames qw(:full :short);
 
+#with 'MooseX::Getopt';
+
 =head1 NAME
 
 Transposome::Role::Util - Numerous utility routines for Transposome. 
@@ -29,6 +31,7 @@ our $VERSION = '0.01';
 =cut
 
 has 'cpus' => (
+#    traits    => ['NoGetopt'],
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_cpus',
@@ -37,6 +40,7 @@ has 'cpus' => (
     );
 
 has 'threads' => (
+#    traits    => ['NoGetopt'],
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_threads',
