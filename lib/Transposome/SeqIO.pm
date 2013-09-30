@@ -24,9 +24,8 @@ our $VERSION = '0.01';
     use Transposome::SeqIO;
 
     my $trans_obj = Transposome::SeqIO->new( file => $infile );
-    my $fh = $trans_obj->get_fh;
 
-    while (my $seq = $trans_obj->next_seq($fh)) {
+    while (my $seq = $trans_obj->next_seq) {
          # do something interesting with $seq
     }
 
@@ -62,7 +61,7 @@ has 'qual' => (
 =head2 next_seq
 
  Title   : next_seq
- Usage   : while (my $seq = $trans_obj->next_seq($fh)) { ... };
+ Usage   : while (my $seq = $trans_obj->next_seq) { ... };
            
  Function: Reads fasta/fastq files seamlessly without needing to 
            specify the format.
@@ -71,7 +70,7 @@ has 'qual' => (
            representing the sequence, id, or quality scores (in the
            case of fastq). E.g.,
            
-           while (my $seq = $trans_obj->next_seq($fh)) { 
+           while (my $seq = $trans_obj->next_seq) { 
                $seq->get_id;   # gets the sequence id
                $seq->get_seq;  # gets the sequence
                $seq->get_qual; # gets the quality scores
@@ -88,7 +87,6 @@ has 'qual' => (
            by calling the method 'get_fh' on a Transposome::SeqIO object. E.g.,
  
            my $trans_obj = Transposome::SeqIO->new( file => $infile );
-           my $fh = $trans_obj->get_fh;
 
 =cut
 
