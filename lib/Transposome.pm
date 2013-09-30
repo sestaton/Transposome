@@ -51,10 +51,9 @@ has '+threads' => (
     traits    => ['NoGetopt'],
     );
 
-
-#sub getopt_usage_config {
-#    return ( usage_sections => ["NAME|SYNOPSIS|OPTIONS"] );
-#}
+has '+logger' => (
+    traits    => ['NoGetopt'],
+    );
 
 =head1 AUTHOR
 
