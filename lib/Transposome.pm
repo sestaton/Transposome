@@ -6,7 +6,7 @@ use YAML;
 use namespace::autoclean;
 
 with 'MooseX::Getopt::Usage',
-#     'MooseX::Getopt::Usage::Role::Man',
+     'MooseX::Getopt::Usage::Role::Man',
      'MooseX::Log::Log4perl',
      'Transposome::Role::Util';
 
@@ -42,6 +42,15 @@ has 'configuration' => (
     lazy    => 1,
     default => sub { YAML::LoadFile shift->config }
     );
+
+has '+cpus' => (
+    traits    => ['NoGetopt'],
+    );
+
+has '+threads' => (
+    traits    => ['NoGetopt'],
+    );
+
 
 #sub getopt_usage_config {
 #    return ( usage_sections => ["NAME|SYNOPSIS|OPTIONS"] );
