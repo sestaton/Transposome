@@ -6,6 +6,7 @@ use YAML;
 use namespace::autoclean;
 
 with 'MooseX::Getopt::Usage',
+     'MooseX::Getopt::Usage::Role::Man',
      'MooseX::Log::Log4perl',
      'Transposome::Role::Util';
 
@@ -25,7 +26,7 @@ our $VERSION = '0.01';
 
     transposome --config transposome_config.yml
 
-=cut 
+=cut
 
 has 'config' => (
     is       => 'ro',
@@ -35,12 +36,16 @@ has 'config' => (
     );
 
 has 'configuration' => (
+    traits  => ['NoGetopt'],
     is      => 'rw',
     isa     => 'HashRef',
     lazy    => 1,
-    traits  => ['NoGetopt'],
     default => sub { YAML::LoadFile shift->config }
     );
+
+#sub getopt_usage_config {
+#    return ( usage_sections => ["NAME|SYNOPSIS|OPTIONS"] );
+#}
 
 =head1 AUTHOR
 
