@@ -1,5 +1,7 @@
 requires 'Moose', '>= 2.0802';
 requires 'MooseX::Getopt', '>= 0.56';
+requires 'MooseX::Getopt::Usage', '>= 0.14';
+requires 'MooseX::Getopt::Usage::Role::Man', '>= 0.14';
 requires 'MooseX::Log::Log4perl', '>= 0.46';
 requires 'MooseX::Types::Path::Class', '>= 0.06';
 requires 'namespace::autoclean', '>= 0.13';
