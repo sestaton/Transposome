@@ -169,7 +169,6 @@ sub run_allvall_blast {
     my $dir   = $self->dir->absolute; 
     make_path($dir, {verbose => 0, mode => 0771,});
     my $out_path = Path::Class::File->new($dir, $outfile);
-    #my $report_path = Path::Class::File->new($dir, $self->report);
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -183,7 +182,6 @@ sub run_allvall_blast {
     my %blasts;
 
     open my $out, '>>', $out_path or die "\n[ERROR]: Could not open file: $out_path\n";
-    #open my $rep, '>', $report_path or die "\n[ERROR]: Could not open file: $report_path\n"; 
 
     my $pm = Parallel::ForkManager->new($thread);
     $pm->run_on_finish( sub { my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_ref) = @_;
@@ -197,7 +195,6 @@ sub run_allvall_blast {
 			      my $elapsed = $t1 - $t0;
 			      my $time = sprintf("%.2f",$elapsed/60);
 			      my $base = basename($ident);
-			      #say $rep basename($ident)," just finished with PID $pid and exit code: $exit_code in $time minutes";
 			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.") 
 				  if Log::Log4perl::initialized();
 			} );
@@ -218,10 +215,8 @@ sub run_allvall_blast {
     my $total_elapsed = $t2 - $t0;
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
-    #say $rep "\n======> Finished running mgblast on $seqct sequences in $final_time minutes";
     $self->log->info("======== Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.")
 	if Log::Log4perl::initialized();
-    #close $rep;
 
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is: $outfile.")
