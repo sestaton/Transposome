@@ -19,6 +19,10 @@ To install this package, you will first need to install [BLAST+](http://blast.nc
     make test
     make install
 
+or simply,
+
+    cpanm git://github.com/sestaton/Transposome.git
+
 See the Updating your installation page, if you have previously installed Transposome.
 
 **BASIC USAGE**
