@@ -6,10 +6,6 @@ use namespace::autoclean;
 use utf8;
 use charnames qw(:full :short);
 
-<<<<<<< HEAD
-#with 'MooseX::Getopt';
->>>>>>> d3ef9b5731dc93c537effa56313a157f8e0d6f1d
-
 =head1 NAME
 
 Transposome::Role::Util - Numerous utility routines for Transposome. 
@@ -33,11 +29,6 @@ our $VERSION = '0.01';
 =cut
 
 has 'cpus' => (
-<<<<<<< HEAD
-#    traits    => ['NoGetopt'],
-=======
-    traits    => ['NoGetopt'],
->>>>>>> d3ef9b5731dc93c537effa56313a157f8e0d6f1d
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_cpus',
@@ -46,11 +37,6 @@ has 'cpus' => (
     );
 
 has 'threads' => (
-<<<<<<< HEAD
-#    traits    => ['NoGetopt'],
-=======
-    traits    => ['NoGetopt'],
->>>>>>> d3ef9b5731dc93c537effa56313a157f8e0d6f1d
     is        => 'ro',
     isa       => 'Int',
     predicate => 'has_threads',
