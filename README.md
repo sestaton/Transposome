@@ -13,7 +13,7 @@ To install this package, you will first need to install [BLAST+](http://blast.nc
 
     cpanm git://github.com/sestaton/Transposome.git
 
-If you run into any installation issues, it may be necessary to download the code and install manually (see the [Troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information:
+If you run into any installation issues, it may be necessary to download the code and install manually (see the [Troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
 
     git clone https://github.com/sestaton/Transposome.git
     cd Transposome
