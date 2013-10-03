@@ -697,55 +697,55 @@ sub _blast_to_annotation {
     return(\%top_hit_superfam, \%cluster_annot);
 }
 
-sub _make_gypsy_fam {
-    my ($self, $hit) = @_;
+#sub _make_gypsy_fam {
+#    my ($self, $hit) = @_;
 
-    if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
-	$gypsy_fam = $1;
-    }
-    elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-	$gypsy_fam = $1;
-    }
-    elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
-	$gypsy_fam = $1.$2;
-    }
-    elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
-	$gypsy_fam = $1.$2;
-    }
-    elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
-	$gypsy_fam = $1;
-    }
-    elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
-	$gypsy_fam = $1;
-    }
-    else {
-	$gypsy_fam = $$top_hit;
-    }
-}
+#    if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
+#	$gypsy_fam = $1;
+#    }
+#    elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+#	$gypsy_fam = $1;
+#    }
+#    elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
+#	$gypsy_fam = $1.$2;
+#    }
+#    elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+#	$gypsy_fam = $1.$2;
+#    }
+#    elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
+#	$gypsy_fam = $1;
+#    }
+#    elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
+#	$gypsy_fam = $1;
+#    }
+#    else {#
+#	$gypsy_fam = $$top_hit;
+#    }
+#}
 
-sub _make_copia_fam {
-    my ($self, $hit) = @_;
+#sub _make_copia_fam {
+#    my ($self, $hit) = @_;
 
-    if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
-	$copia_fam = $1;
-    }
-    elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-	$copia_fam = $1;
-    }
-    elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
-	$copia_fam = $1.$2;
-    } 
-    elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
-	$copia_fam = $1.$2;
-    }
-    elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
-	$copia_fam = $1;
-    }
-    else {
-	$copia_fam = $$top_hit;
-    }
-
-}
+#    if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
+#	$copia_fam = $1;
+#    }
+#    elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+#	$copia_fam = $1;
+#    }
+#    elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
+#	$copia_fam = $1.$2;
+#    } 
+#    elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
+#	$copia_fam = $1.$2;
+#    }
+#    elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
+#	$copia_fam = $1;
+#    }
+#    else {
+#	$copia_fam = $$top_hit;
+#    }
+#
+#}
 
 =head1 AUTHOR
 
