@@ -590,6 +590,8 @@ sub _blast_to_annotation {
                 last;
             }
             elsif ($type eq 'endogenous_retrovirus' && $$top_hit =~ /erv/i) {
+		$$top_hit =~ s/_I// if $$top_hit =~ /_I|_I$/;
+		$$top_hit =~ s/_LTR// if $$top_hit =~ /_LTR|_LTR$$/;
                 my $anno_key = $self->mk_key($filebase, $type, "Endogenous Retrovirus", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
@@ -617,60 +619,57 @@ sub _blast_to_annotation {
                         }
                     }
 		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
-                        my $gypsy_fam; 
-                        if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
-                            $gypsy_fam = $1;
-                        }
-                        elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-                            $gypsy_fam = $1;
-                        }
-#                        elsif ($$top_hit =~ /(^Gypsy_\d+_[a-zA-Z]+(?:[-|_][I|LTR]/) {
-#			    $gypsy_fam = $1;
-#					      }
-                        elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
-                            $gypsy_fam = $1.$2;
-                        }
-                        elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
-                            $gypsy_fam = $1.$2;
-                        }
-                        elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
-                            $gypsy_fam = $1;
-                        }
-                        elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
-                            $gypsy_fam = $1;
-                        }
-                        else {
-                            $gypsy_fam = $$top_hit;
-                        }
-                        $gypsy_fam =~ s/\_I$// if $gypsy_fam =~ /\_I$/;                                                                                                    
-                        $gypsy_fam =~ s/\_LTR$// if $gypsy_fam =~ /\_LTR$/;
+                        my $gypsy_fam = $$top_hit; 
+                        #if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
+                        #    $gypsy_fam = $1;
+                        #}
+                        #elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                        #    $gypsy_fam = $1;
+                        #}
+                        #elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
+                        #    $gypsy_fam = $1.$2;
+                        #}
+                        #elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+                        #    $gypsy_fam = $1.$2;
+                        #}
+                        #elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
+                        #    $gypsy_fam = $1;
+                        #}
+                        #elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
+                        #    $gypsy_fam = $1;
+                        #}
+                        #else {
+                        #    $gypsy_fam = $$top_hit;
+                        #}
+                        $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I|_I$/;
+                        $gypsy_fam =~ s/_LTR// if $gypsy_fam =~ /_LTR|_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
-                        my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $gypsy_fam, $$top_hit, $$top_hit_perc);
+                        my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $$top_hit, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
                         last;
                     }
                     elsif ($superfam_h =~ /copia/i && $$top_hit =~ /^RLC|Cop/i) {
-                        my $copia_fam;
-                        if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
-                            $copia_fam = $1;
-                        }
-                        elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
-                            $copia_fam = $1;
-                        }
-                        elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
-                            $copia_fam = $1.$2;
-                        } 
-			elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
-                            $copia_fam = $1.$2;
-                        }
-                        elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
-                            $copia_fam = $1;
-                        }
-                        else {
-                            $copia_fam = $$top_hit;
-                        }
-                        $copia_fam =~ s/\_I$// if $copia_fam =~ /\_I$/;                                               
-                        $copia_fam =~ s/\_LTR$// if $copia_fam =~ /\_LTR$/;
+                        my $copia_fam = $$top_hit;
+                        #if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
+                        #    $copia_fam = $1;
+                        #}
+                        #elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+                        #    $copia_fam = $1;
+                        #}
+                        #elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
+                        #    $copia_fam = $1.$2;
+                        #} 
+			#elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
+                        #    $copia_fam = $1.$2;
+                        #}
+                        #elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
+                        #    $copia_fam = $1;
+                        #}
+                        #else {
+                        #    $copia_fam = $$top_hit;
+                        #}
+                        $copia_fam =~ s/_I// if $copia_fam =~ /_I|_I$/;                                               
+                        $copia_fam =~ s/_LTR// if $copia_fam =~ /_LTR|_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
@@ -680,8 +679,8 @@ sub _blast_to_annotation {
                         for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
                             for my $mem (@$fam) {
                                 if ($mem =~ /$$top_hit/i) {
-			            $$top_hit =~ s/\_I$// if $$top_hit =~ /\_I$/;
-			            $$top_hit =~ s/\_LTR$// if $$top_hit =~ /\_LTR$/;
+			            $$top_hit =~ s/_I// if $$top_hit =~ /_I|_I$/;
+			            $$top_hit =~ s/_LTR// if $$top_hit =~ /_LTR|_LTR$/;
                                     $top_hit_superfam{$$top_hit} = $superfam_h;
 				    my $unk_fam = q{ };
                                     my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $unk_fam, $$top_hit, $$top_hit_perc);
@@ -696,6 +695,56 @@ sub _blast_to_annotation {
         }
     }
     return(\%top_hit_superfam, \%cluster_annot);
+}
+
+sub _make_gypsy_fam {
+    my ($self, $hit) = @_;
+
+    if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
+	$gypsy_fam = $1;
+    }
+    elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+	$gypsy_fam = $1;
+    }
+    elsif ($$top_hit =~ /(^Gyp.*\d+?)[-_][I|LTR](_\w+)/i) {
+	$gypsy_fam = $1.$2;
+    }
+    elsif ($$top_hit =~ /^([a-zA-Z]+)(?:-|_)(?:I|LTR)(_\w+)/) {
+	$gypsy_fam = $1.$2;
+    }
+    elsif ($$top_hit =~ /(^RLG_\w+\d+_\d+)/) {
+	$gypsy_fam = $1;
+    }
+    elsif ($$top_hit =~ /(^[a-zA-Z]+)_/) {
+	$gypsy_fam = $1;
+    }
+    else {
+	$gypsy_fam = $$top_hit;
+    }
+}
+
+sub _make_copia_fam {
+    my ($self, $hit) = @_;
+
+    if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
+	$copia_fam = $1;
+    }
+    elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
+	$copia_fam = $1;
+    }
+    elsif ($$top_hit =~ /^(COP.*\d+[-_])[I|LTR].?(\w+)/i) {
+	$copia_fam = $1.$2;
+    } 
+    elsif ($$top_hit =~ /^(RIRE\d+?[-_])[I|LTR].?(\w+)/i) {
+	$copia_fam = $1.$2;
+    }
+    elsif ($$top_hit =~ /(^[A-Za-z]+)_/) {
+	$copia_fam = $1;
+    }
+    else {
+	$copia_fam = $$top_hit;
+    }
+
 }
 
 =head1 AUTHOR
