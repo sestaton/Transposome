@@ -420,8 +420,8 @@ sub clusters_annotation_to_summary  {
 	    my $gperc_corr = $hit_perc * $rep_frac;
             $total_gcov += $gperc_corr;
 	    my $fam = $k;
-	    $fam =~ s/\_I$// if $fam =~ /\_I$/;
-	    $fam =~ s/\_LTR$// if $fam =~ /\_LTR$/;
+	    $fam =~ s/_I// if $fam =~ /_I$/;
+	    $fam =~ s/_LTR// if $fam =~ /_LTR$/;
             say $outsum join "\t", $seqct, $top_hit_superfam{$k}, $fam, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
         }
     }
@@ -590,8 +590,8 @@ sub _blast_to_annotation {
                 last;
             }
             elsif ($type eq 'endogenous_retrovirus' && $$top_hit =~ /erv/i) {
-		$$top_hit =~ s/_I// if $$top_hit =~ /_I|_I$/;
-		$$top_hit =~ s/_LTR// if $$top_hit =~ /_LTR|_LTR$$/;
+		$$top_hit =~ s/_I// if $$top_hit =~ /_I_|_I$/;
+		$$top_hit =~ s/_LTR// if $$top_hit =~ /_LTR_|_LTR$$/;
                 my $anno_key = $self->mk_key($filebase, $type, "Endogenous Retrovirus", $$top_hit, $$top_hit_perc);
                 $cluster_annot{$readct} = $anno_key;
                 last;
@@ -620,9 +620,9 @@ sub _blast_to_annotation {
                     }
 		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam = $$top_hit; 
-                        #if ($$top_hit =~ /(^RLG[_|-][a-zA-Z]+)/) {
-                        #    $gypsy_fam = $1;
-                        #}
+                        if ($gypsy_fam =~ /(^RLG[_|-][a-zA-Z]+)/) {
+                            $gypsy_fam = $1;
+                        }
                         #elsif ($$top_hit =~ /(^Gypsy[-_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                         #    $gypsy_fam = $1;
                         #}
@@ -641,8 +641,8 @@ sub _blast_to_annotation {
                         #else {
                         #    $gypsy_fam = $$top_hit;
                         #}
-                        $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I|_I$/;
-                        $gypsy_fam =~ s/_LTR// if $gypsy_fam =~ /_LTR|_LTR$/;
+                        $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I_|_I$/;
+                        $gypsy_fam =~ s/_LTR// if $gypsy_fam =~ /_LTR_|_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $$top_hit, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
@@ -650,9 +650,9 @@ sub _blast_to_annotation {
                     }
                     elsif ($superfam_h =~ /copia/i && $$top_hit =~ /^RLC|Cop/i) {
                         my $copia_fam = $$top_hit;
-                        #if ($$top_hit =~ /(^RLC[_|-][a-zA-Z]+)/) {
-                        #    $copia_fam = $1;
-                        #}
+                        if ($copia_fam =~ /(^RLC[_|-][a-zA-Z]+)/) {
+                            $copia_fam = $1;
+                        }
                         #elsif ($$top_hit =~ /(^Copia[-|_]\d+_[a-zA-Z]+)(?:[-|_][I|LTR])/) {
                         #    $copia_fam = $1;
                         #}
@@ -668,8 +668,8 @@ sub _blast_to_annotation {
                         #else {
                         #    $copia_fam = $$top_hit;
                         #}
-                        $copia_fam =~ s/_I// if $copia_fam =~ /_I|_I$/;                                               
-                        $copia_fam =~ s/_LTR// if $copia_fam =~ /_LTR|_LTR$/;
+                        $copia_fam =~ s/_I// if $copia_fam =~ /_I_|_I$/;                                               
+                        $copia_fam =~ s/_LTR// if $copia_fam =~ /_LTR_|_LTR$/;
                         $top_hit_superfam{$$top_hit} = $superfam_h;
                         my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
                         $cluster_annot{$readct} = $anno_key;
@@ -679,8 +679,8 @@ sub _blast_to_annotation {
                         for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
                             for my $mem (@$fam) {
                                 if ($mem =~ /$$top_hit/i) {
-			            $$top_hit =~ s/_I// if $$top_hit =~ /_I|_I$/;
-			            $$top_hit =~ s/_LTR// if $$top_hit =~ /_LTR|_LTR$/;
+			            $$top_hit =~ s/_I_// if $$top_hit =~ /_I_|_I$/;
+			            $$top_hit =~ s/_LTR_// if $$top_hit =~ /_LTR_|_LTR$/;
                                     $top_hit_superfam{$$top_hit} = $superfam_h;
 				    my $unk_fam = q{ };
                                     my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $unk_fam, $$top_hit, $$top_hit_perc);
