@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Basename;
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use Module::Path qw(module_path);
 use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
@@ -119,11 +119,14 @@ while (<$rep>) {
 	my $second = <$rep>; chomp $second;
 	($g0, $mems1) = split /\t/, $first;
 	($g1, $mems2) = split /\t/, $second;
-	ok($mems1 eq $cls12.",".$cls11, 'Expected clusters were joined (1)' );
-	ok($mems2 eq $cls22.",".$cls21, 'Expected clusters were joined (2)' );
+	my $cg0 = $cls11.",".$cls12; my $cg1 = $cls12.",".$cls11;
+        my $cg2 = $cls21.",".$cls22; my $cg3 = $cls22.",".$cls21;
+        like($mems1, qr/$cg0|$cg1|$cg2|$cg3/, 'Expected clusters were joined (1)' );
+        like($mems2, qr/$cg0|$cg1|$cg2|$cg3/, 'Expected clusters were joined (2)' );
     }
 }
 close $rep;
 END {
-    system("rm -rf $outdir $blfl");
+    remove_tree($outdir, {safe => 1});
+    unlink $blfl;
 }
