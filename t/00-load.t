@@ -7,13 +7,13 @@ use lib qw(../blib/lib);
 use Test::More tests => 12;
 
 BEGIN {
-    use_ok( 'Transposome' ) || print "Bail out!\n";
-    use_ok( 'Transposome::SeqUtil' ) || print "Bail out!\n";
-    use_ok( 'Transposome::SeqIO' ) || print "Bail out!\n";
-    use_ok( 'Transposome::Cluster' ) || print "Bail out!\n";
-    use_ok( 'Transposome::Annotation' ) || print "Bail out!\n";
-    use_ok( 'Transposome::PairFinder' ) || print "Bail out!\n";
-    use_ok( 'Transposome::Run::Blast' ) || print "Bail out!\n";
+    use_ok( 'Transposome' ) || print "[Error]: Could not load Transposome.\n";
+    use_ok( 'Transposome::SeqUtil' ) || print "[Error]: Could not load Transposome::SeqUtil.\n";
+    use_ok( 'Transposome::SeqIO' ) || print "[Error]: Could not load Transposome::SeqIO.\n";
+    use_ok( 'Transposome::Cluster' ) || print "[Error]: Could not load Transposome::Cluster.\n";
+    use_ok( 'Transposome::Annotation' ) || print "[Error]: Could not load Transposome::Annotation.\n";
+    use_ok( 'Transposome::PairFinder' ) || print "[Error]: Could not load Transposome::PairFinder.\n";
+    use_ok( 'Transposome::Run::Blast' ) || print "[Error]: Could not load Transposome::Run::Blast.\n";
 }
 
 diag( "Testing Transposome $Transposome::VERSION, Perl $], $^X" );
