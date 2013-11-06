@@ -7,9 +7,13 @@ Annotation of transposable element families from unassembled sequence reads
 
 
 
+**DEPENDENCIES**
+
+To use this package, you will first need to install [BLAST+](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) and [mgblast](http://sourceforge.net/projects/gicl/). Perl version 5.12 (or greater) is required, and there are a number of Perl dependencies that will need to be installed (see below). 
+
 **INSTALLATION**
 
-To use this package, you will first need to install [BLAST+](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) and [mgblast](http://sourceforge.net/projects/gicl/). Next, there are some Perl dependencies that will need to be installed. The recommened method to satisfy the Perl dependencies is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and run the following command:
+The recommened method to satisfy the Perl dependencies is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and run the following command:
 
     cpanm git://github.com/sestaton/Transposome.git
 
