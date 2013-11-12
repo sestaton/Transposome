@@ -1,3 +1,4 @@
+bin/transposome
 Changes
 README.pod
 lib/Transposome.pm
