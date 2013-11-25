@@ -122,7 +122,7 @@ my ($anno_rp_path, $anno_sum_rep_path, $total_readct,
     $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file});
+                                            $seqct, $rep_frac, $blasts, $superfams);
 
 #
 # log summary of results

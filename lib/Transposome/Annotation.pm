@@ -290,10 +290,6 @@ sub clusters_annotation_to_summary  {
     my ($self, $anno_rp_path, $anno_sum_rep_path, $total_readct, 
 	$seqct, $rep_frac, $blasts, $superfams) = @_;
 
-    #my $report = $self->file->relative;
-    #my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
-
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
@@ -385,10 +381,8 @@ sub _make_blastdb {
 
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
-    #my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
 
     my $db = $dbname."_blastdb";
-    #my $db_path = File::Spec->rel2abs($dbpath.$db);
     my $db_path = Path::Class::File->new($self->dir, $db);
     unlink $db_path if -e $db_path;
 

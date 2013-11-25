@@ -26,8 +26,8 @@ t/10-annotation.t
 t/lib/TestUtils.pm
 t/lib/TestUtils/TestConfig.pm
 t/Transposome/transposome.t
-xt/sestaton/00-pod.t
-xt/sestaton/01-pod-coverage.t
+xt/00-pod.t
+xt/01-pod-coverage.t
 src/Makefile
 src/README.md
 src/community.cpp
