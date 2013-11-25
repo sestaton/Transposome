@@ -2,6 +2,7 @@ package Transposome::Annotation;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
 use namespace::autoclean;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -147,8 +148,7 @@ sub BUILD {
 
 =cut
 
-sub annotate_clusters {
-    my ($self, $cls_with_merges_dir, $seqct, $cls_tot) = @_;
+method annotate_clusters ($cls_with_merges_dir, $seqct, $cls_tot) {
     
     my $report = $self->file->relative;
     my $database = $self->database->absolute;
@@ -286,13 +286,8 @@ sub annotate_clusters {
 
 =cut 
 
-sub clusters_annotation_to_summary  {
-    my ($self, $anno_rp_path, $anno_sum_rep_path, $total_readct, 
-	$seqct, $rep_frac, $blasts, $superfams) = @_;
-
-    #my $report = $self->file->relative;
-    #my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    #my $rp_path = File::Spec->rel2abs($rppath.$rpname.$rpsuffix);
+method clusters_annotation_to_summary ($anno_rp_path, $anno_sum_rep_path, $total_readct, $seqct, 
+				       $rep_frac, $blasts, $superfams) {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -380,8 +375,7 @@ sub clusters_annotation_to_summary  {
 
 =cut 
 
-sub _make_blastdb {
-    my ($self, $db_fas) = @_;
+method _make_blastdb ($db_fas) {
 
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
@@ -427,8 +421,7 @@ sub _make_blastdb {
 
 =cut
 
-sub _parse_blast_to_top_hit {
-    my ($self, $blast_out, $blast_file_path) = @_;
+method _parse_blast_to_top_hit ($blast_out, $blast_file_path) {
  
     my %blhits;
     my $hit_ct = 0;
@@ -485,8 +478,7 @@ sub _parse_blast_to_top_hit {
 
 =cut
 
-sub _blast_to_annotation {
-    my ($self, $repeats, $filebase, $readct, $top_hit, $top_hit_perc) = @_;
+method _blast_to_annotation ($repeats, $filebase, $readct, $top_hit, $top_hit_perc) {
 
     my %top_hit_superfam;
     my %cluster_annot;

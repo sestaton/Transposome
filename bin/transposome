@@ -119,10 +119,19 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
 					       cpus      => $config->{cpu} );
 
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
-    $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
+    $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters( cls_with_merges_dir => $cls_dir_path, 
+								      seqct               => $seqct, 
+								      cls_tot             => $cls_tot );
 
-$annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file});
+#$anno_rp_path, $anno_sum_rep_path, Int $total_readct, Int $seqct,
+#Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
+$annotation->clusters_annotation_to_summary( anno_rp_path      => $anno_rp_path, 
+					     anno_sum_rep_path => $anno_sum_rep_path, 
+					     total_readct      => $total_readct,
+                                             seqct             => $seqct, 
+					     rep_frac          => $rep_frac, 
+					     blasts            => $blasts, 
+					     superfams         => $superfams );
 
 #
 # log summary of results
