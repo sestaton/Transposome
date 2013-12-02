@@ -1,9 +1,10 @@
 package Transposome::PairFinder;
 
 use 5.012;
-use Moose;
-use namespace::autoclean;
 use utf8;
+use Moose;
+use MooseX::Method::Signatures;
+use namespace::autoclean;
 use Encode qw(encode decode);
 use DB_File;
 use vars qw($DB_BTREE &R_DUP);  
@@ -88,29 +89,27 @@ has 'fraction_coverage' => (
 
 =cut
 
-sub parse_blast {
-    my ($self) = @_;
-    
+method parse_blast {
     my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
     }
     my $int_file = $iname;
     my $idx_file = $iname;
-    my $hs_file = $iname;
+    my $hs_file  = $iname;
     $int_file .= "_louvain.int";
     $idx_file .= "_louvain.idx";
-    $hs_file .= "_louvain.hs";
+    $hs_file  .= "_louvain.hs";
     my $int_path = File::Spec->catfile($self->dir, $int_file);
     my $idx_path = File::Spec->catfile($self->dir, $idx_file);
-    my $hs_path = File::Spec->catfile($self->dir, $hs_file);
+    my $hs_path  = File::Spec->catfile($self->dir, $hs_file);
     
     # counters
     my $total_hits = 0;
     my $parsed_hits = 0;
     my $index = 0;
     
-    my $fh = $self->file->openr;
+    my $fh = $self->get_fh;
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -219,7 +218,7 @@ sub parse_blast {
 	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
 	    if Log::Log4perl::initialized();
 
-	return($idx_path, $int_path, $hs_path);
+	return ($idx_path, $int_path, $hs_path);
     }
     else {
 	my $dbm = "mgblast_matchpairs.dbm";
@@ -301,7 +300,7 @@ sub parse_blast {
 	    say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
 	}
 	close $idx;
-
+ 
 	open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
 	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";	
 
@@ -341,7 +340,7 @@ sub parse_blast {
 	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
 	    if Log::Log4perl::initialized();
 
-	return($idx_path, $int_path, $hs_path);
+	return ($idx_path, $int_path, $hs_path);
 
     }
 }
@@ -362,8 +361,7 @@ sub parse_blast {
 
 =cut
 
-sub _validate_format {
-    my ($self, $line) = @_;
+method _validate_format ($line) {
     my @f = split /\t/, $line;
     unless (scalar @f == 12) {
 	$self->log->error("'$line' is not the correct format in file: $self->file. Exiting.")
