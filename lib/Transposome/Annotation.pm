@@ -48,7 +48,7 @@ our $VERSION = '0.02';
     
  
     $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                                $seqct, $rep_frac, $blasts, $superfams, $report);
+                                                $seqct, $rep_frac, $blasts, $superfams);
 
 
 =cut
