@@ -2,6 +2,8 @@ package Transposome::Run::Blast;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(Int);
 use File::Basename;
 use namespace::autoclean;
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -98,9 +100,7 @@ has 'mgblast_exec' => (
     predicate => 'has_mgblast_exec',
     );
 
-sub BUILD {
-    my ($self) = @_;
-
+method BUILD {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
@@ -155,9 +155,7 @@ sub BUILD {
 
 =cut 
 
-sub run_allvall_blast {
-    my ($self) = @_;
-
+method run_allvall_blast {
     my $t0 = gettimeofday();
     my $file = $self->file->absolute;
     my $cpu = $self->cpus;
@@ -243,9 +241,7 @@ sub run_allvall_blast {
 
 =cut 
 
-sub _make_mgblastdb {
-    my ($self) = @_;
-
+method _make_mgblastdb {
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
@@ -288,9 +284,7 @@ sub _make_mgblastdb {
 
 =cut 
 
-sub _run_blast {
-    my ($self, $subseq_file, $database, $cpu) = @_;
-
+method _run_blast ($subseq_file, $database, Int $cpu) {
     my ($dbfile,$dbdir,$dbext) = fileparse($database, qr/\.[^.]*/);
     my ($subfile,$subdir,$subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
@@ -352,9 +346,7 @@ sub _run_blast {
 
 =cut
 
-sub _split_reads {
-    my ($self, $numseqs) = @_;
-
+method _split_reads (Int $numseqs) {
     my ($iname, $ipath, $isuffix) = fileparse($self->file->absolute, qr/\.[^.]*/);
     my $dir = $self->dir->absolute;
 

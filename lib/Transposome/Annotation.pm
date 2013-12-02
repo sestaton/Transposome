@@ -3,6 +3,7 @@ package Transposome::Annotation;
 use 5.012;
 use Moose;
 use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(ArrayRef HashRef Int Str ScalarRef); 
 use namespace::autoclean;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -88,9 +89,7 @@ has 'makeblastdb_exec' => (
     predicate => 'has_makeblastdb_exec',
     );
 
-sub BUILD {
-    my ($self) = @_;
-
+method BUILD {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
@@ -148,8 +147,7 @@ sub BUILD {
 
 =cut
 
-method annotate_clusters ($cls_with_merges_dir, $seqct, $cls_tot) {
-    
+method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     my $report = $self->file->relative;
     my $database = $self->database->absolute;
     my $db_path = $self->_make_blastdb($database);
@@ -286,9 +284,8 @@ method annotate_clusters ($cls_with_merges_dir, $seqct, $cls_tot) {
 
 =cut 
 
-method clusters_annotation_to_summary ($anno_rp_path, $anno_sum_rep_path, $total_readct, $seqct, 
-				       $rep_frac, $blasts, $superfams) {
-
+method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Class::File $anno_sum_rep_path, Int $total_readct, Int $seqct, 
+				       Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
@@ -375,8 +372,7 @@ method clusters_annotation_to_summary ($anno_rp_path, $anno_sum_rep_path, $total
 
 =cut 
 
-method _make_blastdb ($db_fas) {
-
+method _make_blastdb (Path::Class::File $db_fas) {
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
     #my $db_file = File::Spec->rel2abs($dbpath.$dbname.$dbsuffix);
@@ -421,8 +417,7 @@ method _make_blastdb ($db_fas) {
 
 =cut
 
-method _parse_blast_to_top_hit ($blast_out, $blast_file_path) {
- 
+method _parse_blast_to_top_hit (ArrayRef $blast_out, Str $blast_file_path) {
     my %blhits;
     my $hit_ct = 0;
 
@@ -478,8 +473,7 @@ method _parse_blast_to_top_hit ($blast_out, $blast_file_path) {
 
 =cut
 
-method _blast_to_annotation ($repeats, $filebase, $readct, $top_hit, $top_hit_perc) {
-
+method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, ScalarRef $top_hit, ScalarRef $top_hit_perc) {
     my %top_hit_superfam;
     my %cluster_annot;
 

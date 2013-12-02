@@ -2,6 +2,7 @@ package Transposome::SeqUtil;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use DB_File;
@@ -110,9 +111,7 @@ Returns : In order, 1) a hash containing the id, sequence      HashRef
 
 =cut
 
-sub store_seq {
-    my ($self) = @_;
- 
+method store_seq {
     my %seqhash;
     unless ($self->in_memory) {
         $DB_BTREE->{cachesize} = 100000;
@@ -154,9 +153,7 @@ sub store_seq {
 
 =cut
 
-sub sample_seq {
-    my ($self) = @_;
-
+method sample_seq {
     my $filename = $self->file->relative;
     my $k = $self->sample_size;
     my $seed = $self->seed;

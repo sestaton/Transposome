@@ -2,6 +2,8 @@ package Transposome::Role::Util;
 
 use 5.012;
 use Moose::Role;
+use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(Str);
 use namespace::autoclean;
 use utf8;
 use charnames qw(:full :short);
@@ -67,8 +69,7 @@ has 'threads' => (
 
 =cut
 
-sub mk_key {
-    my ($self) = shift;
+method mk_key {
     return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_;
 }
 
@@ -88,8 +89,7 @@ sub mk_key {
 
 =cut
 
-sub mk_vec {
-    my ($self, $key) = @_;
+method mk_vec (Str $key) {
     return split "\N{INVISIBLE SEPARATOR}", $key;
 }
 

@@ -2,6 +2,7 @@ package Transposome::Annotation::Typemap;
 
 use 5.012;
 use Moose::Role;
+use MooseX::Method::Signatures;
 use Storable qw(freeze);
 
 =head1 NAME
@@ -64,8 +65,7 @@ our $VERSION = '0.01';
 
 =cut
 
-sub map_repeat_types {
-    my ($self, $infile) = @_;
+method map_repeat_types ($infile) {
     open my $in, '<', $infile or die "\n[ERROR]: Could not open file: $infile\n";
 
     my $matches = $self->_build_repeat_map();
@@ -148,8 +148,7 @@ sub map_repeat_types {
 
 =cut 
 
-sub _build_repeat_map {
-    
+method _build_repeat_map {
     my $matches = {};
     
     $matches->{'transposable_element'}{'dna_transposon'} = [{'Mariner/Tc1' => []}, {'hAT' => []}, 
