@@ -3,6 +3,7 @@ package TestUtils;
 use 5.012;
 use Moose;
 use MooseX::Types::Path::Class;
+use MooseX::Method::Signatures;
 use File::Temp;
 use namespace::autoclean;
 
@@ -73,8 +74,7 @@ has 'build_all' => (
 
 =cut
 
-sub fasta_constructor {
-    my ($self) = @_;
+method fasta_constructor {
     if ($self->build_all) {
 	my $proper_fa = $self->_build_proper_fa_data;
 	my $problematic_fa = $self->_build_problematic_fa_data;
@@ -122,8 +122,7 @@ sub fasta_constructor {
 
 =cut
 
-sub fastq_constructor {
-    my ($self) = @_;
+method fastq_constructor {
     if ($self->build_all) {
 	my $proper_fq = $self->_build_proper_fq_data;
 	my $problematic_fq = $self->_build_problematic_fq_data;
@@ -171,8 +170,7 @@ sub fastq_constructor {
 
 =cut
 
-sub blast_constructor {
-    my ($self) = @_;
+method blast_constructor {
     if ($self->build_proper) {
 	my $proper_bl = $self->_build_blast_data;
 	if ($self->destroy) {
@@ -200,8 +198,7 @@ sub blast_constructor {
 
 =cut
 
-sub _build_proper_fa_data {
-
+method _build_proper_fa_data {
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fasta",
@@ -259,8 +256,7 @@ sub _build_proper_fa_data {
 
 =cut
 
-sub _build_proper_fq_data {
-
+method _build_proper_fq_data {
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fastq",
@@ -334,8 +330,7 @@ sub _build_proper_fq_data {
 
 =cut
 
-sub _build_problematic_fa_data {
-
+method _build_problematic_fa_data {
     my $tmpfa = File::Temp->new( TEMPLATE => "transposome_fa_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fasta",
@@ -369,8 +364,7 @@ Title   : _build_problematic_fq_data
 
 =cut
 
-sub _build_problematic_fq_data {
-
+method _build_problematic_fq_data {
     my $tmpfq = File::Temp->new( TEMPLATE => "transposome_fq_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".fastq",
@@ -410,8 +404,7 @@ sub _build_problematic_fq_data {
 
 =cut
 
-sub _build_blast_data {
-
+method _build_blast_data {
     my $tmpbl = File::Temp->new( TEMPLATE => "transposome_mgblast_XXXX",
                                  DIR      => 't',
                                  SUFFIX   => ".bln",

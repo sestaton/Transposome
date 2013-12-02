@@ -3,6 +3,7 @@ package TestUtils::TestConfig;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
+use MooseX::Method::Signatures;
 use File::Temp;
 use namespace::autoclean;
 use TestUtils;
@@ -58,8 +59,7 @@ has 'repeat_db' => (
 
 =cut
 
-sub config_constructor {
-    my ($self) = @_;
+method config_constructor {
     if ($self->build_proper) {
         my $proper_yml = $self->_build_config_data;
         if ($self->destroy) {
@@ -86,9 +86,7 @@ sub config_constructor {
 
 =cut
 
-sub _build_config_data {
-    my ($self) = @_;
-
+method _build_config_data {
     my $tmpyml = File::Temp->new( TEMPLATE => "transposome_config_XXXX",
                                   DIR      => 't',
                                   SUFFIX   => ".yml",
