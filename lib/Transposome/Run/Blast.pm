@@ -22,6 +22,18 @@ with 'MooseX::Log::Log4perl',
      'Transposome::Role::Types',
      'Transposome::Role::Util';
 
+=head1 NAME
+
+Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
+
 =head1 SYNOPSIS
 
     use Transposome::Run::Blast;
