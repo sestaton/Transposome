@@ -48,6 +48,8 @@ WriteMakefile(
 	'MooseX::Getopt::Usage::Role::Man' => 0.14,
 	'MooseX::Log::Log4perl'            => 0.46,
         'MooseX::Types::Path::Class'       => 0.06,
+	'MooseX::Types::Moose'             => 0.38,
+	'MooseX::Method::Signatures'       => 0.46,
 	'namespace::autoclean'             => 0.13,
 	'Try::Tiny'                        => 0.12,
 	'IPC::System::Simple'              => 1.21,
