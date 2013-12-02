@@ -1,11 +1,11 @@
 package Transposome::Role::Util;
 
 use 5.012;
+use utf8;
 use Moose::Role;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str);
 use namespace::autoclean;
-use utf8;
 use charnames qw(:full :short);
 
 =head1 NAME
@@ -69,8 +69,8 @@ has 'threads' => (
 
 =cut
 
-method mk_key {
-    return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @_;
+method mk_key (@arg) {
+    return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
 }
 
 =head2 mk_vec
