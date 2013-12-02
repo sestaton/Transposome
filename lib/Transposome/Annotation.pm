@@ -3,7 +3,7 @@ package Transposome::Annotation;
 use 5.012;
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(ArrayRef HashRef Int Str ScalarRef); 
+use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
 use namespace::autoclean;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -574,7 +574,7 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
             }
         }
     }
-    return(\%top_hit_superfam, \%cluster_annot);
+    return (\%top_hit_superfam, \%cluster_annot);
 }
 
 =head1 AUTHOR
