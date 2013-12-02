@@ -2,6 +2,8 @@ package Transposome::Cluster;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(HashRef);
 use namespace::autoclean;
 use Graph::UnionFind;
 use File::Spec;
@@ -23,11 +25,11 @@ Transposome::Cluster - Clustering and cluster analysis routines in Transposome.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -76,8 +78,7 @@ has 'bin_dir' => (
 
 =cut
 
-sub louvain_method {
-    my ($self) = @_;
+method louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
@@ -185,9 +186,7 @@ sub louvain_method {
 
 =cut
 
-sub find_pairs {
-    my ($self, $cls_file, $cls_log_file) = @_;
-    
+method find_pairs ($cls_file, $cls_log_file) {    
     my $out_dir = $self->dir->relative;
     my $cls_log_path = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
@@ -302,9 +301,7 @@ sub find_pairs {
 
 =cut
 
-sub make_clusters {
-    my ($self, $graph_comm, $idx_file) = @_;
-
+method make_clusters ($graph_comm, $idx_file) {
     my $int_file = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
@@ -412,9 +409,7 @@ sub make_clusters {
 
 =cut
 
-sub merge_clusters {
-    my ($self, $vertex, $seqs, $read_pairs, $cls_log_file, $uf) = @_;
-
+method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls_log_file, $uf) {
     my $infile = $self->file->relative;
     my $out_dir = $self->dir->relative;
     my $str = POSIX::strftime("%m_%d_%Y_%H_%M_%S", localtime);

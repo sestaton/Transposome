@@ -1,7 +1,13 @@
 Revision history for Transposome
 
-Version	 Date	     Location	
-0.01	 10/01/2013  Athens, GA
+Version	Date	Location
+0.02	12/02/2013	Athens, GA
+
+Add method signatures, which adds dependencies.
+Bug fixes and code clean up for annotation summary
+method.
+
+0.01	10/01/2013	Athens, GA
 
 Initial release.	
 

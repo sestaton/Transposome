@@ -2,6 +2,7 @@ package Transposome::SeqIO;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -13,11 +14,11 @@ Transposome::SeqIO - Class for reading Fasta/q data.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -90,9 +91,7 @@ has 'qual' => (
 
 =cut
 
-sub next_seq {
-    my ($self) = @_;
-
+method next_seq {
     my $fh = $self->fh;
     my $line = $fh->getline;
     return unless defined $line && $line =~ /\S/;
@@ -191,8 +190,7 @@ Args    : A sequence header                                    Scalar
 
 =cut
 
-sub _set_id_per_encoding {
-    my ($self, $hline) = @_;
+method _set_id_per_encoding ($hline) {
     if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
 	return $1."/".$2;
     }

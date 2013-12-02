@@ -2,6 +2,8 @@ package Transposome::Annotation;
 
 use 5.012;
 use Moose;
+use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(ArrayRef HashRef Int Str ScalarRef); 
 use namespace::autoclean;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -23,11 +25,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -87,9 +89,7 @@ has 'makeblastdb_exec' => (
     predicate => 'has_makeblastdb_exec',
     );
 
-sub BUILD {
-    my ($self) = @_;
-
+method BUILD {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
@@ -147,9 +147,7 @@ sub BUILD {
 
 =cut
 
-sub annotate_clusters {
-    my ($self, $cls_with_merges_dir, $seqct, $cls_tot) = @_;
-    
+method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     my $report = $self->file->relative;
     my $database = $self->database->absolute;
     my $db_path = $self->_make_blastdb($database);
@@ -286,10 +284,8 @@ sub annotate_clusters {
 
 =cut 
 
-sub clusters_annotation_to_summary  {
-    my ($self, $anno_rp_path, $anno_sum_rep_path, $total_readct, 
-	$seqct, $rep_frac, $blasts, $superfams) = @_;
-
+method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Class::File $anno_sum_rep_path, Int $total_readct, Int $seqct, 
+				       Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
@@ -376,9 +372,7 @@ sub clusters_annotation_to_summary  {
 
 =cut 
 
-sub _make_blastdb {
-    my ($self, $db_fas) = @_;
-
+method _make_blastdb (Path::Class::File $db_fas) {
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
 
@@ -421,9 +415,7 @@ sub _make_blastdb {
 
 =cut
 
-sub _parse_blast_to_top_hit {
-    my ($self, $blast_out, $blast_file_path) = @_;
- 
+method _parse_blast_to_top_hit (ArrayRef $blast_out, Str $blast_file_path) {
     my %blhits;
     my $hit_ct = 0;
 
@@ -479,9 +471,7 @@ sub _parse_blast_to_top_hit {
 
 =cut
 
-sub _blast_to_annotation {
-    my ($self, $repeats, $filebase, $readct, $top_hit, $top_hit_perc) = @_;
-
+method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, ScalarRef $top_hit, ScalarRef $top_hit_perc) {
     my %top_hit_superfam;
     my %cluster_annot;
 

@@ -2,6 +2,7 @@ package Transposome::Role::Config;
 
 use 5.012;
 use Moose::Role;
+use MooseX::Method::Signatures;
 use namespace::autoclean;
 
 =head1 NAME
@@ -10,12 +11,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
-
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -44,9 +44,7 @@ our $VERSION = '0.01';
 
 =cut 
 
-sub get_config {
-    my ($self) = @_;
-
+method get_config {
     my %config;
 
     $config{sequence_file}    = $self->configuration->{blast_input}->[0]->{sequence_file};
@@ -90,9 +88,7 @@ sub get_config {
 
 =cut 
 
-sub _validate_params { 
-    my ($self, $config) = @_;
-
+method _validate_params ($config) {
     for my $k (keys %$config) {
 	my $v = $config->{$k};
         if (not defined $v) {

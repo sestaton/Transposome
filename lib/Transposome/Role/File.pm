@@ -3,7 +3,7 @@ package Transposome::Role::File;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-#use Fcntl qw(:flock);
+use MooseX::Method::Signatures;
 use namespace::autoclean;
 
 =head1 NAME
@@ -12,11 +12,11 @@ Transposome::Role::File - File handling methods for Transposome.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -65,8 +65,7 @@ has 'fh' => (
 
 =cut
 
-sub get_fh {
-    my ($self) = @_;
+method get_fh {
     if (-e $self->file) {
 	my $fh = $self->file->openr;
 	return $fh;
@@ -89,10 +88,8 @@ sub get_fh {
 
 =cut
 
-sub _build_fh {
-    my ($self) = @_;
+method _build_fh {
     my $fh = $self->file->openr;
-    #flock $fh, LOCK_EX;
     return $fh;
 }
 

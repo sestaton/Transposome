@@ -130,7 +130,7 @@ ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annot
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams, $config->{cluster_log_file}); #FIXME
+                                            $seqct, $rep_frac, $blasts, $superfams);
 
 system("rm -rf $config->{output_directory} t/$config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file formatdb.log");
 
