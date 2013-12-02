@@ -94,7 +94,7 @@ ok( ref($blasts) eq 'ARRAY', 'Correct data structure returned for creating annot
 ok( ref($superfams) eq 'ARRAY', 'Correct data structure returned for creating annotation summary (2)' );
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams, $report);
+                                            $seqct, $rep_frac, $blasts, $superfams);
 
 END {
     system("rm -rf $outdir $blfl t/cluster_test_rep* $db");
