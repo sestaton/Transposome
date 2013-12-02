@@ -34,6 +34,7 @@ ok( defined($mem_idx_file), 'Can parse blast to index in memory' );
 ok( defined($mem_int_file), 'Can parse blast to integer file in memory ' );
 ok( defined($mem_hs_file), 'Can parse blast to edge file in memory' );
 
+exit;
 my ($mem_idx_recct, $mem_int_recct, $mem_hs_recct, 
     $file_idx_recct, $file_int_recct, $file_hs_recct) = (0, 0, 0, 0, 0, 0);
 open my $mem_idx, '<', $mem_idx_file;
@@ -144,8 +145,8 @@ is( $mem_idx_recct, $file_idx_recct, 'In-memory and on-file processing methods g
 is( $mem_int_recct, $file_int_recct, 'In-memory and on-file processing methods generated the integer mapping files' );
 is( $mem_hs_recct, $file_hs_recct, 'In-memory and on-file processing methods generated the same pair file with scores' );
 
-END {
-    system("rm -rf $outdir $blfl");
-}
+#END {
+#    system("rm -rf $outdir $blfl");
+#}
 
 done_testing();
