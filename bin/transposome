@@ -23,11 +23,11 @@ transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -123,8 +123,6 @@ my ($anno_rp_path, $anno_sum_rep_path, $total_readct,
 								      $seqct, 
 								      $cls_tot );
 
-#$anno_rp_path, $anno_sum_rep_path, Int $total_readct, Int $seqct,
-#Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
 $annotation->clusters_annotation_to_summary( $anno_rp_path, 
 					     $anno_sum_rep_path, 
 					     $total_readct,
