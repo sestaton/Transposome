@@ -38,7 +38,7 @@ has 'id' => (
     reader    => 'get_id',
     writer    => 'set_id',
     predicate => 'has_id',
-    );
+);
 
 has 'seq' => (
     is        => 'rw',
@@ -46,7 +46,7 @@ has 'seq' => (
     reader    => 'get_seq',
     writer    => 'set_seq',
     predicate => 'has_seq',
-    );
+);
 
 has 'qual' => (
     is        => 'rw',
@@ -55,7 +55,7 @@ has 'qual' => (
     reader    => 'get_qual',
     writer    => 'set_qual',
     predicate => 'has_qual',
-    );
+);
 
 =head1 METHODS
 
@@ -253,3 +253,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 __PACKAGE__->meta->make_immutable;
 
+1;

@@ -58,20 +58,20 @@ has 'database' => (
       isa      => 'Path::Class::File',
       required => 1,
       coerce   => 1,
-    );
+);
 
 has 'evalue' => (
     is       => 'ro',
     isa      => 'Num',
     default  => 10,
-    );
+);
 
 has 'report' => (
       is       => 'ro',
       isa      => 'Path::Class::File',
       required => 0,
       coerce   => 1,
-    );
+);
 
 has 'blastn_exec' => (
     is        => 'rw',
@@ -79,7 +79,7 @@ has 'blastn_exec' => (
     reader    => 'get_blastn_exec',
     writer    => 'set_blastn_exec',
     predicate => 'has_blastn_exec',
-    );
+);
 
 has 'makeblastdb_exec' => (
     is        => 'rw',
@@ -87,7 +87,7 @@ has 'makeblastdb_exec' => (
     reader    => 'get_makeblastdb_exec',
     writer    => 'set_makeblastdb_exec',
     predicate => 'has_makeblastdb_exec',
-    );
+);
 
 method BUILD {
     my @path = split /:|;/, $ENV{PATH};
@@ -213,8 +213,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
         my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
 
         my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
-                       "sort -k1,1 -u | ".                       # count each read in the report only once                                                 
-                       "cut -f2 | ".                             # keep only the ssids        
+                       "sort -k1,1 -u | ".                       # count each read in the report only once                                                                  "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
                        "uniq -c | ".                             # reduce the list
                        "sort -bnr | ".                           # count unique items
@@ -627,3 +626,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 __PACKAGE__->meta->make_immutable;
+
+1;

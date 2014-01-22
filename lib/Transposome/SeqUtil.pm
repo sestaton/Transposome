@@ -64,14 +64,14 @@ has 'in_memory' => (
     predicate  => 'has_in_memory',
     lazy       => 1,
     default    => 0,
-    );
+);
 
 has 'sample_size' => (
     is        => 'ro',
     isa       => 'ModNum',
     predicate => 'has_sample',
     coerce    => 1,
-    );
+);
 
 has 'seed' => (
     is        => 'ro',
@@ -79,7 +79,7 @@ has 'seed' => (
     predicate => 'has_seed',
     lazy      => 1,
     default   => 11,
-    );
+);
 
 has 'no_store' => (
     is        => 'ro',
@@ -87,7 +87,7 @@ has 'no_store' => (
     predicate => 'has_no_store',
     lazy      => 1,
     default   => 0,
-    );
+);
 
 =head1 METHODS
 
@@ -243,3 +243,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 __PACKAGE__->meta->make_immutable;
+
+1;

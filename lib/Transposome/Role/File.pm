@@ -32,20 +32,20 @@ has 'file' => (
       isa      => 'Path::Class::File',
       required => 1,
       coerce   => 1,
-    );
+);
 
 has 'dir' => (
       is       => 'ro',
       isa      => 'Path::Class::Dir',
       required => 0,
       coerce   => 1,
-    );
+);
 
 has 'fh' => (
     is         => 'ro',
     isa        => 'IO::File',
     lazy_build => 1,
-    );
+);
 
 =head1 METHODS
 

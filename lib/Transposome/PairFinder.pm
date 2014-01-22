@@ -49,7 +49,7 @@ has 'in_memory' => (
     predicate  => 'has_in_memory',
     lazy       => 1,
     default    => 0,
-    );
+);
 
 has 'percent_identity' => (
     is        => 'ro',
@@ -57,7 +57,7 @@ has 'percent_identity' => (
     predicate => 'has_percent_identity',
     lazy      => 1,
     default   => 90.0,
-    );
+);
 
 has 'fraction_coverage' => (
     is        => 'ro',
@@ -65,7 +65,7 @@ has 'fraction_coverage' => (
     predicate => 'has_percent_coverage',
     lazy      => 1,
     default   => 0.55,
-    );
+);
 
 =head1 METHODS
 
@@ -420,3 +420,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 __PACKAGE__->meta->make_immutable;
+
+1;

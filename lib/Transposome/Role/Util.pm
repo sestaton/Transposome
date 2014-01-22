@@ -35,7 +35,7 @@ has 'cpus' => (
     predicate => 'has_cpus',
     lazy      => 1,
     default   => 1,
-    );
+);
 
 has 'threads' => (
     is        => 'ro',
@@ -43,7 +43,7 @@ has 'threads' => (
     predicate => 'has_threads',
     lazy      => 1,
     default   => 1,
-    );
+);
 
 =head1 METHODS
 

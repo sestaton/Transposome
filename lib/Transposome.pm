@@ -33,7 +33,7 @@ has 'config' => (
     isa      => 'Str',
     required => 1,
     documentation => qq{The Transposome configuration file},
-    );
+);
 
 has 'configuration' => (
     traits  => ['NoGetopt'],
@@ -41,11 +41,11 @@ has 'configuration' => (
     isa     => 'HashRef',
     lazy    => 1,
     default => sub { YAML::LoadFile shift->config }
-    );
+);
 
 has '+logger' => (
     traits    => ['NoGetopt'],
-    );
+);
 
 =head1 AUTHOR
 
@@ -97,3 +97,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 __PACKAGE__->meta->make_immutable;
+
+1;

@@ -55,7 +55,7 @@ has 'aln_num' => (
     predicate => 'has_aln_num',
     lazy      => 1,
     default   => 90000000,
-    );
+);
 
 has 'desc_num' => (
     is        => 'ro',
@@ -63,14 +63,14 @@ has 'desc_num' => (
     predicate => 'has_desc_num',
     lazy      => 1,
     default   => 90000000,
-    );
+);
 
 has 'seq_num' => (
     is        => 'ro',
     isa       => 'Num',
     predicate => 'has_seq_num',
     required  => 1,
-    );
+);
 
 has 'percent_identity' => (
     is        => 'ro',
@@ -78,7 +78,7 @@ has 'percent_identity' => (
     predicate => 'has_percent_identity',
     lazy      => 1,
     default   => 85.0,
-    );
+);
 
 has 'min_overlap' => (
     is        => 'ro',
@@ -86,7 +86,7 @@ has 'min_overlap' => (
     predicate => 'has_min_overlap',
     lazy      => 1,
     default   => 50,
-    );
+);
 
 has 'max_mismatch' => (
     is        => 'ro',
@@ -94,7 +94,7 @@ has 'max_mismatch' => (
     predicate => 'has_max_mismatch',
     lazy      => 1,
     default   => 30,
-    );
+);
 
 has 'formatdb_exec' => (
     is        => 'rw',
@@ -102,7 +102,7 @@ has 'formatdb_exec' => (
     reader    => 'get_formatdb_exec',
     writer    => 'set_formatdb_exec',
     predicate => 'has_formatdb_exec',
-    );
+);
 
 has 'mgblast_exec' => (
     is        => 'rw',
@@ -110,7 +110,7 @@ has 'mgblast_exec' => (
     reader    => 'get_mgblast_exec',
     writer    => 'set_mgblast_exec',
     predicate => 'has_mgblast_exec',
-    );
+);
 
 method BUILD {
     my @path = split /:|;/, $ENV{PATH};
@@ -454,3 +454,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 =cut
 
 __PACKAGE__->meta->make_immutable;
+
+1;
