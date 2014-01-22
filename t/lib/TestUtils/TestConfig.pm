@@ -18,7 +18,7 @@ Version 0.01
 
 =cut
 
-    our $VERSION = '0.01';
+our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
@@ -33,15 +33,15 @@ has 'seq_file' => (
     is       => 'ro',
     isa      => 'Path::Class::File',
     required => 0,
-    coerce   => 1 
-    );
+    coerce   => 1
+);
 
 has 'repeat_db' => (
     is       => 'ro',
     isa      => 'Path::Class::File',
     required => 0,
     coerce   => 1,
-    );
+);
 
 =head2 config_constructor
 
@@ -60,13 +60,13 @@ has 'repeat_db' => (
 =cut
 
 method config_constructor {
-    if ($self->build_proper) {
+    if ( $self->build_proper ) {
         my $proper_yml = $self->_build_config_data;
-        if ($self->destroy) {
+        if ( $self->destroy ) {
             unlink $proper_yml;
         }
         else {
-            return [ $proper_yml ];
+            return [$proper_yml];
         }
     }
 }
@@ -87,18 +87,20 @@ method config_constructor {
 =cut
 
 method _build_config_data {
-    my $tmpyml = File::Temp->new( TEMPLATE => "transposome_config_XXXX",
-                                  DIR      => 't',
-                                  SUFFIX   => ".yml",
-                                  UNLINK   => 0 );
+    my $tmpyml = File::Temp->new(
+        TEMPLATE => "transposome_config_XXXX",
+        DIR      => 't',
+        SUFFIX   => ".yml",
+        UNLINK   => 0
+    );
 
     my $tmpyml_name = $tmpyml->filename;
 
-    my $seq_file = $self->seq_file;
+    my $seq_file  = $self->seq_file;
     my $repeat_db = $self->repeat_db;
-    my $test = TestUtils->new( build_proper => 1, destroy => 0 );
-    my $blast = $test->blast_constructor;
-    my ($blfl) = @$blast;
+    my $test      = TestUtils->new( build_proper => 1, destroy => 0 );
+    my $blast     = $test->blast_constructor;
+    my ($blfl)    = @$blast;
 
     say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";

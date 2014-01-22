@@ -26,16 +26,16 @@ our $VERSION = '0.02';
 =cut
 
 has 'counter' => (
-      traits  => ['Counter'],
-      is      => 'ro',
-      isa     => 'Num',
-      default => 0,
-      handles => {
-	  inc_counter   => 'inc',
-	  dec_counter   => 'dec',
-	  reset_counter => 'reset',
-      },
-    );
+    traits  => ['Counter'],
+    is      => 'ro',
+    isa     => 'Num',
+    default => 0,
+    handles => {
+        inc_counter   => 'inc',
+        dec_counter   => 'dec',
+        reset_counter => 'reset',
+    },
+);
 
 =head1 AUTHOR
 
