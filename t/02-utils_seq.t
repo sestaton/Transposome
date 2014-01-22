@@ -16,7 +16,9 @@ ok( $test2->fasta_constructor, 'Can build proper Fasta data for testing' );
 ok( $test2->fastq_constructor, 'Can build proper Fastq data for testing' );
 
 my $test3 = TestUtils->new( build_problematic => 1, destroy => 1 );
-ok( $test3->fasta_constructor, 'Can build Fasta data with problems for testing' );
-ok( $test3->fastq_constructor, 'Can build Fastq data with problems for testing' );
+ok( $test3->fasta_constructor,
+    'Can build Fasta data with problems for testing' );
+ok( $test3->fastq_constructor,
+    'Can build Fastq data with problems for testing' );
 
 done_testing();
