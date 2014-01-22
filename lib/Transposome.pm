@@ -29,9 +29,9 @@ our $VERSION = '0.02';
 =cut
 
 has 'config' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
+    is            => 'ro',
+    isa           => 'Str',
+    required      => 1,
     documentation => qq{The Transposome configuration file},
 );
 
@@ -40,12 +40,10 @@ has 'configuration' => (
     is      => 'rw',
     isa     => 'HashRef',
     lazy    => 1,
-    default => sub { YAML::LoadFile shift->config }
+    default => sub { YAML::LoadFile shift->config },
 );
 
-has '+logger' => (
-    traits    => ['NoGetopt'],
-);
+has '+logger' => ( traits => ['NoGetopt'], );
 
 =head1 AUTHOR
 
