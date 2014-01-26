@@ -36,8 +36,8 @@ our $VERSION = '0.02';
     use Transposome::Annotation;
 
     my $cluster_file = '/path/to/cluster_file.cls';
-    my $seqct = 'total_seqs_in_analysis';  # Integer
-    my $cls_tot = 'total_reads_clustered'; # Integer
+    my $seqct        = 'total_seqs_in_analysis';  # Integer
+    my $cls_tot      = 'total_reads_clustered'; # Integer
 
     my $annotation = Transposome::Annotation->new( database  => 'repeat_db.fas',
                                                    dir       => 'outdir',
@@ -148,22 +148,28 @@ method BUILD {
 =cut
 
 method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
-    my $report = $self->file->relative;
+    # set paths for annotate_clusters() method
     my $database = $self->database->absolute;
-    my $db_path = $self->_make_blastdb($database);
-    my $out_dir = $self->dir->relative;
-    my $blastn = $self->get_blastn_exec;
-    my $thread_range = sprintf("%.0f", $self->threads * $self->cpus);
-    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
-    my $rp_path = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
+    my $db_path  = $self->_make_blastdb($database);
+    my $out_dir  = $self->dir->relative;
+    my $blastn   = $self->get_blastn_exec;
 
-    my $anno_rep = $rpname."_annotations.tsv";
-    my $anno_summary_rep = $rpname."_annotations_summary.tsv";
-    my $anno_rp_path = Path::Class::File->new($out_dir, $anno_rep);
+    # cluster report path
+    my $report   = $self->file->relative;
+    my ($rpname, $rppath, $rpsuffix) = fileparse($report, qr/\.[^.]*/);
+    my $rp_path  = Path::Class::File->new($out_dir, $rpname.$rpsuffix);
+
+    # set paths for annotation files
+    my $anno_rep          = $rpname."_annotations.tsv";
+    my $anno_summary_rep  = $rpname."_annotations_summary.tsv";
+    my $anno_rp_path      = Path::Class::File->new($out_dir, $anno_rep);
     my $anno_sum_rep_path = Path::Class::File->new($out_dir, $anno_summary_rep);
+
+    # results and variables controlling method behavior
+    my $thread_range = sprintf("%.0f", $self->threads * $self->cpus);
     my $total_readct = 0;
-    my $evalue = $self->evalue;
-    my $rep_frac = $cls_tot / $seqct;
+    my $evalue       = $self->evalue;
+    my $rep_frac     = $cls_tot / $seqct;
     
     # log results
     if (Log::Log4perl::initialized()) {
@@ -176,10 +182,10 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     }
 
     my $top_hit_superfam = {};
-    my $cluster_annot = {};
+    my $cluster_annot    = {};
 
     my $repeat_typemap = $self->map_repeat_types($database);
-    my %repeats = %{ thaw($repeat_typemap) };
+    my %repeats        = %{ thaw($repeat_typemap) };
 
     ## get input files
     opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
@@ -193,11 +199,13 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     }
 
     ## set path to output dir
-    my $annodir = $cls_with_merges_dir."_annotations";
+    my $annodir  = $cls_with_merges_dir."_annotations";
     my $out_path = File::Spec->rel2abs($annodir);
     make_path($annodir, {verbose => 0, mode => 0711,});
-    my @blasts;    # container for each report (hash) 
-    my @blast_out; # container for blastn output
+
+    # data structures for holding mapping results
+    my @blasts;                  # container for each report (hash) 
+    my @blast_out;               # container for blastn output
     my @superfams;
     my @cluster_annotations;
     my %all_cluster_annotations; # container for annotations; used for creating summary
@@ -243,7 +251,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfamily", "Family","Top_hit","Top_hit_perc";
 
     for my $readct (reverse sort { $a <=> $b } keys %all_cluster_annotations) {
-	my @annots = $self->mk_vec($all_cluster_annotations{$readct});
+	my @annots  = $self->mk_vec($all_cluster_annotations{$readct});
 	my $cluster = shift @annots;
 	say $out join "\t", $cluster, $readct, join "\t", @annots;
     }
@@ -283,8 +291,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
 
 =cut 
 
-method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Class::File $anno_sum_rep_path, Int $total_readct, Int $seqct, 
-				       Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
+method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Class::File $anno_sum_rep_path, 
+                                       Int $total_readct, Int $seqct, Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
@@ -306,7 +314,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
     my %annot;
     my %fams;
     my $total_ct = 0;
-    my $hashct = scalar @$blasts;
+    my $hashct   = scalar @$blasts;
     my $hitct;
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
@@ -335,7 +343,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
     say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", "HitPerc", "GenomePerc";
     for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
         if (exists $top_hit_superfam{$k}) {
-	    my $hit_perc = sprintf("%.12f",$fams{$k}/$total_ct);
+	    my $hit_perc   = sprintf("%.12f",$fams{$k}/$total_ct);
 	    my $gperc_corr = $hit_perc * $rep_frac;
             $total_gcov += $gperc_corr;
 	    my $fam = $k;
@@ -385,8 +393,10 @@ method _make_blastdb (Path::Class::File $db_fas) {
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")
 	    if Log::Log4perl::initialized();
-	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file. These cause problems with BLAST+. Exiting.")
+	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.")
 	    if Log::Log4perl::initialized();
+        $self->log->error("These cause problems with BLAST+. Exiting.")
+            if Log::Log4perl::initialized();
 	exit(1);
     };
 
