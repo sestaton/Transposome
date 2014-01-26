@@ -92,12 +92,13 @@ has 'qual' => (
 =cut
 
 method next_seq {
-    my $fh = $self->fh;
+    my $fh   = $self->fh;
     my $line = $fh->getline;
     return unless defined $line && $line =~ /\S/;
     chomp $line;
 
     if (substr($line, 0, 1) eq '>') {
+	# this method checks if the Casava format is 1.4 or 1.8+
         my $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
         
@@ -149,13 +150,16 @@ method next_seq {
             $qual .= $qline;
             last if length($qual) >= length($seq);
         }
-
-        if (!length($seq)) {
+   
+        if (!length($qual)) {
             $self->log->error("No quality scores for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         }
 
+	#TODO: benchmark validation methods vs. simple parsing only
+        # this is probably a huge performance hit but this validation saves time
+        # by checking for tainted data
         unless (length($qual) >= length($seq)) {
 	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
 		if Log::Log4perl::initialized();
