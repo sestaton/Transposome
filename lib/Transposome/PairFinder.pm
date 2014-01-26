@@ -97,17 +97,17 @@ method parse_blast {
     my $int_file = $iname;
     my $idx_file = $iname;
     my $hs_file  = $iname;
-    $int_file .= "_louvain.int";
-    $idx_file .= "_louvain.idx";
-    $hs_file  .= "_louvain.hs";
+    $int_file    .= "_louvain.int";
+    $idx_file    .= "_louvain.idx";
+    $hs_file     .= "_louvain.hs";
     my $int_path = File::Spec->catfile($self->dir, $int_file);
     my $idx_path = File::Spec->catfile($self->dir, $idx_file);
     my $hs_path  = File::Spec->catfile($self->dir, $hs_file);
     
     # counters
-    my $total_hits = 0;
+    my $total_hits  = 0;
     my $parsed_hits = 0;
-    my $index = 0;
+    my $index       = 0;
     
     my $fh = $self->get_fh;
     
@@ -126,15 +126,15 @@ method parse_blast {
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 	    
-	    my $pair = $self->mk_key($q_name, $s_name);
-	    my $revpair = $self->mk_key($s_name, $q_name);
+	    my $pair            = $self->mk_key($q_name, $s_name);
+	    my $revpair         = $self->mk_key($s_name, $q_name);
 	    my $subj_hit_length = ($s_end - $s_start) + 1;
-	    my $subj_cov = $subj_hit_length/$s_len;
+	    my $subj_cov        = $subj_hit_length/$s_len;
 
 	    if ($q_start > $q_end) {
 		$total_hits++;
 		my $neg_query_hit_length = ($q_start - $q_end) + 1;
-		my $neg_query_cov = $neg_query_hit_length/$q_len;
+		my $neg_query_cov        = $neg_query_hit_length/$q_len;
 
 		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		    if (exists $match_pairs{$pair}) {
@@ -144,7 +144,7 @@ method parse_blast {
 			push @{$match_pairs{$revpair}}, $score;
 		    }
 		    else {
-			$match_pairs{$pair} = [$score];
+			$match_pairs{$pair}   = [$score];
 			$match_index{$q_name} = $index unless exists $match_index{$q_name};
 			$index++;
 			$match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -155,7 +155,7 @@ method parse_blast {
 	    else {
 		$total_hits++;
                 my $pos_query_hit_length = ($q_end - $q_start) + 1;
-                my $pos_query_cov = $pos_query_hit_length/$q_len;
+                my $pos_query_cov        = $pos_query_hit_length/$q_len;
 
                 if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
                     if (exists $match_pairs{$pair}) {
@@ -165,7 +165,7 @@ method parse_blast {
                         push @{$match_pairs{$revpair}}, $score;
                     }
                     else {
-                        $match_pairs{$pair} = [$score];
+                        $match_pairs{$pair}   = [$score];
                         $match_index{$q_name} = $index unless exists $match_index{$q_name};
                         $index++;
                         $match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -215,8 +215,10 @@ method parse_blast {
 
 	# log results
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
+	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
 	    if Log::Log4perl::initialized();
+	$self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
+            if Log::Log4perl::initialized();
 
 	return ($idx_path, $int_path, $hs_path);
     }
@@ -244,15 +246,15 @@ method parse_blast {
 	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
 		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 
-	    my $pair = $self->mk_key($q_name, $s_name);
-	    my $revpair = $self->mk_key($s_name, $q_name);
+	    my $pair            = $self->mk_key($q_name, $s_name);
+	    my $revpair         = $self->mk_key($s_name, $q_name);
 	    my $subj_hit_length = ($s_end - $s_start) + 1;
-	    my $subj_cov = $subj_hit_length/$s_len;
+	    my $subj_cov        = $subj_hit_length/$s_len;
 
 	    if ($q_start > $q_end) {
 		$total_hits++;
 		my $neg_query_hit_length = ($q_start - $q_end) + 1;
-		my $neg_query_cov = $neg_query_hit_length/$q_len;
+		my $neg_query_cov        = $neg_query_hit_length/$q_len;
 
 		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		    if (exists $db->{$pair}) {
@@ -262,7 +264,7 @@ method parse_blast {
 			push @{$db->{$revpair}}, $score;
 		    }
 		    else {
-			$db->{$pair} = [$score];
+			$db->{$pair}          = [$score];
 			$match_index{$q_name} = $index unless exists $match_index{$q_name};
 			$index++;
 			$match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -273,7 +275,7 @@ method parse_blast {
 	    else {
 		$total_hits++;
 		my $pos_query_hit_length = ($q_end - $q_start) + 1;
-		my $pos_query_cov = $pos_query_hit_length/$q_len;
+		my $pos_query_cov        = $pos_query_hit_length/$q_len;
 
 		if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		    if (exists $db->{$pair}) {
@@ -283,7 +285,7 @@ method parse_blast {
 			push @{$db->{$revpair}}, $score;
 		    }
 		    else {
-			$db->{$pair} = [$score];
+			$db->{$pair}          = [$score];
 			$match_index{$q_name} = $index unless exists $match_index{$q_name};
 			$index++;
 			$match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -307,7 +309,7 @@ method parse_blast {
 	while (my ($match, $scores) = each %$db) {
 	    my $match_score = max(@$scores);
 	    my ($qry, $sbj) = $self->mk_vec($match);
-	    my $revmatch = $self->mk_key($sbj, $qry);
+	    my $revmatch    = $self->mk_key($sbj, $qry);
 	    if (exists $db->{$revmatch}) {
 		my $rev_match_score = max(@{$db->{$revmatch}});
 		if ($rev_match_score > $match_score) {
@@ -337,11 +339,12 @@ method parse_blast {
 
 	# log results
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft. Final output files are: $int_file, $idx_file, and $hs_file.")
+	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
+	    if Log::Log4perl::initialized();
+	$self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
 	    if Log::Log4perl::initialized();
 
 	return ($idx_path, $int_path, $hs_path);
-
     }
 }
 
