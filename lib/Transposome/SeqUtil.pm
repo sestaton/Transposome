@@ -113,6 +113,7 @@ Returns : In order, 1) a hash containing the id, sequence      HashRef
 
 method store_seq {
     my %seqhash;
+
     unless ($self->in_memory) {
         $DB_BTREE->{cachesize} = 100000;
         $DB_BTREE->{flags} = R_DUP;
@@ -124,10 +125,12 @@ method store_seq {
 
     my $filename = $self->file->relative;
     my $seqio = Transposome::SeqIO->new( file => $filename );
+
     while (my $seq = $seqio->next_seq) {
 	$self->inc_counter if $seq->has_seq;
 	$seqhash{$seq->get_id} = $seq->get_seq;
     }
+
     return (\%seqhash, $self->counter);
 }
 
@@ -154,10 +157,11 @@ method store_seq {
 =cut
 
 method sample_seq {
-    my $filename = $self->file->relative;
-    my $k = $self->sample_size;
-    my $seed = $self->seed;
-    my $n = 0;
+    # get method vars from class attributes
+    my $filename = $self->file->relative;   # file to sample
+    my $k        = $self->sample_size;      # sample size
+    my $seed     = $self->seed;             # random seed
+    my $n        = 0;                       # number of records seen
     my @sample;
     my %seqhash;
 
@@ -166,10 +170,18 @@ method sample_seq {
     srand($seed);
     while (my $seq = $seqio_fa->next_seq) {
 	$n++;
-	push @sample, {$seq->get_id => $seq->get_seq};
+	push @sample, { $seq->get_id => $seq->get_seq };
 	last if $n == $k;
     }
-    ##TODO add test if $k > $n
+
+    if ($k > $n) {
+	##TODO: Add test to validate..
+	warn "\n[ERROR]: Sample size $k is larger than the number of sequences ($n).";  
+	warn "Pick a smaller sample size. Exiting.\n";
+	$self->log->error("\n[ERROR]: Sample size $k is larger than the number of sequences ($n). Pick a smaller sample size. Exiting.")
+            if Log::Log4perl::initialized();
+	exit(1);
+    }
 
     while (my $seq = $seqio_fa->next_seq) {
 	my $i = int rand $n++;
