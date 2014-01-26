@@ -47,24 +47,29 @@ our $VERSION = '0.02';
 method get_config {
     my %config;
 
-    $config{sequence_file}    = $self->configuration->{blast_input}->[0]->{sequence_file};
-    $config{sequence_num}     = $self->configuration->{blast_input}->[1]->{sequence_num};
-    $config{cpu}              = $self->configuration->{blast_input}->[2]->{cpu};
-    $config{thread}           = $self->configuration->{blast_input}->[3]->{thread};
-    $config{output_directory} = $self->configuration->{blast_input}->[4]->{output_directory};
+    # blast input section from config
+    $config{sequence_file}     = $self->configuration->{blast_input}->[0]->{sequence_file};
+    $config{sequence_num}      = $self->configuration->{blast_input}->[1]->{sequence_num};
+    $config{cpu}               = $self->configuration->{blast_input}->[2]->{cpu};
+    $config{thread}            = $self->configuration->{blast_input}->[3]->{thread};
+    $config{output_directory}  = $self->configuration->{blast_input}->[4]->{output_directory};
 
+    # clustering options from config
     $config{in_memory}         = $self->configuration->{clustering_options}->[0]->{in_memory};
     $config{percent_identity}  = $self->configuration->{clustering_options}->[1]->{percent_identity};
     $config{fraction_coverage} = $self->configuration->{clustering_options}->[2]->{fraction_coverage};
     $config{merge_threshold}   = $self->configuration->{clustering_options}->[3]->{merge_threshold};
 
-    $config{cluster_size} = $self->configuration->{annotation_options}->[0]->{cluster_size};
-    $config{blast_evalue} = $self->configuration->{annotation_options}->[1]->{blast_evalue};
+    # annotation options from config
+    $config{cluster_size}      = $self->configuration->{annotation_options}->[0]->{cluster_size};
+    $config{blast_evalue}      = $self->configuration->{annotation_options}->[1]->{blast_evalue};
 
-    $config{repeat_database} = $self->configuration->{annotation_input}->[0]->{repeat_database};
+    # annotation input from config
+    $config{repeat_database}   = $self->configuration->{annotation_input}->[0]->{repeat_database};
 
-    $config{run_log_file}     = $self->configuration->{output}->[0]->{run_log_file};
-    $config{cluster_log_file} = $self->configuration->{output}->[1]->{cluster_log_file};
+    # output from config
+    $config{run_log_file}      = $self->configuration->{output}->[0]->{run_log_file};
+    $config{cluster_log_file}  = $self->configuration->{output}->[1]->{cluster_log_file};
 
     my $valid_config = $self->_validate_params(\%config);
 
@@ -92,7 +97,8 @@ method _validate_params ($config) {
     for my $k (keys %$config) {
 	my $v = $config->{$k};
         if (not defined $v) {
-            warn "\n[ERROR]: '$k' is not defined after parsing configuration file. This indicates there may be a blank line in your configuration file.\n";
+            warn "\n[ERROR]: '$k' is not defined after parsing configuration file.";
+	    warn "           This indicates there may be a blank line in your configuration file.";
 	    warn "           Please check your configuration file and try again. Exiting.\n";
             exit(1);
         }
