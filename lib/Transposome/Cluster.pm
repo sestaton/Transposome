@@ -79,26 +79,30 @@ has 'bin_dir' => (
 =cut
 
 method louvain_method {
-    my $int_file = $self->file->relative;
-    my $out_dir = $self->dir->relative;
-    my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-    my $realbin = $self->bin_dir->resolve;
-    my $cls_bin = $iname.".bin";                    # Community "bin" format
-    my $cls_tree = $iname.".tree";                  # hierarchical tree of clustering results
-    my $cls_tree_weights = $cls_tree.".weights";    # bit score, the weights applied to clustering
-    my $cls_tree_log = $cls_tree.".log";            # the summary of clustering results at each level of refinement
-    my $hierarchy_err = $cls_tree.".hierarchy.log"; # hierarchical tree building log (not actually used)
-    my $levels;                                     # the number of hierarchical levels
+    # set get paths to class attributes
+    my $int_file  = $self->file->relative;
+    my $out_dir   = $self->dir->relative;
+    my $realbin   = $self->bin_dir->resolve;
 
-    my $cls_bin_path = File::Spec->catfile($out_dir, $cls_bin);
-    my $cls_tree_path = File::Spec->catfile($out_dir, $cls_tree);
+    my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
+    my $realbin          = $self->bin_dir->resolve;
+    my $cls_bin          = $iname.".bin";              # Community "bin" format
+    my $cls_tree         = $iname.".tree";             # hierarchical tree of clustering results
+    my $cls_tree_weights = $cls_tree.".weights";       # bit score, the weights applied to clustering
+    my $cls_tree_log     = $cls_tree.".log";           # the summary of clustering results at each level of refinement
+    my $hierarchy_err    = $cls_tree.".hierarchy.log"; # hierarchical tree building log (not actually used)
+    my $levels;                                        # the number of hierarchical levels
+
+    my $cls_bin_path          = File::Spec->catfile($out_dir, $cls_bin);
+    my $cls_tree_path         = File::Spec->catfile($out_dir, $cls_tree);
     my $cls_tree_weights_path = File::Spec->catfile($out_dir, $cls_tree_weights);
-    my $cls_tree_log_path = File::Spec->catfile($out_dir, $cls_tree_log);
-    my $hierarchy_err_path = File::Spec->catfile($out_dir, $hierarchy_err);
-    ##TODO add test to see if this is is being run locally i.e., check local bin. could return these from a sub
-    my $lconvert = File::Spec->catfile($realbin, 'louvain_convert');
-    my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
-    my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
+    my $cls_tree_log_path     = File::Spec->catfile($out_dir, $cls_tree_log);
+    my $hierarchy_err_path    = File::Spec->catfile($out_dir, $hierarchy_err);
+    ##TODO add test to see if this is is being run locally 
+    ##     i.e., check local bin. could return these from a sub
+    my $lconvert              = File::Spec->catfile($realbin, 'louvain_convert');
+    my $lcommunity            = File::Spec->catfile($realbin, 'louvain_community');
+    my $lhierarchy            = File::Spec->catfile($realbin, 'louvain_hierarchy');
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -138,7 +142,7 @@ method louvain_method {
 
     my @comm;
     for (my $i = 0; $i <= $levels-1; $i++) {
-        my $cls_graph_comm = $cls_tree.".graph_node2comm_level_".$i; 
+        my $cls_graph_comm      = $cls_tree.".graph_node2comm_level_".$i; 
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
@@ -187,10 +191,10 @@ method louvain_method {
 =cut
 
 method find_pairs ($cls_file, $cls_log_file) {    
-    my $out_dir = $self->dir->relative;
-    my $cls_log_path = File::Spec->catfile($out_dir, $cls_log_file);
+    my $out_dir                      = $self->dir->relative;
+    my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    my $cls_file_path = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix);
+    my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); ##TODO: clean this up...not portable
     
     my $uf = Graph::UnionFind->new;
 
@@ -302,12 +306,13 @@ method find_pairs ($cls_file, $cls_log_file) {
 =cut
 
 method make_clusters ($graph_comm, $idx_file) {
-    my $int_file = $self->file->relative;
-    my $out_dir = $self->dir->relative;
+    # set paths for make_clusters() method
+    my $int_file             = $self->file->relative;
+    my $out_dir              = $self->dir->relative;
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-    my $cluster_file = $iname.".cls";
-    my $membership_file = $cluster_file.".membership.txt";
-    my $cluster_file_path = File::Spec->catfile($out_dir, $cluster_file);
+    my $cluster_file         = $iname.".cls";
+    my $membership_file      = $cluster_file.".membership.txt";
+    my $cluster_file_path    = File::Spec->catfile($out_dir, $cluster_file);
     my $membership_file_path = File::Spec->catfile($out_dir, $membership_file);
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
@@ -410,15 +415,16 @@ method make_clusters ($graph_comm, $idx_file) {
 =cut
 
 method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls_log_file, $uf) {
-    my $infile = $self->file->relative;
-    my $out_dir = $self->dir->relative;
-    my $str = POSIX::strftime("%m_%d_%Y_%H_%M_%S", localtime);
+    my $infile          = $self->file->relative;
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
-    my $cls_dir_base = $iname;
+    my $out_dir         = $self->dir->relative;
+    my $str = POSIX::strftime("%m_%d_%Y_%H_%M_%S", localtime);
+
+    my $cls_dir_base    = $iname;
     my $cls_with_merges = $cls_dir_base;
-    my $cls_dir = $cls_dir_base."_cls_fasta_files_$str";
-    $cls_with_merges .= "_merged_$str.cls";
-    my $cls_dir_path = $ipath.$cls_dir;
+    my $cls_dir         = $cls_dir_base."_cls_fasta_files_$str";
+    $cls_with_merges    .= "_merged_$str.cls";
+    my $cls_dir_path    = $ipath.$cls_dir;
     make_path($cls_dir_path, {verbose => 0, mode => 0711,}); # allows for recursively making paths        
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
