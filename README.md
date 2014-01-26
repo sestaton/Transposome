@@ -3,8 +3,6 @@ Transposome
 
 Annotation of transposable element families from unassembled sequence reads
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sestaton/transposome/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
 **DEPENDENCIES**
 
 To use this package, you will first need to install [BLAST+](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) and [mgblast](http://sourceforge.net/projects/gicl/). Perl version 5.12 (or greater) is required, and there are a number of Perl dependencies that will need to be installed (see below). 
@@ -87,4 +85,4 @@ Copyright (C) 2013 S. Evan Staton
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: http://www.opensource.org/licenses/mit-license.php
 
-
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sestaton/transposome/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
