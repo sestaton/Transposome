@@ -24,8 +24,8 @@ our $VERSION = '0.02';
     use Transposome::Annotation;
 
     my $cluster_file = '/path/to/cluster_file.cls';
-    my $seqct = 'total_seqs_in_analysis';  # Integer
-    my $cls_tot = 'total_reads_clustered'; # Integer
+    my $seqct        = 'total_seqs_in_analysis';    # Integer
+    my $cls_tot      = 'total_reads_clustered';     # Integer
 
     my $annotation = Transposome::Annotation->new( database  => 'repeat_db.fas',
                                                    dir       => 'outdir',
@@ -151,49 +151,49 @@ method map_repeat_types ($infile) {
 method _build_repeat_map {
     my $matches = {};
     
-    $matches->{'transposable_element'}{'dna_transposon'} = [{'Mariner/Tc1' => []}, {'hAT' => []}, 
-							    {'MuDR' => []}, {'EnSpm' => []}, 
-							    {'piggyBac' => []}, {'P' => []}, 
-							    {'Merlin' => []}, {'Harbinger' => []}, 
-							    {'Transib' => []}, {'Novosib' => []}, 
-							    {'Helitron' => []}, {'Polinton' => []}, 
-							    {'Kolobok' => []}, {'ISL2EU' => []}, 
-							    {'Crypton' => []}, {'Sola' => []}, 
-							    {'Zator' => []}, {'Ginger/1' => []}, 
-							    {'Ginger2/TDD' => []}, {'Academ' => []}, 
-							    {'Zisupton' => []}, {'IS3EU' => []}];
+    $matches->{'transposable_element'}{'dna_transposon'}          = [{'Mariner/Tc1' => []}, {'hAT'       => []}, 
+							             {'MuDR'        => []}, {'EnSpm'     => []}, 
+							             {'piggyBac'    => []}, {'P'         => []}, 
+							             {'Merlin'      => []}, {'Harbinger' => []}, 
+							             {'Transib'     => []}, {'Novosib'   => []}, 
+							             {'Helitron'    => []}, {'Polinton'  => []}, 
+							             {'Kolobok'     => []}, {'ISL2EU'    => []}, 
+							             {'Crypton'     => []}, {'Sola'      => []}, 
+							             {'Zator'       => []}, {'Ginger/1'  => []}, 
+							             {'Ginger2/TDD' => []}, {'Academ'    => []}, 
+							             {'Zisupton'    => []}, {'IS3EU'     => []}];
     
-    $matches->{'transposable_element'}{'ltr_retrotransposon'} = [{'Gypsy' => []}, {'Copia' => []}, 
-								 {'BEL' => []}, {'DIRS' => []}];
+    $matches->{'transposable_element'}{'ltr_retrotransposon'}     = [{'Gypsy' => []}, {'Copia' => []}, 
+								     {'BEL'   => []}, {'DIRS'  => []}];
     
-    $matches->{'transposable_element'}{'endogenous_retrovirus'} = [{'ERV1' => []}, {'ERV2' => []}, 
-								   {'ERV3' => []}, {'Lentivirus' => []}, 
-								   {'ERV4' => []}];
+    $matches->{'transposable_element'}{'endogenous_retrovirus'}   = [{'ERV1' => []}, {'ERV2'       => []}, 
+								     {'ERV3' => []}, {'Lentivirus' => []}, 
+								     {'ERV4' => []}];
     
-    $matches->{'transposable_element'}{'non-ltr_retrotransposon'} = [{'SINE' => [{'SINE1/7SL' => []}, {'SINE2/tRNA' => []},
-										 {'SINE3/5S' => []},{'SINE4' => []}]},
-								     {'CRE' => []}, {'NeSL' => []}, 
-								     {'R4' => []}, {'R2' => []}, 
-								     {'L1' => []}, {'RTE' => []}, 
-								     {'I' => []}, {'Jockey' => []}, 
-								     {'CR1' => []}, {'Rex1' => []}, 
-								     {'RandI' => []}, {'Penelope' => []}, 
-								     {'Tx1' => []}, {'RTEX' => []}, 
-								     {'Crack' => []}, {'Nimb' => []}, 
-								     {'Proto1' => []}, {'Proto2' => []}, 
-								     {'RTETP' => []}, {'Hero' => []}, 
-								     {'L2' => []}, {'Tad1' => []}, 
-								     {'Loa' => []}, {'Ingi' => []}, 
-								     {'Outcast' => []}, {'R1' => []}, 
-								     {'Daphne' => []}, {'L2A' => []}, 
-								     {'L2B' => []}, {'Ambal' => []}, 
-								     {'Vingi' => []}, {'Kiri' => []}];
+    $matches->{'transposable_element'}{'non-ltr_retrotransposon'} = [{'SINE'    => [{'SINE1/7SL' => []}, {'SINE2/tRNA' => []},
+										    {'SINE3/5S'  => []}, {'SINE4'      => []}]},
+								     {'CRE'     => []}, {'NeSL'     => []}, 
+								     {'R4'      => []}, {'R2'       => []}, 
+								     {'L1'      => []}, {'RTE'      => []}, 
+								     {'I'       => []}, {'Jockey'   => []}, 
+								     {'CR1'     => []}, {'Rex1'     => []}, 
+								     {'RandI'   => []}, {'Penelope' => []}, 
+								     {'Tx1'     => []}, {'RTEX'     => []}, 
+								     {'Crack'   => []}, {'Nimb'     => []}, 
+								     {'Proto1'  => []}, {'Proto2'   => []}, 
+								     {'RTETP'   => []}, {'Hero'     => []}, 
+								     {'L2'      => []}, {'Tad1'     => []}, 
+								     {'Loa'     => []}, {'Ingi'     => []}, 
+								     {'Outcast' => []}, {'R1'       => []}, 
+								     {'Daphne'  => []}, {'L2A'      => []}, 
+								     {'L2B'     => []}, {'Ambal'    => []}, 
+								     {'Vingi'   => []}, {'Kiri'     => []}];
     
-    $matches->{'simple_repeat'}{'Satellite'} = [{'SAT' => []}, {'MSAT' => []}];
+    $matches->{'simple_repeat'}{'Satellite'}                      = [{'SAT' => []}, {'MSAT' => []}];
     
-    $matches->{'pseudogene'} = [{'rRNA' => []}, {'tRNA' => []}, {'snRNA' => []}];
+    $matches->{'pseudogene'}                                      = [{'rRNA' => []}, {'tRNA' => []}, {'snRNA' => []}];
     
-    $matches->{'integrated_virus'} = [{'DNA_Virus' => []}, {'Caulimoviridae' => []}];
+    $matches->{'integrated_virus'}                                = [{'DNA_Virus' => []}, {'Caulimoviridae' => []}];
     
     return $matches;
 }
