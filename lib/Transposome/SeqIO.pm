@@ -111,7 +111,7 @@ method next_seq {
         seek $fh, -length($sline)-1, 1 if length $sline;
 
         if (!length($seq)) {
-            $self->log->error("No sequence for Fastq record '$name'.")
+            $self->log->error("No sequence for Fasta record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
         }
