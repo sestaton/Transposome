@@ -85,7 +85,6 @@ method louvain_method {
     my $realbin   = $self->bin_dir->resolve;
 
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
-    my $realbin          = $self->bin_dir->resolve;
     my $cls_bin          = $iname.".bin";              # Community "bin" format
     my $cls_tree         = $iname.".tree";             # hierarchical tree of clustering results
     my $cls_tree_weights = $cls_tree.".weights";       # bit score, the weights applied to clustering
