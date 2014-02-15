@@ -3,10 +3,11 @@ package Transposome::Role::Util;
 use 5.012;
 use utf8;
 use Moose::Role;
-use MooseX::Method::Signatures;
+#use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str);
 use namespace::autoclean;
 use charnames qw(:full :short);
+use Method::Signatures;
 
 =head1 NAME
 

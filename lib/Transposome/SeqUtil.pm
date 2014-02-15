@@ -2,8 +2,9 @@ package Transposome::SeqUtil;
 
 use 5.012;
 use Moose;
-use MooseX::Method::Signatures;
+#use MooseX::Method::Signatures;
 use Moose::Util::TypeConstraints;
+use Method::Signatures;
 use namespace::autoclean;
 use DB_File;
 use vars qw($DB_BTREE &R_DUP);  

@@ -2,10 +2,11 @@ package Transposome::Run::Blast;
 
 use 5.012;
 use Moose;
-use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Int);
+#use MooseX::Method::Signatures;
+#use MooseX::Types::Moose qw(Int);
 use File::Basename;
 use namespace::autoclean;
+use Method::Signatures; # { compile_at_BEGIN => 0 };
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes qw(gettimeofday);
 use POSIX qw(strftime);
@@ -112,7 +113,7 @@ has 'mgblast_exec' => (
     predicate => 'has_mgblast_exec',
 );
 
-method BUILD {
+method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
@@ -380,8 +381,7 @@ method _split_reads (Int $numseqs) {
     if (-e $self->file) {
         my $filename = $self->file->absolute;
         my $seqio = Transposome::SeqIO->new( file => $filename );
-        my $fh = $seqio->get_fh;
-        while (my $seq = $seqio->next_seq($fh)) {
+        while (my $seq = $seqio->next_seq) {
 
 	    if ($count % $numseqs == 0 && $count > 0) {
 		$fcount++;

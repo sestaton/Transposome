@@ -2,9 +2,9 @@ package Transposome::SeqIO;
 
 use 5.012;
 use Moose;
-use MooseX::Method::Signatures;
+#use MooseX::Method::Signatures;
 use namespace::autoclean;
-
+use Method::Signatures;
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File';
 
