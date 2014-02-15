@@ -49,7 +49,6 @@ WriteMakefile(
 	'MooseX::Log::Log4perl'            => 0.46,
         'MooseX::Types::Path::Class'       => 0.06,
 	'MooseX::Types::Moose'             => 0.38,
-	#'MooseX::Method::Signatures'       => 0.46,
 	'Method::Signatures'               => 20131010,
 	'namespace::autoclean'             => 0.13,
 	'Try::Tiny'                        => 0.12,
