@@ -49,7 +49,8 @@ WriteMakefile(
 	'MooseX::Log::Log4perl'            => 0.46,
         'MooseX::Types::Path::Class'       => 0.06,
 	'MooseX::Types::Moose'             => 0.38,
-	'MooseX::Method::Signatures'       => 0.46,
+	#'MooseX::Method::Signatures'       => 0.46,
+	'Method::Signatures'               => 20131010,
 	'namespace::autoclean'             => 0.13,
 	'Try::Tiny'                        => 0.12,
 	'IPC::System::Simple'              => 1.21,
@@ -69,7 +70,7 @@ WriteMakefile(
     INST_SCRIPT => 'blib/bin',
     EXE_FILES => [ 'bin/louvain_convert', 'bin/louvain_community', 'bin/louvain_hierarchy', 'bin/transposome' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Transposome-*' },
+    clean => { FILES => 'Transposome-* bin/louvain_*' },
     test  => { TESTS => 't/*.t t/Transposome/*.t' },
 );
 
