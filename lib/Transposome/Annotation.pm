@@ -2,9 +2,7 @@ package Transposome::Annotation;
 
 use 5.012;
 use Moose;
-#use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
-use namespace::autoclean;
 use Method::Signatures;
 use List::Util qw(sum max);
 use IPC::System::Simple qw(system capture EXIT_ANY);
@@ -14,6 +12,7 @@ use File::Basename;
 use Try::Tiny;
 use Storable qw(thaw);
 use POSIX qw(strftime);
+use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
