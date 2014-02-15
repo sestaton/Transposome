@@ -3,8 +3,6 @@ package Transposome::PairFinder;
 use 5.012;
 use utf8;
 use Moose;
-#use MooseX::Method::Signatures;
-use namespace::autoclean;
 use Method::Signatures;
 use Encode qw(encode decode);
 use DB_File;
@@ -15,6 +13,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
 use POSIX qw(strftime);
+use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File', 

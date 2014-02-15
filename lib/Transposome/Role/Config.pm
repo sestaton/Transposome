@@ -2,9 +2,8 @@ package Transposome::Role::Config;
 
 use 5.012;
 use Moose::Role;
-#use MooseX::Method::Signatures;
-use namespace::autoclean;
 use Method::Signatures;
+use namespace::autoclean;
 
 =head1 NAME
 

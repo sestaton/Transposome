@@ -3,11 +3,10 @@ package TestUtils::TestConfig;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-#use MooseX::Method::Signatures;
 use Method::Signatures;
 use File::Temp;
-use namespace::autoclean;
 use TestUtils;
+use namespace::autoclean;
 
 =head1 NAME
 

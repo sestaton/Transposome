@@ -2,9 +2,7 @@ package Transposome::Cluster;
 
 use 5.012;
 use Moose;
-#use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(HashRef);
-use namespace::autoclean;
 use Method::Signatures;
 use Graph::UnionFind;
 use File::Spec;
@@ -15,6 +13,7 @@ use File::Path qw(make_path);
 use Path::Class::File;
 use POSIX qw(strftime);
 use Config;
+use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File', 

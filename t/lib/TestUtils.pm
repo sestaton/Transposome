@@ -3,7 +3,6 @@ package TestUtils;
 use 5.012;
 use Moose;
 use MooseX::Types::Path::Class;
-#use MooseX::Method::Signatures;
 use Method::Signatures;
 use File::Temp;
 use namespace::autoclean;

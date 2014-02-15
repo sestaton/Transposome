@@ -2,11 +2,9 @@ package Transposome::Run::Blast;
 
 use 5.012;
 use Moose;
-#use MooseX::Method::Signatures;
-#use MooseX::Types::Moose qw(Int);
+use Cwd;
 use File::Basename;
-use namespace::autoclean;
-use Method::Signatures; # { compile_at_BEGIN => 0 };
+use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes qw(gettimeofday);
 use POSIX qw(strftime);
@@ -16,7 +14,7 @@ use Path::Class::File;
 use Parallel::ForkManager;
 use Try::Tiny;
 use Transposome::SeqIO;
-use Cwd;
+use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File', 
