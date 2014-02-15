@@ -3,7 +3,6 @@ package Transposome::Role::Config;
 use 5.012;
 use Moose::Role;
 use Method::Signatures;
-use namespace::autoclean;
 
 =head1 NAME
 

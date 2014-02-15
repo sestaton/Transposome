@@ -3,9 +3,7 @@ package Transposome::Role::File;
 use 5.012;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-#use MooseX::Method::Signatures;
 use Method::Signatures;
-use namespace::autoclean;
 
 =head1 NAME
 
