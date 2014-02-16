@@ -3,7 +3,6 @@ package Transposome::SeqIO;
 use 5.012;
 use Moose;
 use Method::Signatures;
-use Carp qw(croak);
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -115,7 +114,6 @@ method next_seq {
             $self->log->error("No sequence for Fasta record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	    #croak "No sequence for Fasta record '$name'.";
         }
         $self->set_seq($seq);
         return $self;
@@ -136,7 +134,6 @@ method next_seq {
 	    $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	    #croak "No sequence for Fastq record '$name'.";
         }
         $self->set_seq($seq);
         
@@ -146,7 +143,6 @@ method next_seq {
 	    $self->log->error("No comment line for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	    #croak "No comment line for Fastq record '$name'.";
         }
         my $qual;
         while (my $qline = <$fh>) {
@@ -159,17 +155,13 @@ method next_seq {
             $self->log->error("No quality scores for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
-	    #croak "No quality scores for '$name'.";
         }
 
-	#TODO: benchmark validation methods vs. simple parsing only
-        # this is probably a huge performance hit but this validation saves time
-        # by checking for tainted data
-        #unless (length($qual) >= length($seq)) {
-	    #$self->log->error("Unequal number of quality and scores and bases for '$name'.")
-		#if Log::Log4perl::initialized();
-	    #exit(1);
-        #}
+        unless (length($qual) >= length($seq)) {
+	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
+		if Log::Log4perl::initialized();
+	    exit(1);
+        }
         $self->set_qual($qual);
 
         return $self;
