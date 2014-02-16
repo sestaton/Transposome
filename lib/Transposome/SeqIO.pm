@@ -3,6 +3,7 @@ package Transposome::SeqIO;
 use 5.012;
 use Moose;
 use Method::Signatures;
+use Carp qw(croak);
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -114,6 +115,7 @@ method next_seq {
             $self->log->error("No sequence for Fasta record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
+	    #croak "No sequence for Fasta record '$name'.";
         }
         $self->set_seq($seq);
         return $self;
@@ -131,9 +133,10 @@ method next_seq {
         seek $fh, -length($sline)-1, 1 if length $sline;
 
         if (!length($seq)) {
-            $self->log->error("No sequence for Fastq record '$name'.")
+	    $self->log->error("No sequence for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
+	    #croak "No sequence for Fastq record '$name'.";
         }
         $self->set_seq($seq);
         
@@ -143,6 +146,7 @@ method next_seq {
 	    $self->log->error("No comment line for Fastq record '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
+	    #croak "No comment line for Fastq record '$name'.";
         }
         my $qual;
         while (my $qline = <$fh>) {
@@ -155,16 +159,17 @@ method next_seq {
             $self->log->error("No quality scores for '$name'.")
 		if Log::Log4perl::initialized();
 	    exit(1);
+	    #croak "No quality scores for '$name'.";
         }
 
 	#TODO: benchmark validation methods vs. simple parsing only
         # this is probably a huge performance hit but this validation saves time
         # by checking for tainted data
-        unless (length($qual) >= length($seq)) {
-	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
+        #unless (length($qual) >= length($seq)) {
+	    #$self->log->error("Unequal number of quality and scores and bases for '$name'.")
+		#if Log::Log4perl::initialized();
+	    #exit(1);
+        #}
         $self->set_qual($qual);
 
         return $self;
@@ -226,32 +231,10 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 S. Evan Staton.
+Copyright (C) 2013 S. Evan Staton
 
-This program is distributed under the MIT (X11) License:
-L<http://www.opensource.org/licenses/mit-license.php>
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
+This program is distributed under the MIT (X11) License, which should be distributed with the package. 
+If not, it can be found here: L<http://www.opensource.org/licenses/mit-license.php>
 
 =cut
 
