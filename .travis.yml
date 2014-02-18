@@ -1,9 +1,11 @@
 language: perl
 perl:
-  - "5.18"
-  - "5.16"
-  - "5.14"
+#  - "5.18"
+#  - "5.16"
+#  - "5.14"
   - "5.12"
+
+before_script: cpanm DB_File
 
 branches:
   only:
