@@ -3,9 +3,11 @@ Revision history for Transposome
 Version	Date	Location
 0.02	12/02/2013	Athens, GA
 
-Add method signatures, which adds dependencies.
-Bug fixes and code clean up for annotation summary
-method.
+- Add method signatures (via Method::Signatures).
+- Bug fixes and code clean up for annotation summary method.
+- Rework next_seq method in SeqIO class to build fh instead of
+  taking one as an option. This is much more familiar to use, though
+  considerably slower according to my benchmarks.
 
 0.01	10/01/2013	Athens, GA
 
