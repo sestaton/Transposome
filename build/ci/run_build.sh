@@ -1,4 +1,4 @@
-#!/bin/bash
+#!usr/bin/env sh
 
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz
 cd mgblast
@@ -8,4 +8,4 @@ cd ..
 
 sudo apt-get install libdb-dev libdb++-dev ncbi-blast+
 
-perl Makefile.PL && make test
+#perl Makefile.PL && make test
