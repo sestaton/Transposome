@@ -1,4 +1,4 @@
-#!usr/bin/env sh
+#!/bin/bash
 
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz
 cd mgblast
