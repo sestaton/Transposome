@@ -27,7 +27,7 @@ wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.14/blast-2.2.14-x6
 export PATH=$PATH:blast-2.2.14/bin
 
 ## install blast+ and bdb
-sudo apt-get install libdb-dev libdb++-dev ncbi-blast+
+sudo apt-get -y install libdb-dev libdb++-dev ncbi-blast+
 
 ## Export PATH to mgblast
 export PATH=$PATH:$dir
