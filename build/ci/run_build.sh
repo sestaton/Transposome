@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Fetch mgblast and modify makefile for location of NCBI Toolkit
+## Fetch mgblast and modify the makefile for the location of NCBI Toolkit
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz && tar xzf mgblast.tar.gz
 cd mgblast
 dir=`pwd`
@@ -21,10 +21,10 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 make
 cd ..
 
-## Fetch legacy blast executables so we have formatdb
+## Fetch legacy BLAST executables so we have formatdb
 wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.14/blast-2.2.14-x64-linux.tar.gz
 tar xzf blast-2.2.14-x64-linux.tar.gz
 
-## install blast+ and BerkelyDB
+## Install BLAST+ and BerkeleyDB
 sudo apt-get -y install libdb-dev libdb++-dev ncbi-blast+
 
