@@ -4,7 +4,7 @@ use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use lib qw(../blib/lib);
-use Test::More tests => 7;
+use Test::More tests => 12;
 
 BEGIN {
     use_ok('Transposome') || print "[Error]: Could not load Transposome.\n";
@@ -33,37 +33,30 @@ my $ex = 0;
 for my $p (@path) {
     my $bl = $p . "/" . "blastn";
     my $mb = $p . "/" . "makeblastdb";
-    #my $bl = 'blastn';
-    #my $mb = 'makeblastdb';
     if ( -e $bl && -x $bl && $bl =~ /ncbi/ ) {
         $ex++;
-        say "We have blasn";
-        #ok( -e $bl && -x $bl, 'blastn exists and is executable' );
+        #say "We have blasn";
+        ok( -e $bl && -x $bl, 'blastn exists and is executable' );
     }
     if ( -e $mb ) {
         $ex++;
-        say "We have mbdb";
-        #ok( -e $mb, 'makeblastdb exists' );
+        #say "We have mbdb";
+        ok( -e $mb, 'makeblastdb exists' );
     }
     my $mg = $p . "/" . "mgblast";
     my $fd = $p . "/" . "formatdb";
     #my $mg = 'mgblast';
     #my $fd = 'formatdb';
 
-##&& -e $fd && -x $fd ) { 
-    if ( -e $mg && -x $mg ) {
+    if ( -e $mg && -x $mg && -e $fd && -x $fd ) { 
         $ex++;
-        say "We have mgblast";
-        #ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
-        #ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-        $ex++;
-    }
-    if ( -e $fd && -e $fd ) {
-        say "We have fdb";
-        $ex++;
+        #say "We have mgblast";
+        ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
+        ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
+        #$ex++;
     }
 }
 
-#is( $ex, 4,
-#    'All required external programs for clustering and analysis exist and appear usable'
-#);
+is( $ex, 4,
+    'All required external programs for clustering and analysis exist and appear usable'
+);
