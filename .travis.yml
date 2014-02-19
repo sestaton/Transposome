@@ -7,6 +7,8 @@ perl:
 
 before_install: source ./build/ci/run_build.sh
 
+after_failure: cat /home/travis/.cpanm/build.log
+
 branches:
   only:
     - master
