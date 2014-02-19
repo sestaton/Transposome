@@ -10,7 +10,7 @@ before_install: ./build/ci/run_build.sh
 #  - export PATH=$PATH:mgblast
 
 install:
-  - cpanm -v --installdeps --notest
+  - cpanm -v --installdeps --notest .
 
 script: "export PATH=$PATH:blast-2.2.14/bin; export PATH=$PATH:mgblast; perl Makefile.PL; prove -lv t/*"
 
