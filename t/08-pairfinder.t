@@ -3,7 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
-use Data::Dump qw(dd);
+#use Data::Dump qw(dd); # for debugging, not required
 use autodie qw(open);
 use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
