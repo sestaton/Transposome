@@ -27,7 +27,7 @@ diag("Testing Transposome $Transposome::VERSION, Perl $], $^X");
 ##See if we can load mgblast, formatdb, and blastn, which are required
 my @path = split /:|;/, $ENV{PATH};
 
-say "PATH: ",$ENV{PATH};
+#say "PATH: ",$ENV{PATH}; # for debug
 
 my $ex = 0;
 for my $p (@path) {
@@ -35,29 +35,21 @@ for my $p (@path) {
     my $mb = $p . "/" . "makeblastdb";
     if ( -e $bl && -x $bl ) {
         $ex++;
-        say "We have blasn";
         ok( -e $bl && -x $bl, 'blastn exists and is executable' );
     }
     if ( -e $mb && -x $mb ) {
         $ex++;
-        say "We have mbdb";
         ok( -e $mb, 'makeblastdb exists' );
     }
     my $mg = $p . "/" . "mgblast";
     my $fd = $p . "/" . "formatdb";
-    #my $mg = 'mgblast';
-    #my $fd = 'formatdb';
 
     if ( -e $fd && -x $fd ) { 
         $ex++;
-        say "formatdb";
-        #ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
         ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-        #$ex++;
     }
     if ( -e $mg && -x $mg ) {
        $ex++;
-       say "We have mgblast";
        ok( -e $mg && -x $mg, 'mgblast exists and is executable' ); 
     }
 }
