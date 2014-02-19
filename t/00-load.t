@@ -33,12 +33,12 @@ my $ex = 0;
 for my $p (@path) {
     my $bl = $p . "/" . "blastn";
     my $mb = $p . "/" . "makeblastdb";
-    if ( -e $bl && -x $bl && $bl =~ /ncbi/ ) {
+    if ( -e $bl && -x $bl ) {
         $ex++;
         say "We have blasn";
         ok( -e $bl && -x $bl, 'blastn exists and is executable' );
     }
-    if ( -e $mb ) {
+    if ( -e $mb && -x $mb ) {
         $ex++;
         say "We have mbdb";
         ok( -e $mb, 'makeblastdb exists' );
@@ -53,7 +53,7 @@ for my $p (@path) {
         say "We have mgblast and formatdb";
         ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
         ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-        #$ex++;
+        $ex++;
     }
 }
 
