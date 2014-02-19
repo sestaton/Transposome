@@ -57,6 +57,6 @@ for my $p (@path) {
     }
 }
 
-#is( $ex, 4,
-#    'All required external programs for clustering and analysis exist and appear usable'
-#);
+is( $ex, 4,
+    'All required external programs for clustering and analysis exist and appear usable'
+);

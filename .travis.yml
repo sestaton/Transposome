@@ -5,7 +5,7 @@ perl:
 #  - "5.14"
   - "5.12"
 
-before_install: ./build/ci/run_build.sh
+before_install: source ./build/ci/run_build.sh
 
 branches:
   only:

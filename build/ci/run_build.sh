@@ -21,7 +21,8 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 make
 
 ## Fetch legacy blast executables so we have formatdb
-wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.14/blast-2.2.14-x64-linux.tar.gz && tar xzf blast-2.2.14-x86.tar.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.14/blast-2.2.14-x64-linux.tar.gz
+tar xzf blast-2.2.14-x64-linux.tar.gz
 
 ## Export PATH to formatdb
 export PATH=$PATH:blast-2.2.14/bin
