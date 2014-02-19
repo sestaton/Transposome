@@ -1,6 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.03	12/19/2014	Athens, GA
+
+- Add CI support and include instructions for installing deps.
+- Modified method for setting path to blast executables so there
+  is nothing custom about the install
+
 0.02	12/02/2013	Athens, GA
 
 - Add method signatures (via Method::Signatures).
