@@ -12,7 +12,7 @@ before_install: ./build/ci/run_build.sh
 #install:
 #  - cpanm --quiet --installdeps --notest .
 
-script: "export PATH=$PATH:mgblast; export PATH=$PATH:mgblast/blast-2.2.14/bin;ls; perl Makefile.PL; prove -lv t/*"
+script: "export PATH=$PATH:mgblast; export PATH=$PATH:blast-2.2.14/bin; ls;"
 
 after_failure: cat /home/travis/.cpanm/build.log
 
