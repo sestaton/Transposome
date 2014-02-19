@@ -5,9 +5,9 @@ perl:
 #  - "5.14"
   - "5.12"
 
-before_install: source ./build/ci/run_build.sh
+before_install: ./build/ci/run_build.sh
 
-after_failure: cat ~/.cpanm/build.log
+after_failure: cat ~/travis/.cpanm/build.log
 
 branches:
   only:
