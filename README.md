@@ -13,7 +13,7 @@ There is also a Perl API which allows you to build custom analysis pipelines, re
 
 **DEPENDENCIES**
 
-To use this package, you will first need to install [BLAST+](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) and [mgblast](http://sourceforge.net/projects/gicl/). Perl version 5.12 (or greater) is required, and there are a number of Perl dependencies that will need to be installed (see below). 
+To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [Installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
 
 **INSTALLATION**
 
