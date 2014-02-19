@@ -95,7 +95,7 @@ method BUILD (@_) {
     for my $p (@path) {
 	my $bl = $p."/"."blastn";
 	my $mb = $p."/"."makeblastdb";
-        if (-e $bl && -x $bl && $bl =~ /ncbi/ && -e $mb) {
+        if (-e $bl && -x $bl && -e $mb && -x $mb) {
             $self->set_blastn_exec($bl);
             $self->set_makeblastdb_exec($mb);
         }
