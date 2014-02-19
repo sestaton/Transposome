@@ -20,8 +20,14 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 ## Compile mgblast
 make
 
+## Fetch legacy blast executables so we have formatdb
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/2.2.14/blast-2.2.14-x64-linux.tar.gz && tar xzf blast-2.2.14-x86.tar.gz
+
+## Export PATH to formatdb
+export PATH=$PATH:blast-2.2.14/bin
+
 ## install blast+ and bdb
 sudo apt-get install libdb-dev libdb++-dev ncbi-blast+
 
-## Export PATH to mgblast so we can test Transposome
+## Export PATH to mgblast
 export PATH=$PATH:$dir
