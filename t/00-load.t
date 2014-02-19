@@ -48,12 +48,17 @@ for my $p (@path) {
     #my $mg = 'mgblast';
     #my $fd = 'formatdb';
 
-    if ( -e $mg && -x $mg && -e $fd && -x $fd ) { 
+    if ( -e $fd && -x $fd ) { 
         $ex++;
-        say "We have mgblast and formatdb";
-        ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
+        say "formatdb";
+        #ok( -e $mg && -x $mg, 'mgblast exists and is executable' );
         ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-        $ex++;
+        #$ex++;
+    }
+    if ( -e $mg && -x $mg ) {
+       $ex++;
+       say "We have mgblast";
+       ok( -e $mg && -x $mg, 'mgblast exists and is executable' ); 
     }
 }
 
