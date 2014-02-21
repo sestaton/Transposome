@@ -175,13 +175,12 @@ method sample_seq {
     }
 
     if ($k > $n) {
-	##TODO: Add test to validate..
 	warn "\n[ERROR]: Sample size $k is larger than the number of sequences ($n).";  
 	warn "Pick a smaller sample size. Exiting.\n";
 	$self->log->error("\n[ERROR]: Sample size $k is larger than the number of sequences ($n). Pick a smaller sample size. Exiting.")
             if Log::Log4perl::initialized();
-	exit(1);
     }
+
 
     while (my $seq = $seqio_fa->next_seq) {
 	my $i = int rand $n++;
