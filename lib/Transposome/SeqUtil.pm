@@ -180,29 +180,28 @@ method sample_seq {
 	$self->log->error("\n[ERROR]: Sample size $k is larger than the number of sequences ($n). Pick a smaller sample size. Exiting.")
             if Log::Log4perl::initialized();
     }
-
-
-    while (my $seq = $seqio_fa->next_seq) {
-	my $i = int rand $n++;
-	if ($i < scalar @sample) {
-	    $sample[$i] = {$seq->get_id => $seq->get_seq};
-	}
-    }
-
-    for my $seq (@sample) {
-	for my $h (keys %$seq) {
-	    if ($self->no_store) {
-		say join "\n", ">".$h, $seq->{$h};
-	    }
-	    else {
-		$self->inc_counter if $seq->{$h};
-		$seqhash{$h} = $seq->{$h};
+    else {
+        while (my $seq = $seqio_fa->next_seq) {
+	    my $i = int rand $n++;
+	    if ($i < scalar @sample) {
+		$sample[$i] = {$seq->get_id => $seq->get_seq};
 	    }
 	}
-    }
-    
-    return (\%seqhash, $self->counter) unless $self->no_store;
-}
+
+        for my $seq (@sample) {
+	    for my $h (keys %$seq) {
+		if ($self->no_store) {
+		    say join "\n", ">".$h, $seq->{$h};
+		}
+		else {
+		    $self->inc_counter if $seq->{$h};
+		    $seqhash{$h} = $seq->{$h};
+		}
+	    }
+	}   
+        return (\%seqhash, $self->counter) unless $self->no_store;
+    }   
+}   
 
 =head1 AUTHOR
 
