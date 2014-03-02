@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Transposome : Annotation of transposable element families from unassembled sequence reads" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Transposome</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/sestaton/Transposome">View on GitHub</a>
+
+          <h1 id="project_title">Transposome</h1>
+          <h2 id="project_tagline">Annotation of transposable element families from unassembled sequence reads</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/sestaton/Transposome/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/sestaton/Transposome/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a name="what-is-transposome" class="anchor" href="#what-is-transposome"><span class="octicon octicon-link"></span></a>What is Transposome?</h3>
+
+<p>Transposome is a command line application to annotate <a href="http://en.wikipedia.org/wiki/Transposable_element">transposable elements</a> from paired-end whole genome shotgun data. There are many tools to estimate the mathematical nature of repeats from short sequence reads. There are also a number of tools for analyzing repeats directly from a genome assembly. This tool allows you to infer the abundance of repeat types in the genome without a reference genome sequence. The output files make it easy to quickly summarize genomic abundance by transposable element class, superfamily, family, or any other level of the repeat taxonomy.</p>
+
+<p>There is also a Perl API which allows you to build custom analysis pipelines, repeat stages of the analysis, or test a range of parameter values for each phase of Transposome (see the <a href="https://github.com/sestaton/Transposome/wiki/Tutorial">Tutorial</a> page for more information).</p>
+
+<p><strong>DEPENDENCIES</strong></p>
+
+<p>To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the <a href="https://github.com/sestaton/Transposome/wiki/Installing-dependencies">Installing dependencies</a> page for a walk through of how to install the dependencies. </p>
+
+<p><strong>INSTALLATION</strong></p>
+
+<p>The recommened method to satisfy the Perl dependencies is to install <a href="http://search.cpan.org/%7Emiyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm">cpanminus</a>, and run the following command:</p>
+
+<pre><code>cpanm git://github.com/sestaton/Transposome.git
+</code></pre>
+
+<p>If you run into any installation issues, it may be necessary to download the code and install manually (see the <a href="https://github.com/sestaton/Transposome/wiki/Troubleshooting">Troubleshooting</a> page for more information):</p>
+
+<pre><code>git clone https://github.com/sestaton/Transposome.git
+cd Transposome
+cpanm --installdeps .
+perl Makefile.PL
+make
+make test
+make install
+</code></pre>
+
+<p>Updating your installation can be achieved by simply running the same commands.</p>
+
+<p><strong>BASIC USAGE</strong></p>
+
+<p>Following installation, fill out the sample configuration file in the 'config' directory
+in the Transposome distribution, specifying the location of data files and parameters for analysis.</p>
+
+<p>Then, simply run the <code>transposome</code> program, specifying your configuration file:</p>
+
+<pre><code>transposome --config transposome_config.yml
+</code></pre>
+
+<p>The name of the configuration file does not matter, this is just an example. Though, the format is important. See the <a href="https://github.com/sestaton/Transposome/wiki/Quick-Start">Quick Start</a> wiki page for more details.</p>
+
+<p><strong>ADVANCED USAGE</strong></p>
+
+<p>It is possible to run only one part of the Transposome package, the clustering methods for example, or create 
+your own analysis methods to plug into Transposome. In addition, you can extend existing methods.</p>
+
+<p>For all available methods, simply type <code>perldoc</code> followed by the name of the class you are interested in 
+using. For example,</p>
+
+<pre><code>perldoc Transposome::Cluster
+</code></pre>
+
+<p>Available classes are: </p>
+
+<pre><code>Transposome::Annotation
+Transposome::Cluster
+Transposome::PairFinder
+Transposome::SeqIO
+Transposome::SeqUtil
+Transposome::Run::Blast
+</code></pre>
+
+<p><strong>SUPPORT AND DOCUMENTATION</strong></p>
+
+<p>After installing, you can find documentation for the Transposome package with the
+<code>perldoc</code> command.</p>
+
+<pre><code>perldoc Transposome
+</code></pre>
+
+<p>If you are not interested in using Transposome programmatically or inspecting the class methods, simply type
+<code>perldoc</code> followed by the name of main program to run the full analysis.</p>
+
+<pre><code>perldoc transposome 
+</code></pre>
+
+<p>The <code>transposome</code> program will also print a diagnostic help message when executed with no arguments.</p>
+
+<p>You can also look for information at:</p>
+
+<pre><code>Transposome wiki
+    https://github.com/sestaton/Transposome/wiki
+
+Transposome issue tracker
+    https://github.com/sestaton/Transposome/issues
+</code></pre>
+
+<p><strong>LICENSE AND COPYRIGHT</strong></p>
+
+<p>Copyright (C) 2013 S. Evan Staton</p>
+
+<p>This program is distributed under the MIT (X11) License, which should be distributed with the package. 
+If not, it can be found here: <a href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></p>
+
+<p><a href="https://travis-ci.org/sestaton/Transposome"><img src="https://travis-ci.org/sestaton/Transposome.png?branch=master" alt="Build Status"></a> <a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/sestaton/transposome/trend.png" alt="Bitdeli Badge"></a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Transposome maintained by <a href="https://github.com/sestaton">sestaton</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
