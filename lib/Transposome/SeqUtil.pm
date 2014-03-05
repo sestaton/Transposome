@@ -4,7 +4,7 @@ use 5.012;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Method::Signatures;
-use DB_File;
+use BerkeleyDB;
 use vars qw($DB_BTREE &R_DUP);  
 use Transposome::SeqIO;
 use namespace::autoclean;
@@ -115,12 +115,10 @@ method store_seq {
     my %seqhash;
 
     unless ($self->in_memory) {
-        $DB_BTREE->{cachesize} = 100000;
-        $DB_BTREE->{flags} = R_DUP;
         my $seq_dbm = "transposome_seqstore.dbm";
         unlink $seq_dbm if -e $seq_dbm;
-        tie %seqhash, 'DB_File', $seq_dbm, O_RDWR|O_CREAT, 0666, $DB_BTREE
-            or die "\n[ERROR]: Could not open DBM file $seq_dbm: $!\n";
+        tie %seqhash, 'BerkeleyDB::Btree', -Filename => $seq_dbm, -Flags => DB_CREATE
+            or die "\n[ERROR]: Could not open DBM file: $seq_dbm: $! $BerkeleyDB::Error\n";
     }
 
     my $filename = $self->file->relative;
