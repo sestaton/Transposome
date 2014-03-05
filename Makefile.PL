@@ -11,7 +11,8 @@ BEGIN {
     while (<$err>) {
 	chomp;
 	if (/error/i) {
-	    say "\n[ERROR]: Encountered problems trying to compile source. Contact the author if you are unable to resolve this issue.\n";
+	    say "\n[ERROR]: Encountered problems trying to compile source.";
+	    say "Contact the author if you are unable to resolve this issue.\n";
 	    say "Here are the errors: $_. Exiting.\n";
 	    close $err;
 	    unlink("comm_make_errs");
@@ -53,7 +54,7 @@ WriteMakefile(
 	'namespace::autoclean'             => 0.13,
 	'Try::Tiny'                        => 0.12,
 	'IPC::System::Simple'              => 1.21,
-	'DB_File'                          => 1.826,
+	'BerkeleyDB'                       => 0.54,
 	'Module::Path'                     => 0.09,
 	'Path::Class'                      => 0.32,
 	'YAML'                             => 0.84,
