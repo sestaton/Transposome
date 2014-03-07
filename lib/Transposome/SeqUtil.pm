@@ -5,7 +5,6 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use Method::Signatures;
 use BerkeleyDB;
-use vars qw($DB_BTREE &R_DUP);  
 use Transposome::SeqIO;
 use namespace::autoclean;
 
