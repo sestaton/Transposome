@@ -88,9 +88,8 @@ You can also look for information at:
 
 **LICENSE AND COPYRIGHT**
 
-Copyright (C) 2013 S. Evan Staton
+Copyright (C) 2013-2014 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: http://www.opensource.org/licenses/mit-license.php
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sestaton/transposome/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
