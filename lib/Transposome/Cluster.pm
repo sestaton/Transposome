@@ -242,8 +242,8 @@ method find_pairs ($cls_file, $cls_log_file) {
     my @sep_reads;
 
     for my $allpairs (keys %mapped_pairs) {
-        if (scalar(@{$mapped_pairs{$allpairs}}) < 2) {     # if no pair is found in another cluster, 
-            delete $mapped_pairs{$allpairs};               # remove this pair
+        if (@{$mapped_pairs{$allpairs}} < 2) {     # if no pair is found in another cluster, 
+            delete $mapped_pairs{$allpairs};       # remove this pair
         }
         else {
             push @sep_reads, values %$_ for @{$mapped_pairs{$allpairs}};
@@ -354,7 +354,7 @@ method make_clusters ($graph_comm, $idx_file) {
 
     my $cls_ct = 1;
     for my $cls (reverse sort { @{$clus{$a}} <=> @{$clus{$b}} } keys %clus) {
-        my $clus_size = scalar @{$clus{$cls}};
+        my $clus_size = @{$clus{$cls}};
         say $cls_out ">CL$cls_ct $clus_size";
         my @clus_members;
         for my $cls_member (@{$clus{$cls}}) {
@@ -489,7 +489,7 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 	say $rep $non_paired_clsid;
 	say $clsnew join "\n", ">$non_paired_clsid $non_paired_clsseqnum", join " ", @{$read_pairs->{$non_paired_cls}};
 
-	if (scalar(@{$read_pairs->{$non_paired_cls}}) >= $self->cluster_size) {
+	if (@{$read_pairs->{$non_paired_cls}} >= $self->cluster_size) {
 	    my $non_paired_clsfile .= $non_paired_cls.".fas";
 	    my $cls_file_path = File::Spec->catfile($cls_dir_path, $non_paired_clsfile);
 	    open my $clsout, '>', $cls_file_path or die "\n[ERROR]: Could not open file: $cls_file_path\n";

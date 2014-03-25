@@ -366,7 +366,7 @@ method parse_blast {
 
 method _validate_format ($line) {
     my @f = split /\t/, $line;
-    unless (scalar @f == 12) {
+    unless (@f == 12) {
 	$self->log->error("'$line' is not the correct format in file: $self->file. Exiting.")
 	    if Log::Log4perl::initialized();
 	exit(1);

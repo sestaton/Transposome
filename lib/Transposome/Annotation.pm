@@ -192,7 +192,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     my @clus_fas_files = grep /\.fa.*$/, readdir $dir;
     closedir $dir;
 
-    if (scalar @clus_fas_files < 1) {
+    if (@clus_fas_files < 1) {
         $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.")
             if Log::Log4perl::initialized();
         exit(1);
@@ -314,7 +314,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
     my %annot;
     my %fams;
     my $total_ct = 0;
-    my $hashct   = scalar @$blasts;
+    my $hashct   = @$blasts;
     my $hitct;
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
