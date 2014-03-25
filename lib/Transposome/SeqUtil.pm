@@ -180,8 +180,8 @@ method sample_seq {
     else {
         while (my $seq = $seqio_fa->next_seq) {
 	    my $i = int rand $n++;
-	    if ($i < scalar @sample) {
-		$sample[$i] = {$seq->get_id => $seq->get_seq};
+	    if ($i < @sample) {
+		$sample[$i] = { $seq->get_id => $seq->get_seq };
 	    }
 	}
 
