@@ -452,7 +452,11 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     my $group_index = 0;
     for my $group (values %cluster) {
 	my $groupseqnum; my @grpcp;
-	for (@$group) { my $clsstrcp = $_; my ($id, $seqnum) = split /\_/, $clsstrcp, 2; $groupseqnum += $seqnum; push @grpcp, $id; }
+	for my $clsstrcp (@$group) { 
+	    my ($id, $seqnum) = split /\_/, $clsstrcp, 2; 
+	    $groupseqnum += $seqnum; 
+	    push @grpcp, $id; 
+	}
 	$cls_tot += $groupseqnum;
 	say $rep join "\t", $group_index, join ",", @grpcp;
 	say $clsnew ">G$group_index $groupseqnum";
@@ -466,6 +470,7 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 		for my $read (@{$read_pairs->{$clus}}) {
 		    if (exists $seqs->{$read}) {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
+			delete $seqs->{$read};
 		    }
 		    else {
 			$self->log->warn("$read not found. This indicates something went wrong processing the input. Please check your input.")
@@ -497,6 +502,7 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 	    for my $non_paired_read (@{$read_pairs->{$non_paired_cls}}) {
 		if (exists $seqs->{$non_paired_read}) {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
+		    delete $seqs->{$non_paired_read};
 		}
 		else {
 		    $self->log->warn("$non_paired_read not found. This indicates something went wrong processing the input. Please check your input.")
@@ -508,6 +514,16 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     }
     close $rep;
     close $clsnew;
+
+    # write out singletons for rarefaction
+    my $singletons_file = "singletons.fas";
+    my $singletons_file_path = File::Spec->catfile($cls_dir_path, $singletons_file);
+    open my $singlesout, '>', $singletons_file_path or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
+
+    for my $seqid (keys %$seqs) {
+	say $singlesout join "\n", ">".$seqid, $seqs->{$seqid};
+    }
+    close $singlesout;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
