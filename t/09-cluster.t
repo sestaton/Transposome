@@ -149,6 +149,7 @@ open my $singfh, '<', "$cls_dir_path/singletons.fas";
 while (<$singfh>) {
     $single_ct++ if /^>/;
 }
+close $singfh;
 
 is( $single_ct, 24, 'Expected number of reads went into singletons file' );
 is( $cls_tot + $single_ct, 70, 'Expected number of reads went into clusters and singletons file' );
