@@ -13,10 +13,10 @@ use TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 
-use Test::More tests => 49;
+use Test::More tests => 51;
 
 my $infile = 't/test_data/t_reads.fas';
-my $outdir = 't/pairfinder_t';
+my $outdir = 't/cluster_t';
 my $report = 'cluster_test_rep.txt';
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
@@ -59,7 +59,7 @@ ok( defined($cluster_file),
 {
     local $/ = '>';
 
-    open my $in, '<', "t/pairfinder_t/$cluster_file";
+    open my $in, '<', "$outdir/$cluster_file";
     while ( my $line = <$in> ) {
         $line =~ s/>//g;
         next if !length($line);
@@ -142,6 +142,16 @@ while (<$rep>) {
     }
 }
 close $rep;
+
+my $single_ct = 0;
+open my $singfh, '<', "$cls_dir_path/singletons.fas";
+
+while (<$singfh>) {
+    $single_ct++ if /^>/;
+}
+
+is( $single_ct, 24, 'Expected number of reads went into singletons file' );
+is( $cls_tot + $single_ct, 70, 'Expected number of reads went into clusters and singletons file' );
 
 END {
     remove_tree( $outdir, { safe => 1 } );
