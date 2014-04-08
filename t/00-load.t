@@ -33,22 +33,22 @@ my $ex = 0;
 for my $p (@path) {
     my $bl = $p . "/" . "blastn";
     my $mb = $p . "/" . "makeblastdb";
-    if ( -e $bl && -x $bl ) {
+    if ( -e $bl && -x $bl && -e $mb && -x $mb) {
         $ex++;
         ok( -e $bl && -x $bl, 'blastn exists and is executable' );
-    }
-    if ( -e $mb && -x $mb ) {
+    #}
+    #if ( -e $mb && -x $mb ) {
         $ex++;
         ok( -e $mb, 'makeblastdb exists' );
     }
     my $mg = $p . "/" . "mgblast";
     my $fd = $p . "/" . "formatdb";
 
-    if ( -e $fd && -x $fd ) { 
+    if ( -e $fd && -x $fd && -e $mg && -x $mg) { 
         $ex++;
         ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-    }
-    if ( -e $mg && -x $mg ) {
+    #}
+    #if ( -e $mg && -x $mg ) {
        $ex++;
        ok( -e $mg && -x $mg, 'mgblast exists and is executable' ); 
     }
