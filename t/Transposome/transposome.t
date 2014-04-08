@@ -157,7 +157,7 @@ my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-my ( $cls_dir_path, $cls_with_merges_path, $cls_tot ) =
+my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
   $cluster->merge_clusters( $vertex, $seqs,
     $read_pairs, $config->{cluster_log_file}, $uf );    #FIXME
 
@@ -175,7 +175,7 @@ my $annotation = Transposome::Annotation->new(
 
 my ( $anno_rp_path, $anno_sum_rep_path, $total_readct,
     $rep_frac, $blasts, $superfams )
-  = $annotation->annotate_clusters( $cls_dir_path, $seqct, $cls_tot );
+  = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
 is( $total_readct, 48,       'Correct number of reads annotated' );
 is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );

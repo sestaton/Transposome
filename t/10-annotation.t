@@ -68,7 +68,7 @@ my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-my ( $cls_dir_path, $cls_with_merges_path, $cls_tot ) =
+my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
   $cluster->merge_clusters( $vertex, $seqs, $read_pairs, $report, $uf );
 
 ok( defined($cls_dir_path),
@@ -109,7 +109,7 @@ ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
 
 my ( $anno_rp_path, $anno_sum_rep_path, $total_readct,
     $rep_frac, $blasts, $superfams )
-  = $annotation->annotate_clusters( $cls_dir_path, $seqct, $cls_tot );
+  = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
 like( $total_readct, qr/\d+/,
     'Returned the expected type for the total number of reads clustered' );
