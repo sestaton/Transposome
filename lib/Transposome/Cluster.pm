@@ -389,7 +389,8 @@ method make_clusters ($graph_comm, $idx_file) {
  Returns : In order, 1) path to the results directory                            Scalar
                      2) filename (path to) the cluster file with                 Scalar
                         unions above threshold (see below)
-                     3) the total number of reads clustered                      Scalar
+                     3) filename (path to) the singletons file                   Scalar
+                     4) the total number of reads clustered                      Scalar
 
            The cluster file is in a format similar to Fasta, where the           
            identifier specifies the cluster ID followed by the size. The
@@ -530,7 +531,7 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     $self->log->info("======== Transposome::Cluster::merge_clusters completed at: $ft.")
         if Log::Log4perl::initialized();
 
-    return ($cls_dir_path, $cls_with_merges_path, $cls_tot);
+    return ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot);
 }
 
 =head1 AUTHOR
