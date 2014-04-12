@@ -215,13 +215,15 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
         my ($fname, $fpath, $fsuffix) = fileparse($query, qr/\.[^.]*/);
         my $blast_res = $fname;
         my ($filebase, $readct) = split /\_/, $fname, 2;
+	#say join "\t", $fname, $filebase, $readct;
         $total_readct += $readct;
         $blast_res =~ s/\.[^.]+$//;
         $blast_res .= "_blast_$evalue.tsv";
         my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
 
         my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
-                       "sort -k1,1 -u | ".                       # count each read in the report only once                                                                  "cut -f2 | ".                             # keep only the ssids        
+                       "sort -k1,1 -u | ".                       # count each read in the report only once
+		       "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
                        "uniq -c | ".                             # reduce the list
                        "sort -bnr | ".                           # count unique items
