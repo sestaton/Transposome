@@ -139,7 +139,7 @@ method BUILD (@_) {
     }
     catch {
         $self->log->error("Unable to find formatdb. Check your PATH to see that it is installed. Exiting.")
-	    if Log::Log4perl::intialized();
+	    if Log::Log4perl::initialized();
 	exit(1);
     };
 }
