@@ -69,6 +69,7 @@ has 'threads' => (
 
 method mk_key (@arg) {
     return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
+    #return join "~~", map { $_ // " " } @arg;
 }
 
 =head2 mk_vec
@@ -89,6 +90,7 @@ method mk_key (@arg) {
 
 method mk_vec (Str $key) {
     return split "\N{INVISIBLE SEPARATOR}", $key;
+    #return split /\~\~/, $key;
 }
 
 =head1 AUTHOR
