@@ -1,10 +1,10 @@
 package Transposome::Role::Util;
 
 use 5.012;
-use utf8;
+#use utf8;
 use Moose::Role;
 use MooseX::Types::Moose qw(Str);
-use charnames qw(:full :short);
+#use charnames qw(:full :short);
 use Method::Signatures;
 
 =head1 NAME
@@ -68,8 +68,8 @@ has 'threads' => (
 =cut
 
 method mk_key (@arg) {
-    return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
-    #return join "~~", map { $_ // " " } @arg;
+    #return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
+    return join "~~", map { $_ // " " } @arg;
 }
 
 =head2 mk_vec
@@ -89,8 +89,8 @@ method mk_key (@arg) {
 =cut
 
 method mk_vec (Str $key) {
-    return split "\N{INVISIBLE SEPARATOR}", $key;
-    #return split /\~\~/, $key;
+    #return split "\N{INVISIBLE SEPARATOR}", $key;
+    return split /\~\~/, $key;
 }
 
 =head1 AUTHOR
