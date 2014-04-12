@@ -211,11 +211,11 @@ method annotate_clusters (Str $cls_with_merges_dir, Int $seqct, Int $cls_tot) {
     my %all_cluster_annotations; # container for annotations; used for creating summary
 
     for my $file (@clus_fas_files) {
+	next if $file =~ /singletons/;
         my $query = $cls_with_merges_dir."/".$file;
         my ($fname, $fpath, $fsuffix) = fileparse($query, qr/\.[^.]*/);
         my $blast_res = $fname;
         my ($filebase, $readct) = split /\_/, $fname, 2;
-	#say join "\t", $fname, $filebase, $readct;
         $total_readct += $readct;
         $blast_res =~ s/\.[^.]+$//;
         $blast_res .= "_blast_$evalue.tsv";
