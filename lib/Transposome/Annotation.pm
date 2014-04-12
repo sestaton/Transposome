@@ -171,21 +171,25 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my $evalue       = $self->evalue;
     my $rep_frac     = $cls_tot / $seqct;
     my $single_tot   = $seqct - $cls_tot;
+    my $single_frac  = 1 - $rep_frac;
    
     ## annotate singletons, then add total to results
     my ($singleton_hits, $singleton_rep_frac) = $self->_annotate_singletons($singletons_file_path, $rpname, $single_tot, 
 									    $evalue, $thread_range, $db_path, $out_dir, $blastn);
 
+    my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
+    my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
     # log results
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
         $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
 
-        $self->log->info("Total sequences: $seqct");
-        $self->log->info("Total sequences clustered: $cls_tot");
-	$self->log->info("Total sequences unclustered: $single_tot");
-        $self->log->info("Repeat fraction: $rep_frac");
-	$self->log->info("Singleton epeat fraction: $singleton_rep_frac");
+        #$self->log->info("Total sequences: $seqct");
+        #$self->log->info("Total sequences clustered: $cls_tot");
+	#$self->log->info("Total sequences unclustered: $single_tot");
+        #$self->log->info("Repeat fraction from clusters: $rep_frac");
+	#$self->log->info("Singleton repeat fraction: $singleton_rep_frac");
+	#$self->log->info("Total Repeat fraction: $total_rep_frac");
     }
 
     my $top_hit_superfam = {};
@@ -267,9 +271,17 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     unlink glob("$db_path*");
 
     # log results
-    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.")
-        if Log::Log4perl::initialized();
+    #my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    if (Log::Log4perl::initialized()) {
+	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+	$self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.");
+	$self->log->info("Total sequences: $seqct");
+	$self->log->info("Total sequences clustered: $cls_tot");
+	$self->log->info("Total sequences unclustered: $single_tot");
+	$self->log->info("Repeat fraction from clusters: $rep_frac");
+	$self->log->info("Singleton repeat fraction: $singleton_rep_frac");
+	$self->log->info("Total Repeat fraction: $total_rep_frac");
+    }
 
     return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
 }
