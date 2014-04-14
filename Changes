@@ -6,6 +6,7 @@ Version	Date	Location
 - Add method for writing FASTA file of singleton sequences.
 - Add method for annotating and logging repeat content
   of singleton sequences.
+- Add DB_File dep for indexing method.
 
 0.03	12/19/2014	Athens, GA
 
