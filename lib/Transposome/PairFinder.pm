@@ -5,8 +5,7 @@ use utf8;
 use Moose;
 use Method::Signatures;
 use Encode qw(encode decode);
-use DB_File;
-use vars qw($DB_BTREE &R_DUP);  
+use BerkeleyDB;
 use DBM::Deep;
 use File::Spec;
 use File::Basename;
@@ -235,11 +234,9 @@ method parse_blast {
 				 type      => DBM::Deep::TYPE_HASH );
 
 	my %match_index;
-	$DB_BTREE->{cachesize} = 100000;
-	$DB_BTREE->{flags} = R_DUP;
-	
-	tie %match_index, 'DB_File', $dbi, O_RDWR|O_CREAT, 0666, $DB_BTREE
-	    or die "\nERROR: Could not open DBM file $dbi: $!\n";
+
+	tie %match_index, 'BerkeleyDB::Btree', -Filename => $dbi, -Flags => DB_CREATE
+            or die "\n[ERROR]: Could not open DBM file: $dbi: $! $BerkeleyDB::Error\n";
 
 	while (<$fh>) {
 	    chomp;
