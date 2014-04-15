@@ -183,13 +183,6 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
         $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
-
-        #$self->log->info("Total sequences: $seqct");
-        #$self->log->info("Total sequences clustered: $cls_tot");
-	#$self->log->info("Total sequences unclustered: $single_tot");
-        #$self->log->info("Repeat fraction from clusters: $rep_frac");
-	#$self->log->info("Singleton repeat fraction: $singleton_rep_frac");
-	#$self->log->info("Total Repeat fraction: $total_rep_frac");
     }
 
     my $top_hit_superfam = {};
@@ -217,8 +210,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # data structures for holding mapping results
     my @blasts;                  # container for each report (hash) 
     my @blast_out;               # container for blastn output
-    my @superfams;
-    my @cluster_annotations;
+    my @superfams;               # container for top hit superfamilies from each cluster
+    my @cluster_annotations;     # container for cluster annotations
     my %all_cluster_annotations; # container for annotations; used for creating summary
 
     for my $file (@clus_fas_files) {
@@ -272,7 +265,6 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     unlink glob("$db_path*");
 
     # log results
-    #my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     if (Log::Log4perl::initialized()) {
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 	$self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.");
