@@ -190,7 +190,8 @@ method find_pairs ($cls_file, $cls_log_file) {
     my $out_dir                      = $self->dir->relative;
     my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); ##TODO: clean this up...not portable
+    my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); 
+    ##TODO: clean this up...not portable
     
     my $uf = Graph::UnionFind->new;
 
@@ -471,7 +472,8 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 			delete $seqs->{$read};
 		    }
 		    else {
-			$self->log->warn("$read not found. This indicates something went wrong processing the input. Please check your input.")
+			$self->log->warn("$read not found. This indicates something went wrong processing the input. ".
+					 "Please check your input.")
 			    if Log::Log4perl::initialized();
 		    }
 		}
@@ -503,7 +505,9 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 		    delete $seqs->{$non_paired_read};
 		}
 		else {
-		    $self->log->warn("$non_paired_read not found. This indicates something went wrong processing the input. Please check your input.")
+		    $self->log->warn("$non_paired_read not found. ".
+				     "This indicates something went wrong processing the input. ".
+				     "Please check your input.")
 			if Log::Log4perl::initialized();
 		}
 	    }
@@ -514,7 +518,8 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     close $clsnew;
 
     # write out singletons for rarefaction
-    my $singletons_file = "singletons.fas";
+    my $singletons_num = scalar keys %$seqs;
+    my $singletons_file = "singletons_$singletons_num.fas";
     my $singletons_file_path = File::Spec->catfile($cls_dir_path, $singletons_file);
     open my $singlesout, '>', $singletons_file_path or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
 
@@ -571,7 +576,7 @@ method _find_community_exes (Path::Class::Dir $realbin) {
 	    my $lcommunity = File::Spec->catfile($p, 'louvain_community');
 	    my $lhierarchy = File::Spec->catfile($p, 'louvain_hierarchy');
 
-	    if (-e $lconvert &&-x $lconvert &&
+	    if (-e $lconvert && -x $lconvert &&
 		-e $lcommunity && -x $lcommunity &&
 		-e $lhierarchy && -x $lhierarchy) {
 		return ($lconvert, $lcommunity, $lhierarchy);
