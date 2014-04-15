@@ -144,7 +144,8 @@ while (<$rep>) {
 close $rep;
 
 my $single_ct = 0;
-open my $singfh, '<', "$cls_dir_path/singletons.fas";
+my ($singles_file) = glob("$cls_dir_path/singletons*.fas");
+open my $singfh, '<', $singles_file;
 
 while (<$singfh>) {
     $single_ct++ if /^>/;
