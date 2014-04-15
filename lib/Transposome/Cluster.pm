@@ -25,11 +25,11 @@ Transposome::Cluster - Clustering and cluster analysis routines in Transposome.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,8 @@ method louvain_method {
     my $out_dir   = $self->dir->relative;
     my $realbin   = $self->bin_dir->resolve;
 
+    my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
+
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
     my $cls_bin          = $iname.".bin";              # Community "bin" format
     my $cls_tree         = $iname.".tree";             # hierarchical tree of clustering results
@@ -97,11 +99,6 @@ method louvain_method {
     my $cls_tree_weights_path = File::Spec->catfile($out_dir, $cls_tree_weights);
     my $cls_tree_log_path     = File::Spec->catfile($out_dir, $cls_tree_log);
     my $hierarchy_err_path    = File::Spec->catfile($out_dir, $hierarchy_err);
-    ##TODO add test to see if this is is being run locally 
-    ##     i.e., check local bin. could return these from a sub
-    my $lconvert              = File::Spec->catfile($realbin, 'louvain_convert');
-    my $lcommunity            = File::Spec->catfile($realbin, 'louvain_community');
-    my $lhierarchy            = File::Spec->catfile($realbin, 'louvain_hierarchy');
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -248,8 +245,8 @@ method find_pairs ($cls_file, $cls_log_file) {
         else {
             push @sep_reads, values %$_ for @{$mapped_pairs{$allpairs}};
             ($cls_i, $cls_j) = sort @sep_reads;
-            if ($cls_i =~ /$cls_j/) {                      # remove reads that have pairs in the same cluster       
-                delete $mapped_pairs{$allpairs};           # which is uninformative for merging clusters
+            if ($cls_i =~ /$cls_j/) {              # remove reads that have pairs in the same cluster       
+                delete $mapped_pairs{$allpairs};   # which is uninformative for merging clusters
             }
             else {
 		my $k = $self->mk_key($cls_i, $cls_j);
@@ -389,7 +386,8 @@ method make_clusters ($graph_comm, $idx_file) {
  Returns : In order, 1) path to the results directory                            Scalar
                      2) filename (path to) the cluster file with                 Scalar
                         unions above threshold (see below)
-                     3) the total number of reads clustered                      Scalar
+                     3) filename (path to) the singletons file                   Scalar
+                     4) the total number of reads clustered                      Scalar
 
            The cluster file is in a format similar to Fasta, where the           
            identifier specifies the cluster ID followed by the size. The
@@ -530,7 +528,61 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     $self->log->info("======== Transposome::Cluster::merge_clusters completed at: $ft.")
         if Log::Log4perl::initialized();
 
-    return ($cls_dir_path, $cls_with_merges_path, $cls_tot);
+    return ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot);
+}
+
+=head2 _find_community_exes
+
+ Title : _find_community_exes
+ 
+ Usage   : my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
+           
+ Function: Locates the clustering executables shipped with Transposome.
+           Depending on the Perl installation, these may be installed in
+           different locations. For example, with local::lib installed,
+           the executables will not be in the default location.
+           
+                                                                                 Return_type
+ Returns : The path to the default location with standard                        Scalar
+           Perl installation.
+
+                                                                                 Arg_type
+ Args    : Returns : In order, 1) path to the convert program                    Scalar
+                               2) path to the community program                  Scalar
+                               3) path to the hierarchy program                  Scalar
+
+=cut 
+
+method _find_community_exes (Path::Class::Dir $realbin) {
+    my $lconvert   = File::Spec->catfile($realbin, 'louvain_convert');
+    my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
+    my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
+    
+    if (-e $lconvert && -x $lconvert &&
+	-e $lcommunity && -x $lcommunity &&
+	-e $lhierarchy && -x $lhierarchy) {
+	return ($lconvert, $lcommunity, $lhierarchy);
+    }
+    elsif (! -e $lconvert) {
+	my @path = split /:|;/, $ENV{PATH};
+
+	for my $p (@path) {
+	    my $lconvert   = File::Spec->catfile($p, 'louvain_convert');
+	    my $lcommunity = File::Spec->catfile($p, 'louvain_community');
+	    my $lhierarchy = File::Spec->catfile($p, 'louvain_hierarchy');
+
+	    if (-e $lconvert &&-x $lconvert &&
+		-e $lcommunity && -x $lcommunity &&
+		-e $lhierarchy && -x $lhierarchy) {
+		return ($lconvert, $lcommunity, $lhierarchy);
+	    }
+	}
+    }
+    else {
+	$self->log->error("Unable to find clusting executables. This is a bug, please report it. Exiting.")
+	    if Log::Log4perl::initialized();
+	exit(1);
+    }
 }
 
 =head1 AUTHOR
@@ -553,7 +605,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 S. Evan Staton
+Copyright (C) 2013-2014 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: L<http://www.opensource.org/licenses/mit-license.php>

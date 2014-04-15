@@ -1,10 +1,10 @@
 package Transposome::Role::Util;
 
 use 5.012;
-use utf8;
+#use utf8;
 use Moose::Role;
 use MooseX::Types::Moose qw(Str);
-use charnames qw(:full :short);
+#use charnames qw(:full :short);
 use Method::Signatures;
 
 =head1 NAME
@@ -13,11 +13,11 @@ Transposome::Role::Util - Numerous utility routines for Transposome.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,8 @@ has 'threads' => (
 =cut
 
 method mk_key (@arg) {
-    return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
+    #return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
+    return join "~~", map { $_ // " " } @arg;
 }
 
 =head2 mk_vec
@@ -88,7 +89,8 @@ method mk_key (@arg) {
 =cut
 
 method mk_vec (Str $key) {
-    return split "\N{INVISIBLE SEPARATOR}", $key;
+    #return split "\N{INVISIBLE SEPARATOR}", $key;
+    return split /\~\~/, $key;
 }
 
 =head1 AUTHOR

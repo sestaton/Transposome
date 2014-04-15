@@ -23,11 +23,11 @@ transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ my $log = Log::Log4perl::get_logger("Transposome");
 
 my $t0 = [Time::HiRes::gettimeofday];
 my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome started at: $ts. ========");
+$log->info("======== Transposome version: $VERSION (started at: $ts) ========");
 $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
 
 #
@@ -106,8 +106,10 @@ my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
 my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
 my ($seqs, $seqct) = $memstore->store_seq;
-my ($cls_dir_path, $cls_with_merges_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
-                                                                               $read_pairs, $config->{cluster_log_file}, $uf);
+my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
+												      $read_pairs, 
+												      $config->{cluster_log_file}, 
+												      $uf);
 
 #
 # annotate clusters and generate whole-genome summary of results
@@ -119,7 +121,7 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
 					       cpus      => $config->{cpu} );
 
 my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
-    $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $seqct, $cls_tot);
+    $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
                                             $seqct, $rep_frac, $blasts, $superfams);
@@ -162,7 +164,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 S. Evan Staton.
+Copyright 2013-2014 S. Evan Staton.
 
 This program is distributed under the MIT (X11) License:
 L<http://www.opensource.org/licenses/mit-license.php>

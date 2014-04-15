@@ -1,6 +1,13 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.04	4/08/2014	Athens, GA
+
+- Add method for writing FASTA file of singleton sequences.
+- Add method for annotating and logging repeat content
+  of singleton sequences.
+- Add DB_File dep for indexing method.
+
 0.03	12/19/2014	Athens, GA
 
 - Add CI support and include instructions for installing deps.
