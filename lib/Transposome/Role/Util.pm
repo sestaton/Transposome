@@ -1,10 +1,8 @@
 package Transposome::Role::Util;
 
 use 5.012;
-#use utf8;
 use Moose::Role;
 use MooseX::Types::Moose qw(Str);
-#use charnames qw(:full :short);
 use Method::Signatures;
 
 =head1 NAME
@@ -53,11 +51,10 @@ has 'threads' => (
           
  Function: Safely creates a string of joined strings
            to be used (internally) as a hash key. Could
-           also be used in comparisons. This uses a Unicode
-           character that is unlikely to be found in the
-           data being analyzed. This is accomplished with
-           Perl's charnames(), though these characters are available
-           by default as of Perl v5.16.
+           also be used in comparisons. This uses standard
+           ascii characters whereas previous versions relied
+           on unicode characters (which may be safer but is
+           much slower).
 
                                                            Return_type
  Returns : A string comprising the input                   Scalar
@@ -68,7 +65,6 @@ has 'threads' => (
 =cut
 
 method mk_key (@arg) {
-    #return join "\N{INVISIBLE SEPARATOR}", map { $_ // " " } @arg;
     return join "~~", map { $_ // " " } @arg;
 }
 
@@ -89,7 +85,6 @@ method mk_key (@arg) {
 =cut
 
 method mk_vec (Str $key) {
-    #return split "\N{INVISIBLE SEPARATOR}", $key;
     return split /\~\~/, $key;
 }
 
@@ -113,7 +108,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 S. Evan Staton
+Copyright (C) 2013-2014 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: L<http://www.opensource.org/licenses/mit-license.php>
