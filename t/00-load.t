@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings FATAL => 'all';
+use File::Spec;
 use lib qw(../blib/lib);
 use Test::More tests => 12;
 
@@ -31,8 +32,6 @@ my @path = split /:|;/, $ENV{PATH};
 
 my $ex = 0;
 for my $p (@path) {
-    #my $bl = $p . "/" . "blastn";
-    #my $mb = $p . "/" . "makeblastdb";
     my $bl = File::Spec->catfile($p, 'blastn');
     my $mb = File::Spec->catfile($p, 'makeblastdb');
     if ( -e $bl && -x $bl && -e $mb && -x $mb) {
@@ -43,10 +42,8 @@ for my $p (@path) {
         $ex++;
         ok( -e $mb, 'makeblastdb exists' );
     }
-    #my $mg = $p . "/" . "mgblast";
-    #my $fd = $p . "/" . "formatdb";
-    my $mb = File::Spec->catfile($p, 'mgblast');
-    my $fd = File::spec->catfile($p, 'formatdb');
+    my $mg = File::Spec->catfile($p, 'mgblast');
+    my $fd = File::Spec->catfile($p, 'formatdb');
 
     if ( -e $fd && -x $fd && -e $mg && -x $mg) { 
         $ex++;
