@@ -25,7 +25,7 @@ BEGIN {
 
 diag("Testing Transposome $Transposome::VERSION, Perl $], $^X");
 
-##See if we can load mgblast, formatdb, and blastn, which are required
+##See if we can load mgblast, formatdb, makeblastdb, and blastn, which are required
 my @path = split /:|;/, $ENV{PATH};
 
 #say "PATH: ",$ENV{PATH}; # for debug
@@ -34,6 +34,7 @@ my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0);
 for my $p (@path) {
     my $bl = File::Spec->catfile($p, 'blastn');
     my $mb = File::Spec->catfile($p, 'makeblastdb');
+
     if ( -e $mb && -x $mb ) {
         next if $mb_seen;
         $ex++;
