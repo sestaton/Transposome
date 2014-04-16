@@ -8,8 +8,8 @@ use File::Basename;
 use File::Path qw(make_path remove_tree);
 use Module::Path qw(module_path);
 use lib qw(../blib/lib t/lib);
-use Transposome::PairFinder;
 use TestUtils;
+use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 
@@ -69,7 +69,7 @@ ok( defined($cluster_file),
         my $clsct = scalar @ids;
 
         if ( $seqct > 1 ) {
-            ok( $seqct == $clsct, 'Correct number of reads in clusters' );
+            is( $seqct, $clsct, 'Correct number of reads in clusters' );
         }
     }
     close $in;
@@ -98,7 +98,7 @@ my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
         my ( $id,    $seqct )  = split /\s/, $clsid;
         my @ids = split /\s+/, $seqids;
         my $clsct = scalar @ids;
-        ok( $seqct == $clsct, 'Correct number of reads in merged clusters' );
+        is( $seqct, $clsct, 'Correct number of reads in merged clusters' );
     }
     close $in;
 }

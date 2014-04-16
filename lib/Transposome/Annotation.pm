@@ -96,8 +96,7 @@ method BUILD (@_) {
     for my $p (@path) {
 	my $bl = File::Spec->catfile($p, 'blastn');
 	my $mb = File::Spec->catfile($p, 'makeblastdb');
-	#my $bl = $p."/"."blastn";
-	#my $mb = $p."/"."makeblastdb";
+
         if (-e $bl && -x $bl && -e $mb && -x $mb) {
             $self->set_blastn_exec($bl);
             $self->set_makeblastdb_exec($mb);
@@ -219,7 +218,6 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
     for my $file (@clus_fas_files) {
 	next if $file =~ /singletons/;
-        #my $query = $cls_with_merges_dir."/".$file;
 	my $query = File::Spec->catfile($cls_with_merges_dir, $file);
         my ($fname, $fpath, $fsuffix) = fileparse($query, qr/\.[^.]*/);
         my $blast_res = $fname;

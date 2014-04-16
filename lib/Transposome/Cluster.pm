@@ -190,9 +190,7 @@ method find_pairs ($cls_file, $cls_log_file) {
     my $out_dir                      = $self->dir->relative;
     my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    #my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); 
     my $cls_file_path                = File::Spec->catfile($clpath.$out_dir, $clname.$clsuffix);
-    ##TODO: clean this up...not portable
     
     my $uf = Graph::UnionFind->new;
 
@@ -218,8 +216,7 @@ method find_pairs ($cls_file, $cls_log_file) {
             $clsid =~ s/\s/\_/;
             my @ids = split /\s+/, $seqids;       
             # limit cluster size in .cls file here, if desired
-            #push @{$read_pairs{$clsid}}, $_ for @ids;
-            push @{$read_pairs{$clsid}}, @ids;
+            push @{$read_pairs{$clsid}}, $_ for @ids;
         }
         close $in;
     }
@@ -368,11 +365,12 @@ method make_clusters ($graph_comm, $idx_file) {
     }
     close $cls_out;
     close $mem;
-    #unlink $out_dir."/".$_ for @$graph_comm;
+
     for (@$graph_comm) {
 	my $graph_file = File::Spec->catfile($out_dir, $_);
 	unlink $graph_file;
     }
+
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Cluster::make_clusters completed at: $ft.")
