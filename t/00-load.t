@@ -30,28 +30,37 @@ my @path = split /:|;/, $ENV{PATH};
 
 #say "PATH: ",$ENV{PATH}; # for debug
 
-my $ex = 0;
+my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0, 0, 0);
 for my $p (@path) {
     my $bl = File::Spec->catfile($p, 'blastn');
     my $mb = File::Spec->catfile($p, 'makeblastdb');
-    if ( -e $bl && -x $bl && -e $mb && -x $mb) {
+    if ( -e $mb && -x $mb ) {
+        next if $mb_seen;
+        $ex++;
+        ok( -e $mb & -x $mb, 'makeblastdb exists' );
+        $mb_seen = 1;
+    }
+    if ( -e $bl && -x $bl ) {
+        next if $bl_seen;
         $ex++;
         ok( -e $bl && -x $bl, 'blastn exists and is executable' );
-    #}
-    #if ( -e $mb && -x $mb ) {
-        $ex++;
-        ok( -e $mb, 'makeblastdb exists' );
+        $bl_seen = 1;
     }
+
     my $mg = File::Spec->catfile($p, 'mgblast');
     my $fd = File::Spec->catfile($p, 'formatdb');
 
-    if ( -e $fd && -x $fd && -e $mg && -x $mg) { 
+    if ( -e $mg && -x $mg ) {
+        next if $mg_seen;
+        $ex++;
+        ok( -e $mg && -x $mg, 'mgblast exists and is executable' ); 
+        $mg_seen = 1;
+    }
+    if ( -e $fd && -x $fd ) {
+        next if $fd_seen;
         $ex++;
         ok( -e $fd && -x $fd, 'formatdb exists and is executable' );
-    #}
-    #if ( -e $mg && -x $mg ) {
-	$ex++;
-	ok( -e $mg && -x $mg, 'mgblast exists and is executable' ); 
+        $fd_seen = 1;
     }
 }
 
