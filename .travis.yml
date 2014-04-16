@@ -1,13 +1,13 @@
 language: perl
 perl:
-  - "5.18"
-  - "5.16"
-  - "5.14"
+#  - "5.18"
+#  - "5.16"
+#  - "5.14"
   - "5.12"
 
 before_install: ./build/ci/run_build.sh
 
-script: "export PATH=$PATH:mgblast:mgblast/ncbi/bin; perl Makefile.PL && make && make test"
+script: "export PATH=$PATH:/home/mgblast:/home/mgblast/ncbi/bin; echo $PATH; which mgblast; which formatdb; which blastn; which makeblastdb;"
 
 after_failure: cat /home/travis/.cpanm/build.log
 
