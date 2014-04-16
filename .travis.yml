@@ -7,7 +7,7 @@ perl:
 
 before_install: ./build/ci/run_build.sh
 
-script: "export PATH=$PATH:/home/mgblast:/home/mgblast/ncbi/bin; echo $PATH; which mgblast; which formatdb; which blastn; which makeblastdb;"
+script: "export PATH=$PATH:/home/travis/mgblast:/home/travis/mgblast/ncbi/bin; echo $PATH; which mgblast; which formatdb; which blastn; which makeblastdb;"
 
 after_failure: cat /home/travis/.cpanm/build.log
 

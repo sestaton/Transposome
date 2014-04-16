@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home
+`pwd`
 
 ## Fetch mgblast and modify the makefile for the location of NCBI Toolkit
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz && tar xzf mgblast.tar.gz
