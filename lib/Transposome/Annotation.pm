@@ -9,6 +9,7 @@ use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
 use File::Path qw(make_path);
 use File::Basename;
+use File::Spec;
 use Try::Tiny;
 use Storable qw(thaw);
 use POSIX qw(strftime);
@@ -93,8 +94,10 @@ method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-	my $bl = $p."/"."blastn";
-	my $mb = $p."/"."makeblastdb";
+	my $bl = File::Spec->catfile($p, 'blastn');
+	my $mb = File::Spec->catfile($p, 'makeblastdb');
+	#my $bl = $p."/"."blastn";
+	#my $mb = $p."/"."makeblastdb";
         if (-e $bl && -x $bl && -e $mb && -x $mb) {
             $self->set_blastn_exec($bl);
             $self->set_makeblastdb_exec($mb);
@@ -216,7 +219,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
     for my $file (@clus_fas_files) {
 	next if $file =~ /singletons/;
-        my $query = $cls_with_merges_dir."/".$file;
+        #my $query = $cls_with_merges_dir."/".$file;
+	my $query = File::Spec->catfile($cls_with_merges_dir, $file);
         my ($fname, $fpath, $fsuffix) = fileparse($query, qr/\.[^.]*/);
         my $blast_res = $fname;
         my ($filebase, $readct) = split /\_/, $fname, 2;
@@ -397,8 +401,8 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
 method _annotate_singletons (Str $singletons_file_path, $rpname, $single_tot,
                              $evalue, $thread_range, $db_path, $out_dir, $blastn) {
     # set paths for annotation files
-    my $singles_rep          = $rpname."_singletons_annotations.tsv";
-    my $singles_rp_path      = Path::Class::File->new($out_dir, $singles_rep);
+    my $singles_rep     = $rpname."_singletons_annotations.tsv";
+    my $singles_rp_path = Path::Class::File->new($out_dir, $singles_rep);
 
     my @blastcmd = "$blastn -dust no -query $singletons_file_path -out $singles_rp_path -evalue $evalue -db $db_path ".
                    "-outfmt 6 -num_threads $thread_range -max_target_seqs 1";
