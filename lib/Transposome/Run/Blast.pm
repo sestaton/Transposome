@@ -115,8 +115,11 @@ method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-        my $mg = $p."/"."mgblast";
-        my $fd = $p."/"."formatdb";
+        #my $mg = $p."/"."mgblast";
+        #my $fd = $p."/"."formatdb";
+
+	my $mg = File::Spec->catfile($p, 'mgblast');
+	my $fd = File::Spec->catfile($p, 'formatdb');
 
         if (-e $mg && -x $mg) {
             $self->set_mgblast_exec($mg);
