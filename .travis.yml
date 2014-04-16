@@ -7,7 +7,7 @@ perl:
 
 before_install: ./build/ci/run_build.sh
 
-script: "export PATH=$PATH:mgblast:mgblast/ncbi/bin;"
+script: "export PATH=$PATH:mgblast:mgblast/ncbi/bin; perl Makefile.PL && make && make test"
 
 after_failure: cat /home/travis/.cpanm/build.log
 
