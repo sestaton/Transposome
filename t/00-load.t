@@ -30,7 +30,7 @@ my @path = split /:|;/, $ENV{PATH};
 
 #say "PATH: ",$ENV{PATH}; # for debug
 
-my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0, 0, 0);
+my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0);
 for my $p (@path) {
     my $bl = File::Spec->catfile($p, 'blastn');
     my $mb = File::Spec->catfile($p, 'makeblastdb');
