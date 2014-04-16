@@ -7,6 +7,7 @@ Version	Date	Location
 - Add method for annotating and logging repeat content
   of singleton sequences.
 - Add BerkeleyDB indexing method for finding pairs.
+- Add portable methods for working with files and paths.
 
 0.03	12/19/2014	Athens, GA
 
