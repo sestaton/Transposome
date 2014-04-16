@@ -80,9 +80,9 @@ has 'bin_dir' => (
 
 method louvain_method {
     # set get paths to class attributes
-    my $int_file  = $self->file->relative;
-    my $out_dir   = $self->dir->relative;
-    my $realbin   = $self->bin_dir->resolve;
+    my $int_file = $self->file->relative;
+    my $out_dir  = $self->dir->relative;
+    my $realbin  = $self->bin_dir->resolve;
 
     my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
 
@@ -190,7 +190,8 @@ method find_pairs ($cls_file, $cls_log_file) {
     my $out_dir                      = $self->dir->relative;
     my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
-    my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); 
+    #my $cls_file_path                = File::Spec->rel2abs($clpath.$out_dir."/".$clname.$clsuffix); 
+    my $cls_file_path                = File::Spec->catfile($clpath.$out_dir, $clname.$clsuffix);
     ##TODO: clean this up...not portable
     
     my $uf = Graph::UnionFind->new;
@@ -217,7 +218,8 @@ method find_pairs ($cls_file, $cls_log_file) {
             $clsid =~ s/\s/\_/;
             my @ids = split /\s+/, $seqids;       
             # limit cluster size in .cls file here, if desired
-            push @{$read_pairs{$clsid}}, $_ for @ids;
+            #push @{$read_pairs{$clsid}}, $_ for @ids;
+            push @{$read_pairs{$clsid}}, @ids;
         }
         close $in;
     }
@@ -361,13 +363,16 @@ method make_clusters ($graph_comm, $idx_file) {
                 push @clus_members, $index{$cls_member};
             }
         }
-        say $cls_out join " ", @clus_members;
+        say $cls_out join q{ }, @clus_members;
         $cls_ct++;
     }
     close $cls_out;
     close $mem;
-    unlink $out_dir."/".$_ for @$graph_comm;
-
+    #unlink $out_dir."/".$_ for @$graph_comm;
+    for (@$graph_comm) {
+	my $graph_file = File::Spec->catfile($out_dir, $_);
+	unlink $graph_file;
+    }
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Cluster::make_clusters completed at: $ft.")
@@ -413,9 +418,9 @@ method make_clusters ($graph_comm, $idx_file) {
 =cut
 
 method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls_log_file, $uf) {
-    my $infile          = $self->file->relative;
+    my $infile = $self->file->relative;
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
-    my $out_dir         = $self->dir->relative;
+    my $out_dir = $self->dir->relative;
     my $str = POSIX::strftime("%m_%d_%Y_%H_%M_%S", localtime);
 
     my $cls_dir_base    = $iname;
