@@ -31,8 +31,10 @@ my @path = split /:|;/, $ENV{PATH};
 
 my $ex = 0;
 for my $p (@path) {
-    my $bl = $p . "/" . "blastn";
-    my $mb = $p . "/" . "makeblastdb";
+    #my $bl = $p . "/" . "blastn";
+    #my $mb = $p . "/" . "makeblastdb";
+    my $bl = File::Spec->catfile($p, 'blastn');
+    my $mb = File::Spec->catfile($p, 'makeblastdb');
     if ( -e $bl && -x $bl && -e $mb && -x $mb) {
         $ex++;
         ok( -e $bl && -x $bl, 'blastn exists and is executable' );
@@ -41,8 +43,10 @@ for my $p (@path) {
         $ex++;
         ok( -e $mb, 'makeblastdb exists' );
     }
-    my $mg = $p . "/" . "mgblast";
-    my $fd = $p . "/" . "formatdb";
+    #my $mg = $p . "/" . "mgblast";
+    #my $fd = $p . "/" . "formatdb";
+    my $mb = File::Spec->catfile($p, 'mgblast');
+    my $fd = File::spec->catfile($p, 'formatdb');
 
     if ( -e $fd && -x $fd && -e $mg && -x $mg) { 
         $ex++;
