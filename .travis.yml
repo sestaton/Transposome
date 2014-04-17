@@ -7,7 +7,9 @@ perl:
 
 before_install: ./build/ci/run_build.sh
 
-script: "export PATH=$PATH:/home/travis/build/sestaton/Transposome/mgblast:/home/travis/build/sestaton/Transposome/mgblast/ncbi/bin; echo $PATH; which mgblast; which formatdb; which blastn; which makeblastdb;"
+#script: "export PATH=$PATH:/home/travis/build/sestaton/Transposome/mgblast:/home/travis/build/sestaton/Transposome/mgblast/ncbi/bin; which mgblast; which formatdb; which blastn; which makeblastdb"
+
+script: "perl Makefile.PL && make test"
 
 after_failure: cat /home/travis/.cpanm/build.log
 
