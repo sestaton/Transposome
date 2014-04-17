@@ -16,6 +16,8 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 
 ## Compile the NCBI Toolkit
 ./ncbi/make/makedis.csh 2>&1 > /dev/null
+./ncbi/make/makedis.csh 2>&1 > /dev/null
+./ncbi/make/makedis.csh 2>&1 > /dev/null
 echo -e "CWD: $dir\n"
 ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi
 ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin
