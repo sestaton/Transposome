@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#`pwd`
 
 ## Fetch mgblast and modify the makefile for the location of NCBI Toolkit
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz && tar xzf mgblast.tar.gz
@@ -9,7 +8,7 @@ dir=`pwd`
 sed "s,NCBIDIR = .*,NCBIDIR = $dir/ncbi," Makefile > Makefile.bak
 mv Makefile.bak Makefile
 
-echo -e "CWD: $dir\n"
+#echo -e "CWD: $dir\n"
 
 ## Fetch and compile NCBI Toolkit, including deps
 sudo apt-get -qq -y install csh xorg-dev openbox lesstif2-dev
@@ -24,3 +23,10 @@ make
 ## Install BLAST+ and BerkeleyDB
 sudo apt-get -qq -y install libdb-dev libdb++-dev ncbi-blast+
 
+export PATH=$PATH:/home/travis/build/sestaton/Transposome/mgblast:/home/travis/build/sestaton/Transposome/mgblast/ncbi/bin; 
+
+echo $PATH; 
+which mgblast 
+which formatdb 
+which blastn 
+which makeblastb
