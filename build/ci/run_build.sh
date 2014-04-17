@@ -17,12 +17,16 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 ## Compile the NCBI Toolkit
 ./ncbi/make/makedis.csh 2>&1 > /dev/null
 echo -e "CWD: $dir\n"
-sudo cp /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin/formatdb /usr/bin
+ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi
+ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin
+
+#sudo cp /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin/formatdb /usr/bin
 
 ## Compile mgblast
 make
 echo -e "CWD: $dir\n"
-sudo cp /home/travis/build/sestaton/Transposome/mgblast/mgblast /usr/bin
+ls -l /home/travis/build/sestaton/Transposome/mgblast
+#sudo cp /home/travis/build/sestaton/Transposome/mgblast/mgblast /usr/bin
 
 ## Install BLAST+ and BerkeleyDB
 sudo apt-get -qq -y install libdb-dev libdb++-dev ncbi-blast+
