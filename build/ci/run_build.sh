@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ## Fetch mgblast and modify the makefile for the location of NCBI Toolkit
 wget sourceforge.net/projects/gicl/files/mgblast.tar.gz && tar xzf mgblast.tar.gz
 cd mgblast
@@ -18,27 +17,9 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 ./ncbi/make/makedis.csh 2>&1 > /dev/null
 ./ncbi/make/makedis.csh 2>&1 > /dev/null
 ./ncbi/make/makedis.csh 2>&1 > /dev/null
-echo -e "CWD: $dir\n"
-ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi
-ls -l /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin
-
-#sudo cp /home/travis/build/sestaton/Transposome/mgblast/ncbi/bin/formatdb /usr/bin
 
 ## Compile mgblast
 make
-echo -e "CWD: $dir\n"
-ls -l /home/travis/build/sestaton/Transposome/mgblast
-#sudo cp /home/travis/build/sestaton/Transposome/mgblast/mgblast /usr/bin
 
 ## Install BLAST+ and BerkeleyDB
 sudo apt-get -qq -y install libdb-dev libdb++-dev ncbi-blast+
-
-#cp mgblast /usr/bin
-#cp ncbi/bin/formatdb /usr/bin
-#export PATH=$PATH:/home/travis/build/sestaton/Transposome/mgblast:/home/travis/build/sestaton/Transposome/mgblast/ncbi/bin; 
-
-#echo $PATH; 
-#which mgblast 
-#which formatdb 
-#which blastn 
-#which makeblastb
