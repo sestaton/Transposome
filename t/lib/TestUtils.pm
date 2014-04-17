@@ -15,11 +15,12 @@ TestUtils - Methods for mocking data or data structures for testing Transposome.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
+$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
