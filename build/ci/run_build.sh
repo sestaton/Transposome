@@ -9,6 +9,8 @@ dir=`pwd`
 sed "s,NCBIDIR = .*,NCBIDIR = $dir/ncbi," Makefile > Makefile.bak
 mv Makefile.bak Makefile
 
+echo -e "CWD: $dir\n"
+
 ## Fetch and compile NCBI Toolkit, including deps
 sudo apt-get -qq -y install csh xorg-dev openbox lesstif2-dev
 wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar xzf ncbi.tar.gz
