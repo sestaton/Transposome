@@ -1,11 +1,23 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.05	4/17/2014	Athens, GA
+
+- Rework CI build system by isolation build and tests, which
+  are now working as expected.
+- Update package names in dependency list so there are no warnings
+  during install.
+- Changed logic for checking dependencies when testing so required programs 
+  can be in any custom location.
+- Changed locations searched for clustering code so any type of installation
+  should work now. In particular, using local::lib or a custom lib path should
+  work just the same as a default installation.
+
 0.04	4/08/2014	Athens, GA
 
-- Add method for writing FASTA file of singleton sequences.
+- Add method for writing FASTA file of singleton sequences (changes API).
 - Add method for annotating and logging repeat content
-  of singleton sequences.
+  of singleton sequences (changes API).
 - Add BerkeleyDB indexing method for finding pairs.
 - Add portable methods for working with files and paths.
 
@@ -13,7 +25,7 @@ Version	Date	Location
 
 - Add CI support and include instructions for installing deps.
 - Modified method for setting path to blast executables so there
-  is nothing custom about the install
+  is nothing custom about the install.
 
 0.02	12/02/2013	Athens, GA
 
