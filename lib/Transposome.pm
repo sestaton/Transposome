@@ -2,7 +2,9 @@ package Transposome;
 
 use 5.012;
 use Moose;
-use YAML;
+use Method::Signatures;
+use YAML::Tiny;
+use Data::Dump qw(dd);
 use namespace::autoclean;
 
 with 'MooseX::Getopt::Usage',
@@ -32,19 +34,31 @@ $VERSION = eval $VERSION;
 has 'config' => (
     is            => 'ro',
     isa           => 'Str',
-    required      => 1,
+    required      => 0,
     documentation => qq{The Transposome configuration file},
 );
 
-has 'configuration' => (
-    traits  => ['NoGetopt'],
-    is      => 'rw',
-    isa     => 'HashRef',
-    lazy    => 1,
-    default => sub { YAML::LoadFile shift->config },
+has 'version' => ( 
+    is            => 'ro', 
+    isa           => 'Bool', 
+    required       => 0,
+    documentation => qq{Get version information and exit},
 );
 
 has '+logger' => ( traits => ['NoGetopt'], );
+
+method configuration {
+    my $configfile = YAML::Tiny->read( $self->config );
+    my $valid_config = $self->get_config( $configfile );
+    return $valid_config;
+}
+
+method getopt_usage_config {
+   return (
+       format   => "Usage: %c [OPTIONS]",
+       headings => 1,
+   );
+}
 
 =head1 AUTHOR
 

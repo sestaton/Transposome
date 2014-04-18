@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use lib qw(../blib/lib t/lib);
 use TestUtils;
-
 use Test::More tests => 2;
 
 my $test = TestUtils->new(

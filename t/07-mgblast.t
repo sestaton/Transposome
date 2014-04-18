@@ -22,8 +22,8 @@ my $conf = $test->config_constructor;
 my ($conf_file) = @$conf;
 
 my $trans_obj = Transposome->new( config => $conf_file );
-ok( $trans_obj->get_config, 'Configuration data loaded from file correctly' );
-my $config = $trans_obj->get_config;
+ok( $trans_obj->configuration, 'Configuration data loaded from file correctly' );
+my $config = $trans_obj->configuration;
 
 my $log_conf = qq{
     log4perl.category.Transposome       = INFO, Logfile

@@ -3,6 +3,7 @@ package Transposome::Role::Config;
 use 5.012;
 use Moose::Role;
 use Method::Signatures;
+use Data::Dump qw(dd);
 
 =head1 NAME
 
@@ -44,35 +45,37 @@ $VERSION = eval $VERSION;
 
 =cut 
 
-method get_config {
+method get_config ($yaml) {
     my %config;
 
+    #dd $yaml;
     # blast input section from config
-    $config{sequence_file}     = $self->configuration->{blast_input}->[0]->{sequence_file};
-    $config{sequence_num}      = $self->configuration->{blast_input}->[1]->{sequence_num};
-    $config{cpu}               = $self->configuration->{blast_input}->[2]->{cpu};
-    $config{thread}            = $self->configuration->{blast_input}->[3]->{thread};
-    $config{output_directory}  = $self->configuration->{blast_input}->[4]->{output_directory};
+    $config{sequence_file}     = $yaml->[0]->{blast_input}->[0]->{sequence_file};
+    $config{sequence_num}      = $yaml->[0]->{blast_input}->[1]->{sequence_num};
+    $config{cpu}               = $yaml->[0]->{blast_input}->[2]->{cpu};
+    $config{thread}            = $yaml->[0]->{blast_input}->[3]->{thread};
+    $config{output_directory}  = $yaml->[0]->{blast_input}->[4]->{output_directory};
 
     # clustering options from config
-    $config{in_memory}         = $self->configuration->{clustering_options}->[0]->{in_memory};
-    $config{percent_identity}  = $self->configuration->{clustering_options}->[1]->{percent_identity};
-    $config{fraction_coverage} = $self->configuration->{clustering_options}->[2]->{fraction_coverage};
-    $config{merge_threshold}   = $self->configuration->{clustering_options}->[3]->{merge_threshold};
+    $config{in_memory}         = $yaml->[0]->{clustering_options}->[0]->{in_memory};
+    $config{percent_identity}  = $yaml->[0]->{clustering_options}->[1]->{percent_identity};
+    $config{fraction_coverage} = $yaml->[0]->{clustering_options}->[2]->{fraction_coverage};
+    $config{merge_threshold}   = $yaml->[0]->{clustering_options}->[3]->{merge_threshold};
 
     # annotation options from config
-    $config{cluster_size}      = $self->configuration->{annotation_options}->[0]->{cluster_size};
-    $config{blast_evalue}      = $self->configuration->{annotation_options}->[1]->{blast_evalue};
+    $config{cluster_size}      = $yaml->[0]->{annotation_options}->[0]->{cluster_size};
+    $config{blast_evalue}      = $yaml->[0]->{annotation_options}->[1]->{blast_evalue};
 
     # annotation input from config
-    $config{repeat_database}   = $self->configuration->{annotation_input}->[0]->{repeat_database};
+    $config{repeat_database}   = $yaml->[0]->{annotation_input}->[0]->{repeat_database};
 
     # output from config
-    $config{run_log_file}      = $self->configuration->{output}->[0]->{run_log_file};
-    $config{cluster_log_file}  = $self->configuration->{output}->[1]->{cluster_log_file};
+    $config{run_log_file}      = $yaml->[0]->{output}->[0]->{run_log_file};
+    $config{cluster_log_file}  = $yaml->[0]->{output}->[1]->{cluster_log_file};
 
     my $valid_config = $self->_validate_params(\%config);
 
+    #dd \%config;
     return $valid_config;
 }
 
