@@ -4,7 +4,6 @@ use 5.012;
 use Moose;
 use Method::Signatures;
 use YAML::Tiny;
-use Data::Dump qw(dd);
 use namespace::autoclean;
 
 with 'MooseX::Getopt::Usage',
@@ -18,11 +17,11 @@ Transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

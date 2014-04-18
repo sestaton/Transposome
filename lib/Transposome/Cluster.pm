@@ -25,11 +25,11 @@ Transposome::Cluster - Clustering and cluster analysis routines in Transposome.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

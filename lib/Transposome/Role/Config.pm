@@ -3,7 +3,6 @@ package Transposome::Role::Config;
 use 5.012;
 use Moose::Role;
 use Method::Signatures;
-use Data::Dump qw(dd);
 
 =head1 NAME
 
@@ -11,11 +10,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -48,7 +47,6 @@ $VERSION = eval $VERSION;
 method get_config ($yaml) {
     my %config;
 
-    #dd $yaml;
     # blast input section from config
     $config{sequence_file}     = $yaml->[0]->{blast_input}->[0]->{sequence_file};
     $config{sequence_num}      = $yaml->[0]->{blast_input}->[1]->{sequence_num};
@@ -75,7 +73,6 @@ method get_config ($yaml) {
 
     my $valid_config = $self->_validate_params(\%config);
 
-    #dd \%config;
     return $valid_config;
 }
 
