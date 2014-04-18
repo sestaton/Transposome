@@ -42,27 +42,23 @@ $VERSION = eval $VERSION;
 #
 my $trans_obj = Transposome->new_with_options();
 
-#dd $trans_obj;
-#if ($trans_obj->help_flag || !$trans_obj->config) {
-#    $trans_obj->usage;
-#    exit(0);
-#}
-
+#
+# check options
+#
 if ($trans_obj->version) {
     say "Transposome version: $VERSION";
     exit(0);
 }
 
-#if ($trans_obj->help_flag || !$trans_obj->config) {
-#    $trans_obj->usage;
-#    exit(0);
-#}
 if (! $trans_obj->config) {
     print $trans_obj->getopt_usage;
     exit(0);
 }
 
-my $config = $trans_obj->configuration if $trans_obj->config;
+#
+# parse configuration
+#
+my $config = $trans_obj->configuration;
 
 unless (-d $config->{output_directory}) {
     make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
