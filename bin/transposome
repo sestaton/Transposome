@@ -16,6 +16,7 @@ use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
 use File::Spec;
+use Data::Dump qw(dd);
 
 =head1 NAME
 
@@ -41,7 +42,27 @@ $VERSION = eval $VERSION;
 #
 my $trans_obj = Transposome->new_with_options();
 
-my $config = $trans_obj->get_config;
+#dd $trans_obj;
+#if ($trans_obj->help_flag || !$trans_obj->config) {
+#    $trans_obj->usage;
+#    exit(0);
+#}
+
+if ($trans_obj->version) {
+    say "Transposome version: $VERSION";
+    exit(0);
+}
+
+#if ($trans_obj->help_flag || !$trans_obj->config) {
+#    $trans_obj->usage;
+#    exit(0);
+#}
+if (! $trans_obj->config) {
+    print $trans_obj->getopt_usage;
+    exit(0);
+}
+
+my $config = $trans_obj->configuration if $trans_obj->config;
 
 unless (-d $config->{output_directory}) {
     make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
