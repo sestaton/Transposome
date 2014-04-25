@@ -26,11 +26,11 @@ $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
-    transposome --config transposome_config.yml
+    transposome --configfile transposome_config.yml
 
 =cut
 
-has 'config' => (
+has 'configfile' => (
     is            => 'ro',
     isa           => 'Str',
     required      => 0,
@@ -47,7 +47,7 @@ has 'version' => (
 has '+logger' => ( traits => ['NoGetopt'], );
 
 method configuration {
-    my $configfile = YAML::Tiny->read( $self->config );
+    my $configfile   = YAML::Tiny->read( $self->configfile );
     my $valid_config = $self->get_config( $configfile );
     return $valid_config;
 }

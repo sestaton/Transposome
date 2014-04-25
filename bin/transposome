@@ -33,7 +33,7 @@ $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
-    transposome --config transposome_config.yml
+    transposome --configfile transposome_config.yml
 
 =cut 
 
@@ -45,12 +45,9 @@ my $trans_obj = Transposome->new_with_options();
 #
 # check options
 #
-if ($trans_obj->version) {
-    say "Transposome version: $VERSION";
-    exit(0);
-}
+say $VERSION and exit(0) if $trans_obj->version;
 
-if (! $trans_obj->config) {
+if (! $trans_obj->configfile) {
     print $trans_obj->getopt_usage;
     exit(0);
 }
@@ -124,10 +121,10 @@ my $cluster_file = $cluster->make_clusters($comm, $idx_file);
 my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
 my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
 my ($seqs, $seqct) = $memstore->store_seq;
-my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) = $cluster->merge_clusters($vertex, $seqs, 
-												      $read_pairs, 
-												      $config->{cluster_log_file}, 
-												      $uf);
+my ($cls_dir_path, 
+    $cls_with_merges_path, 
+    $singletons_file_path, 
+    $cls_tot) = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
 #
 # annotate clusters and generate whole-genome summary of results
@@ -138,11 +135,20 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
                                                threads   => $config->{thread},
 					       cpus      => $config->{cpu} );
 
-my ($anno_rp_path, $anno_sum_rep_path, $total_readct,                                                                           
-    $rep_frac, $blasts, $superfams) = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+my ($anno_rp_path, 
+    $anno_sum_rep_path, 
+    $total_readct,                                                                           
+    $rep_frac, 
+    $blasts, 
+    $superfams) = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 
-$annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $total_readct,
-                                            $seqct, $rep_frac, $blasts, $superfams);
+$annotation->clusters_annotation_to_summary($anno_rp_path, 
+					    $anno_sum_rep_path, 
+					    $total_readct,
+                                            $seqct, 
+					    $rep_frac, 
+					    $blasts, 
+					    $superfams);
 
 #
 # log summary of results
@@ -152,6 +158,7 @@ my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
 my $dt = DateTime->from_epoch( epoch => 0 );
 $dt = $dt->add( seconds => $t0_t1 );
 $dt = $dt - DateTime->from_epoch( epoch => 0 );
+
 my @time;
 push @time, $dt->days . PL_N( ' day', $dt->days ) if $dt->days;
 push @time, $dt->hours . PL_N( ' hour', $dt->hours ) if $dt->hours;
