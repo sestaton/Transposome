@@ -116,9 +116,6 @@ method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-        #my $mg = $p."/"."mgblast";
-        #my $fd = $p."/"."formatdb";
-
 	my $mg = File::Spec->catfile($p, 'mgblast');
 	my $fd = File::Spec->catfile($p, 'formatdb');
 
@@ -171,15 +168,16 @@ method BUILD (@_) {
 =cut 
 
 method run_allvall_blast {
-    my $t0 = gettimeofday();
-    my $file = $self->file->absolute;
-    my $cpu = $self->cpus;
-    my $thread = $self->threads;
+    my $t0      = gettimeofday();
+    my $dir     = $self->dir->absolute;
+    my $file    = $self->file->absolute;
+    my $cpu     = $self->cpus;
+    my $thread  = $self->threads;
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
+    
     $outfile =~ s/\.fa.*//;
     $outfile .= "_allvall_blast.bln";
-    my $dir   = $self->dir->absolute; 
     make_path($dir, {verbose => 0, mode => 0771,});
     my $out_path = Path::Class::File->new($dir, $outfile);
 
@@ -300,16 +298,17 @@ method _make_mgblastdb {
 =cut 
 
 method _run_blast ($subseq_file, $database, Int $cpu) {
-    my ($dbfile,$dbdir,$dbext) = fileparse($database, qr/\.[^.]*/);
-    my ($subfile,$subdir,$subext) = fileparse($subseq_file, qr/\.[^.]*/);
+    my ($dbfile, $dbdir, $dbext)    = fileparse($database, qr/\.[^.]*/);
+    my ($subfile, $subdir, $subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
-    my $subseq_out = Path::Class::File->new($dbdir, $subfile."_".$dbfile.$suffix);
-    my $min_overlap = $self->min_overlap;
+    my $subseq_out   = Path::Class::File->new($dbdir, $subfile."_".$dbfile.$suffix);
+
+    my $min_overlap  = $self->min_overlap;
     my $max_mismatch = $self->max_mismatch;
-    my $pid = $self->percent_identity;
-    my $desc_num = $self->desc_num;
-    my $aln_num = $self->aln_num;
-    my $mgblast = $self->get_mgblast_exec;
+    my $pid          = $self->percent_identity;
+    my $desc_num     = $self->desc_num;
+    my $aln_num      = $self->aln_num;
+    my $mgblast      = $self->get_mgblast_exec;
 
     my $exit_value;
     my $blast_cmd = "$mgblast ".           # program
@@ -331,7 +330,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
                     "-a $cpu ";            # number of cpus assigned 
 
     try {
-        $exit_value = system([0..5],$blast_cmd);
+        $exit_value = system([0..5], $blast_cmd);
     }
     catch {
         $self->log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.")
