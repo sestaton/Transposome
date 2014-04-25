@@ -40,7 +40,7 @@ has 'config' => (
 has 'version' => ( 
     is            => 'ro', 
     isa           => 'Bool', 
-    required       => 0,
+    required      => 0,
     documentation => qq{Get version information and exit},
 );
 
