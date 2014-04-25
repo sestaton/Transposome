@@ -33,7 +33,7 @@ $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
-    transposome --configfile transposome_config.yml
+    transposome --config transposome_config.yml
 
 =cut 
 
@@ -47,7 +47,7 @@ my $trans_obj = Transposome->new_with_options();
 #
 say $VERSION and exit(0) if $trans_obj->version;
 
-if (! $trans_obj->configfile) {
+if (! $trans_obj->config) {
     print $trans_obj->getopt_usage;
     exit(0);
 }
@@ -55,7 +55,7 @@ if (! $trans_obj->configfile) {
 #
 # parse configuration
 #
-my $config = $trans_obj->configuration;
+my $config = $trans_obj->get_configuration;
 
 unless (-d $config->{output_directory}) {
     make_path($config->{output_directory}, {verbose => 0, mode => 0771,});

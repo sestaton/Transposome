@@ -44,7 +44,7 @@ $VERSION = eval $VERSION;
 
 =cut 
 
-method get_config ($yaml) {
+method parse_configuration ($yaml) {
     my %config;
 
     # blast input section from config

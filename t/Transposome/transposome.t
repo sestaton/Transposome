@@ -26,9 +26,9 @@ my $test = TestUtils->new(
 my $conf = $test->config_constructor;
 my ($conf_file) = @$conf;
 
-my $trans_obj = Transposome->new( configfile => $conf_file );
-ok( $trans_obj->configuration, 'Configuration data loaded from file correctly' );
-my $config = $trans_obj->configuration;
+my $trans_obj = Transposome->new( config => $conf_file );
+ok( $trans_obj->get_configuration, 'Configuration data loaded from file correctly' );
+my $config = $trans_obj->get_configuration;
 
 ok(
     defined( $config->{sequence_file} ),
