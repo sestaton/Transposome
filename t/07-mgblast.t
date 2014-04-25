@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
+use File::Spec;
 use lib qw(../../blib/lib t/lib);
 use Transposome;
 use Transposome::Run::Blast;
@@ -11,9 +12,12 @@ use Log::Log4perl;
 
 use Test::More tests => 2;
 
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
+
 my $test = TestUtils->new(
-    seq_file     => 't/test_data/t_reads.fas',
-    repeat_db    => 't/test_data/t_db.fas',
+    seq_file     => $seqfile,
+    repeat_db    => $repeatdb,
     destroy      => 0,
     build_proper => 1
 );

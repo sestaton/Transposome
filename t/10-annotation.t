@@ -17,11 +17,11 @@ use Transposome::Annotation;
 
 use Test::More tests => 20;
 
-my $infile = 't/test_data/t_reads.fas';
-my $outdir = 't/pairfinder_t';
-my $report = 'cluster_test_rep.txt';
-my $db_fas = 't/test_data/t_db.fas';
-my $db     = 't/test_data/t_db_blastdb';
+my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $outdir  = File::Spec->catdir('t', 'pairfinder_t');
+my $report  = 'cluster_test_rep.txt';
+my $db_fas  = File::Spec->catfile('t', 'test_data', 't_db.fas');
+my $db      = File::Spec->catfile('t', 'test_data', 't_db_blastdb');
 
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
@@ -63,7 +63,7 @@ my ( $read_pairs, $vertex, $uf ) =
   $cluster->find_pairs( $cluster_file, $report );
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
-my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
+my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
 my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );

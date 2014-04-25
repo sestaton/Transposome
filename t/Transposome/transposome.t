@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
+use File::Spec;
 use Module::Path qw(module_path);
 use Log::Log4perl qw(:easy);
 use lib qw(../../blib/lib t/lib);
@@ -16,9 +17,12 @@ use TestUtils;
 
 use Test::More tests => 33;
 
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
+
 my $test = TestUtils->new(
-    seq_file     => 't/test_data/t_reads.fas',
-    repeat_db    => 't/test_data/t_db.fas',
+    seq_file     => $seqfile,
+    repeat_db    => $repeatdb,
     destroy      => 0,
     build_proper => 1
 );
@@ -146,7 +150,7 @@ ok( defined($cluster_file),
     'Can successfully make communities following clusters' );
 
 my ( $read_pairs, $vertex, $uf ) =
-  $cluster->find_pairs( $cluster_file, $config->{cluster_log_file} );    #FIXME
+  $cluster->find_pairs( $cluster_file, $config->{cluster_log_file} );
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $memstore = Transposome::SeqUtil->new(
@@ -158,8 +162,11 @@ is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
 my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
-  $cluster->merge_clusters( $vertex, $seqs,
-    $read_pairs, $config->{cluster_log_file}, $uf );    #FIXME
+  $cluster->merge_clusters( $vertex, 
+			    $seqs,
+			    $read_pairs, 
+			    $config->{cluster_log_file}, 
+			    $uf ); 
 
 ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
@@ -173,9 +180,13 @@ my $annotation = Transposome::Annotation->new(
     cpus     => 1
 );
 
-my ( $anno_rp_path, $anno_sum_rep_path, $total_readct,
-    $rep_frac, $blasts, $superfams )
-  = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+my ( $anno_rp_path, 
+     $anno_sum_rep_path, 
+     $total_readct,
+     $rep_frac, 
+     $blasts, 
+     $superfams )
+    = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
 is( $total_readct, 48,       'Correct number of reads annotated' );
 is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
@@ -184,8 +195,13 @@ ok( ref($blasts) eq 'ARRAY',
 ok( ref($superfams) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (2)' );
 
-$annotation->clusters_annotation_to_summary( $anno_rp_path, $anno_sum_rep_path,
-    $total_readct, $seqct, $rep_frac, $blasts, $superfams );
+$annotation->clusters_annotation_to_summary( $anno_rp_path, 
+					     $anno_sum_rep_path,
+					     $total_readct, 
+					     $seqct, 
+					     $rep_frac, 
+					     $blasts, 
+					     $superfams );
 
 system("rm -rf $config->{output_directory} t/$config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file formatdb.log");
 

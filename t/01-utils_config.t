@@ -2,13 +2,17 @@
 
 use strict;
 use warnings;
+use File::Spec;
 use lib qw(../blib/lib t/lib);
 use TestUtils;
 use Test::More tests => 2;
 
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
+ 
 my $test = TestUtils->new(
-    seq_file     => 'test_data/t_reads.fas',
-    repeat_db    => 'test_data/t_db.fas',
+    seq_file     => $seqfile,
+    repeat_db    => $repeatdb,
     destroy      => 1,
     build_proper => 1
 );
@@ -16,8 +20,8 @@ my $test = TestUtils->new(
 ok( $test->config_constructor, 'Can build all configuration data for testing' );
 
 my $test2 = TestUtils->new(
-    seq_file     => 'test_data/t_reads.fas',
-    repeat_db    => 'test_data/t_db.fas',
+    seq_file     => $seqfile,
+    repeat_db    => $repeatdb,
     destroy      => 0,
     build_proper => 1
 );

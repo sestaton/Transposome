@@ -15,9 +15,10 @@ use Transposome::SeqUtil;
 
 use Test::More tests => 51;
 
-my $infile = 't/test_data/t_reads.fas';
-my $outdir = 't/cluster_t';
-my $report = 'cluster_test_rep.txt';
+my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $outdir  = File::Spec->catdir('t', 'cluster_t');
+my $report  = 'cluster_test_rep.txt';
+
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
 my ($blfl) = @$blast;
@@ -59,7 +60,8 @@ ok( defined($cluster_file),
 {
     local $/ = '>';
 
-    open my $in, '<', "$outdir/$cluster_file";
+    my $cls = File::Spec->catfile($outdir, $cluster_file);
+    open my $in, '<', $cls;
     while ( my $line = <$in> ) {
         $line =~ s/>//g;
         next if !length($line);
@@ -80,7 +82,7 @@ my ( $read_pairs, $vertex, $uf ) =
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 #diag("Indexing sequences, this will take a few seconds...");
-my $memstore = Transposome::SeqUtil->new( file => $infile, in_memory => 1 );
+my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
 my ( $seqs, $seqct ) = $memstore->store_seq;
 
 #diag("Trying to merge clusters...");
@@ -107,7 +109,7 @@ ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
 is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
-my $repfile = File::Spec->catfile( $outdir, $report );
+my $repfile = File::Spec->catfile($outdir, $report);
 open my $rep, '<', $repfile;
 
 my ( $g1, $g0, $cls11, $cls12, $cls21, $cls22, $reads1, $reads2, $mems1,
