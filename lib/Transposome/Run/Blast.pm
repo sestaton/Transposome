@@ -311,7 +311,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
     my $mgblast      = $self->get_mgblast_exec;
 
     my $exit_value;
-    my $blast_cmd = "$mgblast ".           # program
+    my @blast_cmd = "$mgblast ".           # program
                     "-i $subseq_file ".    # query
                     "-d $database ".       # db
                     "-F \"m D\" ".         # filter with dust
@@ -330,7 +330,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
                     "-a $cpu ";            # number of cpus assigned 
 
     try {
-        $exit_value = system([0..5], $blast_cmd);
+        $exit_value = system([0..5], @blast_cmd);
     }
     catch {
         $self->log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.")
