@@ -15,11 +15,11 @@ TestUtils - Methods for mocking data or data structures for testing Transposome.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -572,7 +572,7 @@ S. Evan Staton, C<< <statonse at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 S. Evan Staton
+Copyright (C) 2013-2014 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: L<http://www.opensource.org/licenses/mit-license.php>
