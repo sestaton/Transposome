@@ -403,8 +403,9 @@ method _annotate_singletons (Str $singletons_file_path, $rpname, $single_tot,
     my $singles_rep     = $rpname."_singletons_annotations.tsv";
     my $singles_rp_path = Path::Class::File->new($out_dir, $singles_rep);
 
-    my @blastcmd = "$blastn -dust no -query $singletons_file_path -out $singles_rp_path -evalue $evalue -db $db_path ".
-                   "-outfmt 6 -num_threads $thread_range -max_target_seqs 1";
+    my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
+                   "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
+                   "sort -k1,1 -u > $singles_rp_path";
 
     my $exit_code;
     try {
