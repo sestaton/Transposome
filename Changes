@@ -5,13 +5,13 @@ Version	Date	Location
 
 - Change from using YAML to YAML::Tiny for parsing configuration.
   This gives faster loading with less memory usage.
-- Change option to read configuration from --config to --configfile
-  to be more expressive and avoid conflicts with YAML::Tiny's get_config
-  method.
+- Rename methods for parsing/getting configuration so there is no
+  ambiguity about which class methods are being called.
 - Add option to get version.
 - Modify option handling to generate usage faster, and 
   not try to parse the configuration by default.
 - Bug fix for calculationg repeat percentage of singletons.
+- Clean up file creation methods for all test.
 
 0.05	4/17/2014	Athens, GA
 
