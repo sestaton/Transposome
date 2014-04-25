@@ -1,9 +1,21 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.06	4/25/2014	Athens, GA
+
+- Change from using YAML to YAML::Tiny for parsing configuration.
+  This gives faster loading with less memory usage.
+- Change option to read configuration from --config to --configfile
+  to be more expressive and avoid conflicts with YAML::Tiny's get_config
+  method.
+- Add option to get version.
+- Modify option handling to generate usage faster, and 
+  not try to parse the configuration by default.
+- Bug fix for calculationg repeat percentage of singletons.
+
 0.05	4/17/2014	Athens, GA
 
-- Rework CI build system by isolation build and tests, which
+- Rework CI build system by isolating build and tests, which
   are now working as expected.
 - Update package names in dependency list so there are no warnings
   during install.
