@@ -15,6 +15,8 @@ use Storable qw(thaw);
 use POSIX qw(strftime);
 use namespace::autoclean;
 
+use Data::Dump qw(dd);
+
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
      'Transposome::Role::File', 
@@ -177,19 +179,20 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my $single_frac  = 1 - $rep_frac;
    
     ## annotate singletons, then add total to results
-    my ($singleton_hits, $singleton_rep_frac) = $self->_annotate_singletons($singletons_file_path, $rpname, $single_tot, 
-									    $evalue, $thread_range, $db_path, $out_dir, $blastn);
+    #my ($singleton_hits, $singleton_rep_frac) = $self->_annotate_singletons($singletons_file_path, $rpname, $single_tot, 
+	#								    $evalue, $thread_range, $db_path, $out_dir, $blastn);
 
-    my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
-    my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
+    #my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
+    #my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
+
     # log results
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
         $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
     }
 
-    my $top_hit_superfam = {};
-    my $cluster_annot    = {};
+    #my $top_hit_superfam = {};
+    #my $cluster_annot    = {};
 
     my $repeat_typemap = $self->map_repeat_types($database);
     my %repeats        = %{ thaw($repeat_typemap) };
@@ -211,11 +214,27 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     make_path($annodir, {verbose => 0, mode => 0711,});
 
     # data structures for holding mapping results
-    my @blasts;                  # container for each report (hash) 
+    #my @blasts;                  # container for each report (hash) 
     my @blast_out;               # container for blastn output
-    my @superfams;               # container for top hit superfamilies from each cluster
-    my @cluster_annotations;     # container for cluster annotations
+    #my @superfams;               # container for top hit superfamilies from each cluster
+    #my @cluster_annotations;     # container for cluster annotations
     my %all_cluster_annotations; # container for annotations; used for creating summary
+
+    ## annotate singletons, then add total to results
+    my ($singleton_hits, $singleton_rep_frac, $singles_rp_path,
+	$blasts, $superfams, $cluster_annotations, $top_hit_superfam, 
+	$cluster_annot) = $self->_annotate_singletons(\%repeats,
+						      $singletons_file_path, 
+						      $rpname, 
+						      $single_tot, 
+						      $evalue, 
+						      $thread_range, 
+						      $db_path, 
+						      $out_dir, 
+						      $blastn);
+
+    my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
+    my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
 
     for my $file (@clus_fas_files) {
 	next if $file =~ /singletons/;
@@ -226,7 +245,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
         $total_readct += $readct;
         $blast_res =~ s/\.[^.]+$//;
         $blast_res .= "_blast_$evalue.tsv";
-        my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
+        #my $blast_file_path = File::Spec->catfile($out_path, $blast_res);
+	my $blast_file_path = Path::Class::File->new($out_path, $blast_res);
 
         my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
                        "sort -k1,1 -u | ".                       # count each read in the report only once
@@ -248,13 +268,13 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
         my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blast_out, $blast_file_path);
         next unless defined $top_hit && defined $hit_ct;
                                                            
-        push @blasts, $blhits;
+        push @$blasts, $blhits;
         ($top_hit_superfam, $cluster_annot) = $self->_blast_to_annotation(\%repeats, $filebase, $readct, $top_hit, $top_hit_perc); 
-        push @superfams, $top_hit_superfam unless !%$top_hit_superfam;
-	push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
+        push @$superfams, $top_hit_superfam unless !%$top_hit_superfam;
+	push @$cluster_annotations, $cluster_annot unless !%$cluster_annot;
     }
-
-    @all_cluster_annotations{keys %$_} = values %$_ for @cluster_annotations;
+    
+    @all_cluster_annotations{keys %$_} = values %$_ for @$cluster_annotations;
 
     open my $out, '>', $anno_rp_path or die "\n[ERROR]: Could not open file: $anno_rp_path\n";
     say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfamily", "Family","Top_hit","Top_hit_perc";
@@ -279,7 +299,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 	$self->log->info("Total Repeat fraction: $total_rep_frac");
     }
 
-    return ($anno_rp_path, $anno_sum_rep_path, $total_readct, $rep_frac, \@blasts, \@superfams);
+    return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
 }
 
 =head2 clusters_annotation_to_summary
@@ -307,12 +327,20 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
 =cut 
 
-method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Class::File $anno_sum_rep_path, 
-                                       Int $total_readct, Int $seqct, Num $rep_frac, ArrayRef $blasts, ArrayRef $superfams) {
+method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, 
+				       Path::Class::File $anno_sum_rep_path, 
+                                       $singles_rp_path, 
+				       Int $total_readct, 
+				       Int $seqct, 
+				       Num $rep_frac, 
+				       ArrayRef $blasts, 
+				       ArrayRef $superfams) {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
         if Log::Log4perl::initialized();
+
+    #dd $superfams;
 
     my %top_hit_superfam;
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
@@ -382,7 +410,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
 
  Title   : _annotation_singletons
 
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, don\'t use it directly.
            
  Function: Runs the annotation for singleton sequences within Transposome.
 
@@ -397,17 +425,34 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, Path::Cl
 
 =cut
 
-method _annotate_singletons (Str $singletons_file_path, $rpname, $single_tot,
-                             $evalue, $thread_range, $db_path, $out_dir, $blastn) {
+method _annotate_singletons ($repeats, 
+			     Str $singletons_file_path, 
+			     $rpname, 
+			     $single_tot,
+                             $evalue, 
+			     $thread_range, 
+			     $db_path, 
+			     $out_dir, 
+			     $blastn) {
+
+    my $top_hit_superfam = {};
+    my $cluster_annot    = {};
+    my @blasts;
+    my @superfams;
+    my @cluster_annotations;
+
     # set paths for annotation files
-    my $singles_rep     = $rpname."_singletons_annotations.tsv";
-    my $singles_rp_path = Path::Class::File->new($out_dir, $singles_rep);
+    my $singles_rep         = $rpname."_singletons_annotations.tsv";
+    my $singles_rp_path     = Path::Class::File->new($out_dir, $singles_rep);
+    my $singles_rep_sum     = $rpname."_singletons_annotations_summary.tsv";
+    my $singles_rp_sum_path = Path::Class::File->new($out_dir, $singles_rep_sum);
 
     my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
                    "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
                    "sort -k1,1 -u > $singles_rp_path";
 
     my $exit_code;
+    #my @blast_out;
     try {
 	$exit_code = system([0..5], @blastcmd);
     }
@@ -418,17 +463,38 @@ method _annotate_singletons (Str $singletons_file_path, $rpname, $single_tot,
     };
     
     my ($singleton_hits, $singleton_rep_frac) = (0, 0);
+    my (%blhits, @blct_out);
+
     if (-s $singles_rp_path) {
         open my $singles_fh, '<', $singles_rp_path or die "\n[ERROR]: Could not open file: $singles_rp_path\n";
-        $singleton_hits++ while <$singles_fh>;
+        while (<$singles_fh>) {
+	    $singleton_hits++;
+	    my @f = split;
+	    $blhits{$f[1]}++;
+	}
         close $singles_fh;
+    }
+
+    for my $hittype (keys %blhits) {
+	push @blct_out, $blhits{$hittype}."\t".$hittype."\n";
     }
 
     if ($singleton_hits > 0) {
         $singleton_rep_frac = $singleton_hits / $single_tot;
     }
 
-    return $singleton_hits, $singleton_rep_frac;
+    ## mapping singleton blast hits to repeat types
+    my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
+    next unless defined $top_hit && defined $hit_ct;
+                                                           
+    push @blasts, $blhits;
+    ($top_hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $single_tot, $top_hit, $top_hit_perc); 
+    push @superfams, $top_hit_superfam unless !%$top_hit_superfam;
+    push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
+    ##
+
+    return $singleton_hits, $singleton_rep_frac, $singles_rp_path, \@blasts, 
+    \@superfams, \@cluster_annotations, $top_hit_superfam, $cluster_annot;
 }
 
 
@@ -436,7 +502,7 @@ method _annotate_singletons (Str $singletons_file_path, $rpname, $single_tot,
 
  Title : _make_blastdb
  
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, don\'t use it directly.
            
  Function: Creates a BLAST database of the repeat types being used
            for annotation.
@@ -477,7 +543,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
 
  Title   : _parse_blast_to_top_hit
 
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, don\'t use it directly.
            
  Function: Calculates the top blast hit for each cluster.
  
@@ -494,7 +560,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
 
 =cut
 
-method _parse_blast_to_top_hit (ArrayRef $blast_out, Str $blast_file_path) {
+method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_file_path) {
     my %blhits;
     my $hit_ct = 0;
 
