@@ -52,6 +52,7 @@ has 'fh' => (
 =head2 get_fh
 
  Title   : get_fh
+
  Usage   : my $fh = $trans_obj->file->get_fh;
           
  Function: Gets a filehandle for the associated
@@ -75,7 +76,8 @@ method get_fh {
 =head2 _build_fh
 
  Title   : _build_fh
- Usage   : This is a private method, don't use it directly.
+
+ Usage   : This is a private method, do not use it directly.
           
  Function: Gets a filehandle for the associated
            file.

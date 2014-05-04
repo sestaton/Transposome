@@ -136,7 +136,7 @@ method map_repeat_types ($infile) {
 
  Title : _build_repeat_map
  
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, do not use it directly.
            
  Function: Creates a data structure containing a full taxonomic
            map of repeat types.

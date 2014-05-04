@@ -349,7 +349,8 @@ method parse_blast {
 =head2 _validate_format
 
  Title   : _validate_format
- Usage   : This is a private method, don't use it directly.
+
+ Usage   : This is a private method, do not use it directly.
 
  Function: Ensure the data is in the correct format and exit
            with a clear message.

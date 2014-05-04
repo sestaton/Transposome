@@ -179,7 +179,7 @@ method next_seq {
 
 Title   : _set_id_per_encoding
 
-Usage   : This is a private method, don't use it directly.
+Usage   : This is a private method, do not use it directly.
           
 Function: Try to determine format of sequence files
           and preserve paired-end information.

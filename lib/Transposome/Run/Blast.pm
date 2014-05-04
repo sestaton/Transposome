@@ -126,6 +126,7 @@ method BUILD (@_) {
             $self->set_formatdb_exec($fd);
         }
     }
+
     try {
         die unless $self->has_mgblast_exec;
     }
@@ -241,7 +242,7 @@ method run_allvall_blast {
 
  Title : _make_mgblastdb
  
- Usage   : This is private method, don't use it directly.
+ Usage   : This is private method, do not use it directly.
            
  Function: Creates a BLAST database in the Legacy BLAST format
            for doing an all vs. all BLAST with the program mgblast.
@@ -282,7 +283,7 @@ method _make_mgblastdb {
 
  Title : _run_blast
  
- Usage   : This is private method, don't use it directly.
+ Usage   : This is private method, do not use it directly.
            
  Function: Runs the program mgblast on each subset of sequences
            based on the conditions set when creating the object.
@@ -344,7 +345,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
 
  Title : _split_reads
  
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, do not use it directly.
            
  Function: Splits the input into smaller pieces so
            that mgblast can be run concurrently on 
