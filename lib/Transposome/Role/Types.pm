@@ -2,9 +2,8 @@ package Transposome::Role::Types;
 
 use 5.012;
 use Moose::Role;
+use Moose::Util::TypeConstraints;
 use namespace::autoclean;
-use utf8;
-use charnames qw(:full :short);
 
 =head1 NAME
 
@@ -25,6 +24,14 @@ $VERSION = eval $VERSION;
     ...
 
 =cut
+
+subtype 'ModNum'
+    => as 'Num'
+    => where { /\_/ || /\d+/ };
+
+coerce 'ModNum',
+    from 'Str',
+    via { $_ =~ s/\_//g; 0+$_ };
 
 has 'counter' => (
     traits  => ['Counter'],
