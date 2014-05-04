@@ -80,7 +80,7 @@ method parse_configuration ($yaml) {
 
  Title    : _validate_params
 
- Usage    : This is a private method, don't use it directly.
+ Usage    : This is a private method, do not use it directly.
 
  Function : Valiadate whether all of the slots in config file
             have been set.
@@ -102,12 +102,18 @@ method _validate_params ($config) {
 	    warn "           Please check your configuration file and try again. Exiting.\n";
             exit(1);
         }
-        else {
-            if ($v =~ /^~/) {
-                $v =~ s/^~/$ENV{"HOME"}/;
-                $config->{$k} = $v;
-            }
+        elsif ($v =~ /^~/) {
+            $v =~ s/^~/$ENV{"HOME"}/;
+            $config->{$k} = $v;
         }
+    }
+    
+    for my $file (qw(sequence_file repeat_database)) {
+	if (! -e $config->{$file}) {
+	    warn "\n[ERROR]: '$config->{$file}' was provided in the configuration file but it does not exist or cannot be found.";
+	    warn "            Please check your configuration file and try again. Exiting.\n";
+	    exit(1);
+	}
     }
     return $config;
 }
