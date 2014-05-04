@@ -98,7 +98,7 @@ my $log_conf = qq{
 
     log4perl.appender.Logfile           = Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename  = t/$config->{run_log_file}
-    log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.Logfile.layout    = Log::Log4perl::Layout::PatternLayout
     log4perl.appender.Logfile.layout.ConversionPattern = %m%n
   };
 
@@ -182,21 +182,24 @@ my $annotation = Transposome::Annotation->new(
 
 my ( $anno_rp_path, 
      $anno_sum_rep_path, 
-     $total_readct,
+     $singles_rp_path, 
+     $total_readct, 
      $rep_frac, 
      $blasts, 
      $superfams )
-    = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+     = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
 is( $total_readct, 48,       'Correct number of reads annotated' );
 is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
+
 ok( ref($blasts) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
 ok( ref($superfams) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (2)' );
 
 $annotation->clusters_annotation_to_summary( $anno_rp_path, 
-					     $anno_sum_rep_path,
+					     $anno_sum_rep_path, 
+					     $singles_rp_path, 
 					     $total_readct, 
 					     $seqct, 
 					     $rep_frac, 
