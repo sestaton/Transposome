@@ -16,7 +16,6 @@ use Log::Log4perl;
 use POSIX qw(strftime);
 use File::Path qw(make_path);
 use File::Spec;
-use Data::Dump qw(dd);
 
 =head1 NAME
 
@@ -29,7 +28,7 @@ Version 0.06.1
 =cut
 
 our $VERSION = '0.06.1';
-$VERSION = eval $VERSION;
+#$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
@@ -137,19 +136,21 @@ my $annotation = Transposome::Annotation->new( database  => $config->{repeat_dat
 
 my ($anno_rp_path, 
     $anno_sum_rep_path, 
-    $total_readct,                                                                           
+    $singles_rp_path, 
+    $total_readct, 
     $rep_frac, 
     $blasts, 
-    $superfams) = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+    $superfams)
+    = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 
 $annotation->clusters_annotation_to_summary($anno_rp_path, 
-					    $anno_sum_rep_path, 
-					    $total_readct,
+                                            $anno_sum_rep_path, 
+                                            $singles_rp_path, 
+                                            $total_readct, 
                                             $seqct, 
-					    $rep_frac, 
-					    $blasts, 
-					    $superfams);
-
+                                            $rep_frac, 
+                                            $blasts, 
+                                            $superfams);
 #
 # log summary of results
 #
