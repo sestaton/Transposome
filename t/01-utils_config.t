@@ -51,7 +51,7 @@ my $test4 = TestUtils->new(
     repeat_db    => 'test_db',      # does not exist
     destroy      => 0,
     build_proper => 1
-			   );
+);
 
 my $test4_conf = $test4->config_constructor;
 my ($test4_conf_file) = @$test4_conf;
