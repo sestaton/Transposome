@@ -7,6 +7,7 @@ Version	Date	Location
   annotation summary (changes API).
 - Add explicit check if repeat database and sequence file exist.
 - Move custom types to separate types library.
+- Add tests for missing files that are required.
 
 0.06	4/25/2014	Athens, GA
 
