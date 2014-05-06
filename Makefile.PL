@@ -40,7 +40,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 6.5503,
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
+        'Test::Most' => 0,
     },
     PREREQ_PM => {
         'Moose'                            => 2.0802,

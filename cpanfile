@@ -16,6 +16,7 @@ requires 'DBM::Deep', '>= 2.0008';
 requires 'BerkeleyDB', '>= 0.54';
 requires 'Log::Log4perl', '>= 1.40';
 requires 'DateTime', '>= 1.03';
+requires 'Test::Most';
 requires 'Lingua::EN::Inflect';
 requires 'File::Path';
 requires 'Graph';
