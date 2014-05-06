@@ -1,6 +1,13 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07	5/04/2014	Athens, GA
+
+- Add method for incorporating singleton repeat sequences into
+  annotation summary (changes API).
+- Add explicit check if repeat database and sequence file exist.
+- Move custom types to separate types library.
+
 0.06	4/25/2014	Athens, GA
 
 - Change from using YAML to YAML::Tiny for parsing configuration.
