@@ -304,7 +304,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 	$self->log->info("Total sequences unclustered: $single_tot");
 	$self->log->info("Repeat fraction from clusters: $rep_frac");
 	$self->log->info("Singleton repeat fraction: $singleton_rep_frac");
-	$self->log->info("Total Repeat fraction: $total_rep_frac");
+	$self->log->info("Total repeat fraction: $total_rep_frac");
     }
 
     return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
@@ -494,6 +494,7 @@ method _annotate_singletons ($repeats,
     }
 
     push @blasts, \%blasthits;
+
     ## mapping singleton blast hits to repeat types
     my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
     next unless defined $top_hit && defined $hit_ct;
