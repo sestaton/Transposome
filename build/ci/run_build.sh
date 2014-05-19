@@ -7,11 +7,8 @@ dir=`pwd`
 sed "s,NCBIDIR = .*,NCBIDIR = $dir/ncbi," Makefile > Makefile.bak
 mv Makefile.bak Makefile
 
-# try to fix issues with state of build machine
-sudo apt-get -qq -y update
-
 ## Fetch and compile NCBI Toolkit, including deps
-sudo apt-get -qq -y install csh xorg-dev openbox lesstif2-dev
+#sudo apt-get -qq -y install csh xorg-dev openbox lesstif2-dev
 wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar xzf ncbi.tar.gz
 
 ## Compile the NCBI Toolkit
@@ -23,4 +20,4 @@ wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/old/20060507/ncbi.tar.gz && tar x
 make
 
 ## Install BLAST+ and BerkeleyDB
-sudo apt-get -qq -y install libdb-dev libdb++-dev ncbi-blast+
+#sudo apt-get -qq -y install libdb-dev libdb++-dev ncbi-blast+

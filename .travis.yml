@@ -1,11 +1,14 @@
 language: perl
 perl:
-  - "5.18"
-  - "5.16"
-  - "5.14"
+#  - "5.18"
+#  - "5.16"
+#  - "5.14"
   - "5.12"
 
-before_install: ./build/ci/run_build.sh
+before_install: 
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq -y csh xorg-dev openbox lesstif2-dev libdb-dev libdb++-dev ncbi-blast+
+  - ./build/ci/run_build.sh
 
 script: ./build/ci/run_tests.sh
 
