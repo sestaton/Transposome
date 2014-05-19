@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.1	5/19/2014	Athens, GA
+
+- Fix typo in logging clustering results.
+- Delete commented out types in SeqUtil class since tests are passing.
+
 0.07	5/04/2014	Athens, GA
 
 - Add method for incorporating singleton repeat sequences into
