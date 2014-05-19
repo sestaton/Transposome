@@ -2,7 +2,6 @@ package Transposome::SeqUtil;
 
 use 5.012;
 use Moose;
-#use Moose::Util::TypeConstraints;
 use Method::Signatures;
 use BerkeleyDB;
 use Transposome::SeqIO;
@@ -49,14 +48,6 @@ use Transposome::SeqUtil;
     $sequtil->sample_seq;
 
 =cut
-
-#subtype 'ModNum'
-#    => as 'Num'
-#    => where { /\_/ || /\d+/ };
-
-#coerce 'ModNum',
-#    from 'Str',
-#    via { $_ =~ s/\_//g; 0+$_ };
 
 has 'in_memory' => (
     is         => 'ro',
