@@ -7,7 +7,8 @@ dir=`pwd`
 sed "s,NCBIDIR = .*,NCBIDIR = $dir/ncbi," Makefile > Makefile.bak
 mv Makefile.bak Makefile
 
-#echo -e "CWD: $dir\n"
+# try to fix issues with state of build machine
+sudo apt-get -qq -y update
 
 ## Fetch and compile NCBI Toolkit, including deps
 sudo apt-get -qq -y install csh xorg-dev openbox lesstif2-dev
