@@ -3,19 +3,19 @@
 use 5.012;
 use strict;
 use warnings;
-use Transposome;
-use Transposome::PairFinder;
-use Transposome::Cluster;
-use Transposome::SeqUtil;
-use Transposome::Annotation;
-use Transposome::Run::Blast;
-use Time::HiRes qw(gettimeofday);
-use DateTime;
-use Lingua::EN::Inflect qw(PL_N);
-use Log::Log4perl;
-use POSIX qw(strftime);
-use File::Path qw(make_path);
-use File::Spec;
+#use Transposome;
+#use Transposome::PairFinder;
+#use Transposome::Cluster;
+#use Transposome::SeqUtil;
+#use Transposome::Annotation;
+#use Transposome::Run::Blast;
+#use Time::HiRes qw(gettimeofday);
+#use DateTime;
+#use Lingua::EN::Inflect qw(PL_N);
+#use Log::Log4perl;
+#use POSIX qw(strftime);
+#use File::Path qw(make_path);
+#use File::Spec;
 
 =head1 NAME
 
@@ -37,34 +37,59 @@ our $VERSION = '0.07.1';
 =cut 
 
 #
-# get configuration using Transposome class
+# Main
 #
-my $trans_obj = Transposome->new_with_options();
+my $config = parse_argv();
+my ($t0, $log) = init_transposome($config);
+my $blastdb = run_blast($config);
+my ($idx_file, $int_file, $hs_file) = find_pairs($config, $blastdb);
+my ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = make_clusters($config, $idx_file, $int_file, $hs_file);
+annotate_clusters($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+log_interval($t0, $log);
 
 #
-# check options
-#
-say $VERSION and exit(0) if $trans_obj->version;
+# Methods
+# 
+sub parse_argv {
+    #
+    # get configuration using Transposome class
+    #
+    require Transposome;
+    require File::Path;
+    my $trans_obj = Transposome->new_with_options();
 
-if (! $trans_obj->config) {
-    print $trans_obj->getopt_usage;
-    exit(0);
+    #
+    # check options
+    #
+    say $VERSION and exit(0) if $trans_obj->version;
+
+    if (! $trans_obj->config) {
+	print $trans_obj->getopt_usage;
+	exit(0);
+    }
+
+    #
+    # parse configuration
+    #
+    my $config = $trans_obj->get_configuration;
+
+    unless (-d $config->{output_directory}) {
+	make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
+    }
+    return $config;
 }
 
-#
-# parse configuration
-#
-my $config = $trans_obj->get_configuration;
-
-unless (-d $config->{output_directory}) {
-    make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
-}
-
-#
-# initialize log and timers
-#
-my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
-my $conf = qq{
+sub init_transposome {
+    my ($config) = @_;
+    #
+    # initialize log and timers
+    #
+    require File::Spec;
+    require Log::Log4perl;
+    require Time::HiRes;
+    require POSIX;
+    my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
+    my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
 
     log4perl.appender.Logfile          = Log::Log4perl::Appender::File
@@ -75,100 +100,142 @@ my $conf = qq{
     log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
     log4perl.appender.Screen.stderr  = 1
     log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
-  };
-Log::Log4perl::init( \$conf );
+    };
+    Log::Log4perl::init( \$conf );
 
-my $log = Log::Log4perl::get_logger("Transposome");
+    my $log = Log::Log4perl::get_logger("Transposome");
+    
+    my $t0 = [Time::HiRes::gettimeofday];
+    my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
+    $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
 
-my $t0 = [Time::HiRes::gettimeofday];
-my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome version: $VERSION (started at: $ts) ========");
-$log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
+    return ($t0, $log);
+}
 
-#
-# perform the all vs. all blast
-#
-my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
-                                          dir       => $config->{output_directory},
-                                          threads   => $config->{thread},
-                                          cpus      => $config->{cpu},
-                                          seq_num   => $config->{sequence_num} );
+sub run_blast {
+    my ($config) = @_;
+    #
+    # perform the all vs. all blast
+    #
 
-my $blastdb = $blast->run_allvall_blast;
+    require Transposome::Run::Blast;
+    my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
+					      dir       => $config->{output_directory},
+					      threads   => $config->{thread},
+					      cpus      => $config->{cpu},
+					      seq_num   => $config->{sequence_num} );
+    
+    my $blastdb = $blast->run_allvall_blast;
 
-#
-# parse mglblast results to find best scoring pairwise matches
-#
-my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
-					      dir               => $config->{output_directory},
-					      in_memory         => $config->{in_memory},
-					      percent_identity  => $config->{percent_identity},
-					      fraction_coverage => $config->{fraction_coverage} );
+    return $blastdb;
+}
 
-my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
+sub find_pairs {
+    my ($config, $blastdb) = @_;
 
-#
-# cluster sequences and analyze groupings
-#
-my $cluster = Transposome::Cluster->new( file            => $int_file,
-					 dir             => $config->{output_directory},
-					 merge_threshold => $config->{merge_threshold},
-					 cluster_size    => $config->{cluster_size} );
+    #
+    # parse mglblast results to find best scoring pairwise matches
+    #
+    require Transposome::PairFinder;
+    my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
+						  dir               => $config->{output_directory},
+						  in_memory         => $config->{in_memory},
+						  percent_identity  => $config->{percent_identity},
+						  fraction_coverage => $config->{fraction_coverage} );
+    
+    my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
-my $comm = $cluster->louvain_method;
-my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
-my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
-my ($seqs, $seqct) = $memstore->store_seq;
-my ($cls_dir_path, 
-    $cls_with_merges_path, 
-    $singletons_file_path, 
-    $cls_tot) = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
+    return ($idx_file, $int_file, $hs_file);
+}
 
-#
-# annotate clusters and generate whole-genome summary of results
-#
-my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
-					       dir       => $config->{output_directory},
-					       file      => $config->{cluster_log_file},
-                                               threads   => $config->{thread},
-					       cpus      => $config->{cpu} );
+sub make_clusters {
+    my ($config, $idx_file, $int_file, $hs_file) = @_;
 
-my ($anno_rp_path, 
-    $anno_sum_rep_path, 
-    $singles_rp_path, 
-    $total_readct, 
-    $rep_frac, 
-    $blasts, 
-    $superfams)
-    = $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+    #
+    # cluster sequences and analyze groupings
+    #
+    require Transposome::Cluster;
+    require Transposome::SeqUtil;
+    my $cluster = Transposome::Cluster->new( file            => $int_file,
+					     dir             => $config->{output_directory},
+					     merge_threshold => $config->{merge_threshold},
+					     cluster_size    => $config->{cluster_size} );
+    
+    my $comm = $cluster->louvain_method;
+    my $cluster_file = $cluster->make_clusters($comm, $idx_file);
+    my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
+ 
+    my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
+    my ($seqs, $seqct) = $memstore->store_seq;
 
-$annotation->clusters_annotation_to_summary($anno_rp_path, 
-                                            $anno_sum_rep_path, 
-                                            $singles_rp_path, 
-                                            $total_readct, 
-                                            $seqct, 
-                                            $rep_frac, 
-                                            $blasts, 
-                                            $superfams);
-#
-# log summary of results
-#
-my $t1 = [Time::HiRes::gettimeofday];
-my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
-my $dt = DateTime->from_epoch( epoch => 0 );
-$dt = $dt->add( seconds => $t0_t1 );
-$dt = $dt - DateTime->from_epoch( epoch => 0 );
+    my ($cls_dir_path, 
+	$cls_with_merges_path, 
+	$singletons_file_path, 
+	$cls_tot) = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
-my @time;
-push @time, $dt->days . PL_N( ' day', $dt->days ) if $dt->days;
-push @time, $dt->hours . PL_N( ' hour', $dt->hours ) if $dt->hours;
-push @time, $dt->minutes . PL_N( ' minute', $dt->minutes ) if $dt->minutes;
-push @time, $dt->seconds . PL_N( ' second', $dt->seconds ) if $dt->seconds;
-my $timestr = join ', ', @time;
+    return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+}
 
-my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-$log->info("======== Transposome completed at: $fs. Elapsed time: $timestr. ========");
+sub annotate_clusters {
+    my ($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = @_;
+
+    #
+    # annotate clusters and generate whole-genome summary of results
+    #
+    require Transposome::Annotation;
+    my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
+						   dir       => $config->{output_directory},
+						   file      => $config->{cluster_log_file},
+						   threads   => $config->{thread},
+						   cpus      => $config->{cpu} );
+
+    my ($anno_rp_path, 
+	$anno_sum_rep_path, 
+	$singles_rp_path, 
+	$total_readct, 
+	$rep_frac, 
+	$blasts, 
+	$superfams)
+	= $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+
+    $annotation->clusters_annotation_to_summary($anno_rp_path, 
+						$anno_sum_rep_path, 
+						$singles_rp_path, 
+						$total_readct, 
+						$seqct, 
+						$rep_frac, 
+						$blasts, 
+						$superfams);
+
+}
+
+sub log_interval {
+    my ($t0, $log) = @_;
+    #
+    # log summary of results
+    #
+    require DateTime;
+    require Time::HiRes;
+    require Lingua::EN::Inflect;
+    require POSIX;
+
+    my $t1 = [Time::HiRes::gettimeofday];
+    my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
+    my $dt = DateTime->from_epoch( epoch => 0 );
+    $dt = $dt->add( seconds => $t0_t1 );
+    $dt = $dt - DateTime->from_epoch( epoch => 0 );
+    
+    my @time;
+    push @time, $dt->days . PL_N( ' day', $dt->days ) if $dt->days;
+    push @time, $dt->hours . PL_N( ' hour', $dt->hours ) if $dt->hours;
+    push @time, $dt->minutes . PL_N( ' minute', $dt->minutes ) if $dt->minutes;
+    push @time, $dt->seconds . PL_N( ' second', $dt->seconds ) if $dt->seconds;
+    my $timestr = join ', ', @time;
+    
+    my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $log->info("======== Transposome completed at: $fs. Elapsed time: $timestr. ========");
+}
 
 =head1 AUTHOR
 
