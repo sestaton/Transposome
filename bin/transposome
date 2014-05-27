@@ -3,19 +3,6 @@
 use 5.012;
 use strict;
 use warnings;
-#use Transposome;
-#use Transposome::PairFinder;
-#use Transposome::Cluster;
-#use Transposome::SeqUtil;
-#use Transposome::Annotation;
-#use Transposome::Run::Blast;
-#use Time::HiRes qw(gettimeofday);
-#use DateTime;
-#use Lingua::EN::Inflect qw(PL_N);
-#use Log::Log4perl;
-#use POSIX qw(strftime);
-#use File::Path qw(make_path);
-#use File::Spec;
 
 =head1 NAME
 
@@ -23,11 +10,11 @@ transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.07.1
+Version 0.07.2
 
 =cut
 
-our $VERSION = '0.07.1';
+our $VERSION = '0.07.2';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -37,30 +24,49 @@ our $VERSION = '0.07.1';
 =cut 
 
 #
-# Main
+# get configuration using Transposome class
 #
 my $config = parse_argv();
+
+#
+# initialize log and timers
+#
 my ($t0, $log) = init_transposome($config);
+
+#
+# perform the all vs. all blast
+#
 my $blastdb = run_blast($config);
+
+#
+# parse mglblast results to find best scoring pairwise matches
+#
 my ($idx_file, $int_file, $hs_file) = find_pairs($config, $blastdb);
+
+#
+# cluster sequences and analyze groupings
+#
 my ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = make_clusters($config, $idx_file, $int_file, $hs_file);
+
+#
+# annotate clusters and generate whole-genome summary of results
+#
 annotate_clusters($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+
+#
+# log summary of results
+#
 log_interval($t0, $log);
 
 #
 # Methods
 # 
 sub parse_argv {
-    #
-    # get configuration using Transposome class
-    #
     require Transposome;
     require File::Path;
     my $trans_obj = Transposome->new_with_options();
 
-    #
     # check options
-    #
     say $VERSION and exit(0) if $trans_obj->version;
 
     if (! $trans_obj->config) {
@@ -68,26 +74,22 @@ sub parse_argv {
 	exit(0);
     }
 
-    #
     # parse configuration
-    #
     my $config = $trans_obj->get_configuration;
 
     unless (-d $config->{output_directory}) {
-	make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
+	File::Path::make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
     }
     return $config;
 }
 
 sub init_transposome {
     my ($config) = @_;
-    #
-    # initialize log and timers
-    #
     require File::Spec;
     require Log::Log4perl;
     require Time::HiRes;
     require POSIX;
+
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
     my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
@@ -105,7 +107,7 @@ sub init_transposome {
 
     my $log = Log::Log4perl::get_logger("Transposome");
     
-    my $t0 = [Time::HiRes::gettimeofday];
+    my $t0 = [Time::HiRes::gettimeofday()];
     my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
     $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
@@ -115,11 +117,8 @@ sub init_transposome {
 
 sub run_blast {
     my ($config) = @_;
-    #
-    # perform the all vs. all blast
-    #
-
     require Transposome::Run::Blast;
+
     my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					      dir       => $config->{output_directory},
 					      threads   => $config->{thread},
@@ -133,11 +132,8 @@ sub run_blast {
 
 sub find_pairs {
     my ($config, $blastdb) = @_;
-
-    #
-    # parse mglblast results to find best scoring pairwise matches
-    #
     require Transposome::PairFinder;
+
     my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
 						  dir               => $config->{output_directory},
 						  in_memory         => $config->{in_memory},
@@ -151,12 +147,9 @@ sub find_pairs {
 
 sub make_clusters {
     my ($config, $idx_file, $int_file, $hs_file) = @_;
-
-    #
-    # cluster sequences and analyze groupings
-    #
     require Transposome::Cluster;
     require Transposome::SeqUtil;
+
     my $cluster = Transposome::Cluster->new( file            => $int_file,
 					     dir             => $config->{output_directory},
 					     merge_threshold => $config->{merge_threshold},
@@ -179,11 +172,8 @@ sub make_clusters {
 
 sub annotate_clusters {
     my ($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = @_;
-
-    #
-    # annotate clusters and generate whole-genome summary of results
-    #
     require Transposome::Annotation;
+
     my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 						   dir       => $config->{output_directory},
 						   file      => $config->{cluster_log_file},
@@ -212,25 +202,22 @@ sub annotate_clusters {
 
 sub log_interval {
     my ($t0, $log) = @_;
-    #
-    # log summary of results
-    #
     require DateTime;
     require Time::HiRes;
     require Lingua::EN::Inflect;
     require POSIX;
 
-    my $t1 = [Time::HiRes::gettimeofday];
+    my $t1 = [Time::HiRes::gettimeofday()];
     my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
     my $dt = DateTime->from_epoch( epoch => 0 );
     $dt = $dt->add( seconds => $t0_t1 );
     $dt = $dt - DateTime->from_epoch( epoch => 0 );
     
     my @time;
-    push @time, $dt->days . PL_N( ' day', $dt->days ) if $dt->days;
-    push @time, $dt->hours . PL_N( ' hour', $dt->hours ) if $dt->hours;
-    push @time, $dt->minutes . PL_N( ' minute', $dt->minutes ) if $dt->minutes;
-    push @time, $dt->seconds . PL_N( ' second', $dt->seconds ) if $dt->seconds;
+    push @time, $dt->days . Lingua::EN::Inflect::PL_N( ' day', $dt->days ) if $dt->days;
+    push @time, $dt->hours . Lingua::EN::Inflect::PL_N( ' hour', $dt->hours ) if $dt->hours;
+    push @time, $dt->minutes . Lingua::EN::Inflect::PL_N( ' minute', $dt->minutes ) if $dt->minutes;
+    push @time, $dt->seconds . Lingua::EN::Inflect::PL_N( ' second', $dt->seconds ) if $dt->seconds;
     my $timestr = join ', ', @time;
     
     my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
