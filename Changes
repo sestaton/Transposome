@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.2	5/27/2014	Athens, GA
+
+- Complete redesign of main application for faster loading.
+- Remove string eval of version causing issues on some machines.
+
 0.07.1	5/19/2014	Athens, GA
 
 - Fix typo in logging clustering results.
