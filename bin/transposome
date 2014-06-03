@@ -10,11 +10,11 @@ transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.07.2
+Version 0.07.3
 
 =cut
 
-our $VERSION = '0.07.2';
+our $VERSION = '0.07.3';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -62,8 +62,8 @@ log_interval($t0, $log);
 # Methods
 # 
 sub parse_argv {
-    require Transposome;
-    require File::Path;
+    load_classes('Transposome', 'File::Path');
+
     my $trans_obj = Transposome->new_with_options();
 
     # check options
@@ -85,10 +85,8 @@ sub parse_argv {
 
 sub init_transposome {
     my ($config) = @_;
-    require File::Spec;
-    require Log::Log4perl;
-    require Time::HiRes;
-    require POSIX;
+
+    load_classes('File::Spec', 'Log::Log4perl', 'Time::HiRes', 'POSIX');
 
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
     my $conf = qq{
@@ -117,7 +115,8 @@ sub init_transposome {
 
 sub run_blast {
     my ($config) = @_;
-    require Transposome::Run::Blast;
+
+    load_classes('Transposome::Run::Blast');
 
     my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					      dir       => $config->{output_directory},
@@ -132,7 +131,8 @@ sub run_blast {
 
 sub find_pairs {
     my ($config, $blastdb) = @_;
-    require Transposome::PairFinder;
+
+    load_classes('Transposome::PairFinder');
 
     my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
 						  dir               => $config->{output_directory},
@@ -147,8 +147,8 @@ sub find_pairs {
 
 sub make_clusters {
     my ($config, $idx_file, $int_file, $hs_file) = @_;
-    require Transposome::Cluster;
-    require Transposome::SeqUtil;
+    
+    load_classes('Transposome::Cluster', 'Transposome::SeqUtil');
 
     my $cluster = Transposome::Cluster->new( file            => $int_file,
 					     dir             => $config->{output_directory},
@@ -172,7 +172,8 @@ sub make_clusters {
 
 sub annotate_clusters {
     my ($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = @_;
-    require Transposome::Annotation;
+    
+    load_classes('Transposome::Annotation');
 
     my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 						   dir       => $config->{output_directory},
@@ -202,10 +203,8 @@ sub annotate_clusters {
 
 sub log_interval {
     my ($t0, $log) = @_;
-    require DateTime;
-    require Time::HiRes;
-    require Lingua::EN::Inflect;
-    require POSIX;
+    
+    load_classes('DateTime', 'Time::HiRes', 'Lingua::EN::Inflect', 'POSIX');
 
     my $t1 = [Time::HiRes::gettimeofday()];
     my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
@@ -222,6 +221,22 @@ sub log_interval {
     
     my $fs = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("======== Transposome completed at: $fs. Elapsed time: $timestr. ========");
+}
+
+sub load_classes {
+    my @classes = @_;
+
+    for my $class (@classes) {
+        eval {
+            eval "require $class";
+            $class->import();
+            1;
+        } or do {
+            my $error = $@;
+            die "\nERROR: The module $class is required but it couldn't be loaded. ".
+                "Here is the exception: $error." if $error;
+        };
+    }
 }
 
 =head1 AUTHOR
