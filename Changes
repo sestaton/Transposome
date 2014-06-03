@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.3	6/03/2014	Athens, GA
+
+- Add method to evaluate if classes in main application can
+  be loaded.
+
 0.07.2	5/27/2014	Athens, GA
 
 - Complete redesign of main application for faster loading.
