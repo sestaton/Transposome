@@ -17,7 +17,7 @@ To use this package, you will need Perl version 5.12 (or greater) installed and 
 
 **INSTALLATION**
 
-The recommened method to satisfy the Perl dependencies is to install [cpanminus](http://search.cpan.org/~miyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm), and run the following command:
+The recommened method to satisfy the Perl dependencies is to install [cpanminus](https://metacpan.org/pod/App::cpanminus), and run the following command:
 
     cpanm git://github.com/sestaton/Transposome.git
 
