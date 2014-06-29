@@ -13,7 +13,7 @@ There is also a Perl API which allows you to build custom analysis pipelines, re
 
 **DEPENDENCIES**
 
-To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [Installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
+To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
 
 **INSTALLATION**
 
@@ -21,7 +21,7 @@ The recommened method to satisfy the Perl dependencies is to install [cpanminus]
 
     cpanm git://github.com/sestaton/Transposome.git
 
-If you run into any installation issues, it may be necessary to download the code and install manually (see the [Troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
+If you run into any installation issues, it may be necessary to download the code and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
 
     git clone https://github.com/sestaton/Transposome.git
     cd Transposome
