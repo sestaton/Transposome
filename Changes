@@ -1,6 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.4	8/15/2014	Vancouver, BC
+
+- Modify graph-naming scheme (doesn't impact performance).
+- Add DOI to make repo citable, until the manuscript is 
+  published.
+
 0.07.3	6/03/2014	Athens, GA
 
 - Add method to evaluate if classes in main application can

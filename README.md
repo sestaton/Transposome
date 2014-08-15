@@ -86,6 +86,10 @@ You can also look for information at:
     Transposome issue tracker
         https://github.com/sestaton/Transposome/issues
 
+**CITATION**
+
+Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families from unassembled sequence reads. doi:
+
 **LICENSE AND COPYRIGHT**
 
 Copyright (C) 2013-2014 S. Evan Staton
