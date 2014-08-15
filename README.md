@@ -9,11 +9,11 @@ Annotation of transposable element families from unassembled sequence reads
 
 Transposome is a command line application to annotate [transposable elements](http://en.wikipedia.org/wiki/Transposable_element) from paired-end whole genome shotgun data. There are many tools to estimate the mathematical nature of repeats from short sequence reads. There are also a number of tools for analyzing repeats directly from a genome assembly. This tool allows you to infer the abundance of repeat types in the genome without a reference genome sequence. The output files make it easy to quickly summarize genomic abundance by transposable element class, superfamily, family, or any other level of the repeat taxonomy.
 
-There is also a Perl API which allows you to build custom analysis pipelines, repeat stages of the analysis, or test a range of parameter values for each phase of Transposome (see the [Tutorial](https://github.com/sestaton/Transposome/wiki/Tutorial) page for more information).
+There is also a Perl API which allows you to build custom analysis pipelines, repeat stages of the analysis, or test a range of parameter values for each phase of Transposome (see the [API Tutorial](https://github.com/sestaton/Transposome/wiki/API-Tutorial) page for more information).
 
 **DEPENDENCIES**
 
-To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [Installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
+To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
 
 **INSTALLATION**
 
@@ -21,7 +21,7 @@ The recommened method to satisfy the Perl dependencies is to install [cpanminus]
 
     cpanm git://github.com/sestaton/Transposome.git
 
-If you run into any installation issues, it may be necessary to download the code and install manually (see the [Troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
+If you run into any installation issues, it may be necessary to download the code and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
 
     git clone https://github.com/sestaton/Transposome.git
     cd Transposome
