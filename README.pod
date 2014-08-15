@@ -4,7 +4,7 @@ Transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.04
+Version 0.07.4
 
 ### What is Transposome?
 
@@ -85,6 +85,12 @@ You can also look for information at:
 
     Transposome issue tracker
         https://github.com/sestaton/Transposome/issues
+
+=head1 CITATION
+
+A manuscript is in preparation, but for now please use the following citation:
+
+Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families from unassembled sequence reads. doi:10.55281
 
 =head1 LICENSE AND COPYRIGHT
 
