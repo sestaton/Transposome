@@ -88,6 +88,8 @@ You can also look for information at:
 
 **CITATION**
 
+A manuscript is in preparation, but for now please use the following citation:
+
 Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families from unassembled sequence reads. doi:
 
 **LICENSE AND COPYRIGHT**
