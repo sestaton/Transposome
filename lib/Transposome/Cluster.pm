@@ -25,11 +25,11 @@ Transposome::Cluster - Clustering and cluster analysis routines in Transposome.
 
 =head1 VERSION
 
-Version 0.07.3
+Version 0.07.4
 
 =cut
 
-our $VERSION = '0.07.3';
+our $VERSION = '0.07.4';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -139,7 +139,7 @@ method louvain_method {
 
     my @comm;
     for (my $i = 0; $i <= $levels-1; $i++) {
-        my $cls_graph_comm      = $cls_tree.".graph_node2comm_level_".$i; 
+        my $cls_graph_comm      = $cls_tree.".graph_comm_".$i; 
 	my $cls_graph_comm_path = File::Spec->catfile($self->dir, $cls_graph_comm);
 	
 	try {
