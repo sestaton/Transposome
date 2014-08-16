@@ -92,7 +92,7 @@ A manuscript is in preparation, but for now please use the following citation:
 [![DOI](https://zenodo.org/badge/5565/sestaton/Transposome.png)](http://dx.doi.org/10.5281/zenodo.11303)
 
     Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families
-         from unassembled sequence reads. doi:10.55281
+         from unassembled sequence reads. doi:10.5281/zenodo.11303
 
 **LICENSE AND COPYRIGHT**
 
