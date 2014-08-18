@@ -37,6 +37,8 @@ my ($t0, $log) = init_transposome($config);
 # perform the all vs. all blast
 #
 my $blastdb = run_blast($config);
+die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
+    unless -s $blastdb;
 
 #
 # parse mglblast results to find best scoring pairwise matches
