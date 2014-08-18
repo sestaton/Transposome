@@ -6,6 +6,7 @@ use Moose;
 use Method::Signatures;
 use Encode qw(encode decode);
 use BerkeleyDB;
+use Try::Tiny;
 use DBM::Deep;
 use File::Spec;
 use File::Basename;
@@ -66,6 +67,17 @@ has 'fraction_coverage' => (
     lazy      => 1,
     default   => 0.55,
 );
+
+method BUILD (@_) {
+    try {
+	die unless -s $self->file;
+    }
+    catch {
+        $self->log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.")
+	    if Log::Log4perl::initialized();
+	exit(1);
+    };
+}
 
 =head1 METHODS
 
