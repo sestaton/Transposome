@@ -6,6 +6,10 @@ Version	Date	Location
 - Modify graph-naming scheme (doesn't impact performance).
 - Add DOI to make repo citable, until the manuscript is 
   published.
+- Check if all vs. all blast was successful, otherwise
+  exit from application or check if input is empty when
+  constructing Transposome::Pairfinder object (so both
+  application and API methods should handle this case).
 
 0.07.3	6/03/2014	Athens, GA
 
