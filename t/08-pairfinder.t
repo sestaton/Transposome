@@ -16,7 +16,6 @@ use Test::Most tests => 505;
 my $outdir = 't/transposome_pairfinder_t';
 my $test = TestUtils->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
-#system("rm t/transposome_mgblast_*");
 unlink glob("t/transposome_mgblast_*");
 
 my $blast = $test->blast_constructor;
@@ -32,6 +31,7 @@ my $tmpbln = File::Temp->new(
 
 dies_ok { Transposome::Pairfinder->new( file => $tmpbln, dir => $outdir, in_memory => 1, percent_identity => 90, fraction_coverage => 0.55 ); }
   'Transpsome::Pairfinder dies as expected when given empty input file';
+
 unlink $tmpbln;
 
 ## test in-memory processing
@@ -105,7 +105,6 @@ is( $mem_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
 is( $mem_hs_recct, $mem_int_recct,
     'Index and integer mapping files contain the same records' );
 
-#system("rm -rf t/$outdir");
 remove_tree("t/$outdir");
 
 ## test on-file processing
@@ -187,7 +186,6 @@ is( $mem_hs_recct, $file_hs_recct,
 );
 
 END {
-    #system("rm -rf $outdir $blfl");
     remove_tree($outdir, $blfl);
 }
 
