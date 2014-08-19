@@ -17,11 +17,11 @@ Transposome::SeqUtil - Utilities for handling Fasta/q sequence files.
 
 =head1 VERSION
 
-Version 0.07.4
+Version 0.07.5
 
 =cut
 
-our $VERSION = '0.07.4';
+our $VERSION = '0.07.5';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
