@@ -177,7 +177,7 @@ method run_allvall_blast {
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
     
-    $outfile =~ s/\.fa.*//;
+    $outfile =~ s/\.f.*//;
     $outfile .= "_allvall_blast.bln";
     make_path($dir, {verbose => 0, mode => 0771,});
     my $out_path = Path::Class::File->new($dir, $outfile);
@@ -260,11 +260,15 @@ method _make_mgblastdb {
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
     my $formatdb = $self->get_formatdb_exec;
-    $fname =~ s/\.fa.*//;
+    $fname =~ s/\.f.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
+    my $is_fastq = $self->_is_fastq($file);
+
+    $file = $self->_make_fasta_from_fastq($file, $fname, $dir) if $is_fastq;
+   
     try {
         system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
     }
@@ -276,7 +280,71 @@ method _make_mgblastdb {
         exit(1);
     };
 
+    unlink $file if $is_fastq;
     return $db_path;
+}
+
+=head2 _is_fastq
+
+ Title : _is_fastq
+ 
+ Usage   : This is private method, do not use it directly.
+           
+ Function: Determine if the input is fasta or fastq in order
+           to know how to construct the database.
+
+                                                                   Return_type
+ Returns : In order, 1) boolean (1 - is fastq, 0 - is not fastq)   Scalar
+
+ Args    : In order, 1) the sequence file
+
+=cut 
+
+method _is_fastq ($file) {
+    require Transposome::SeqIO;
+
+    my $seqio = Transposome::SeqIO->new( file => $file );
+
+    my $seq = $seqio->next_seq;
+    if (defined $seq->get_qual) {
+	return 1;
+    }
+    else {
+	return 0;
+    }
+}
+
+=head2 _make_fasta_from_fastq
+
+ Title : _make_fasta_from_fastq
+ 
+ Usage   : This is private method, do not use it directly.
+           
+ Function: Creates a temporary fasta file for database construction
+           if the input is fastq, otherwise the original file is used.
+
+                                                                   Return_type
+ Returns : In order, 1) the fasta file of input sequences          Scalar
+
+ Args    : In order, 1) the sequence file, 
+                     2) the sequence name,
+                     3) the directory of the input
+
+=cut 
+
+method _make_fasta_from_fastq ($file, $fname, $dir) {
+    require Transposome::SeqIO;
+
+    my $seqio = Transposome::SeqIO->new( file => $file );
+    my $tmpfasta = $fname."_tmp.fasta";
+    my $fas_path = Path::Class::File->new($dir, $tmpfasta);
+    my $fasfh = $fas_path->open('w') or die "\n[ERROR]: Could not open file: $fas_path\n";
+
+    while (my $seq = $seqio->next_seq) {
+        say $fasfh join "\n", ">".$seq->get_id, $seq->get_seq;
+    }
+
+    return $fas_path;
 }
 
 =head2 _run_blast
