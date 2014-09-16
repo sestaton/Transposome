@@ -19,7 +19,7 @@ t/03-utils_blast.t
 t/04-seqio.t
 t/05-seqstore.t
 t/06-seqsample.t
-t/07-mgblast.t
+t/07-megablast.t
 t/08-pairfinder.t
 t/09-cluster.t
 t/10-annotation.t
