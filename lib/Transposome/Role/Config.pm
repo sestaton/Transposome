@@ -57,7 +57,7 @@ method parse_configuration ($yaml) {
     # clustering options from config
     $config{in_memory}         = $yaml->[0]->{clustering_options}->[0]->{in_memory};
     $config{percent_identity}  = $yaml->[0]->{clustering_options}->[1]->{percent_identity};
-    $config{fraction_coverage} = $yaml->[0]->{clustering_options}->[2]->{fraction_coverage};
+    $config{alignment_length}  = $yaml->[0]->{clustering_options}->[2]->{alignment_length};
     $config{merge_threshold}   = $yaml->[0]->{clustering_options}->[3]->{merge_threshold};
 
     # annotation options from config
