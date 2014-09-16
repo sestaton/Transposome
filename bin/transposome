@@ -140,7 +140,7 @@ sub find_pairs {
 						  dir               => $config->{output_directory},
 						  in_memory         => $config->{in_memory},
 						  percent_identity  => $config->{percent_identity},
-						  fraction_coverage => $config->{fraction_coverage} );
+						  alignment_length  => $config->{alignment_length} );
     
     my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
