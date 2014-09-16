@@ -15,13 +15,15 @@ use List::Util qw(sum max);
 use POSIX qw(strftime);
 use namespace::autoclean;
 
+use Data::Dump qw(dd);
+
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME
 
-Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
+Transposome::PairFinder - Parse megablast and find best scoring unique matches.
 
 =head1 VERSION
 
@@ -40,7 +42,7 @@ $VERSION = eval $VERSION;
                                                   dir               => 'transposome_out',
                                                   in_memory         => 1,
                                                   percent_identity  => 90.0,
-                                                  fraction_coverage => 0.55 );
+                                                  alignment_length  => 55 );
 
 =cut
 
@@ -60,12 +62,12 @@ has 'percent_identity' => (
     default   => 90.0,
 );
 
-has 'fraction_coverage' => (
+has 'alignment_length' => (
     is        => 'ro',
     isa       => 'Num',
-    predicate => 'has_percent_coverage',
+    predicate => 'has_alignment_length',
     lazy      => 1,
-    default   => 0.55,
+    default   => 55,
 );
 
 method BUILD (@_) {
@@ -128,234 +130,124 @@ method parse_blast {
     $self->log->info("======== Transposome::PairFinder::parse_blast started at: $st.")
         if Log::Log4perl::initialized();
 
-    if ($self->in_memory) {
-	my %match_pairs;
-	my %match_index;
+    my %match_pairs;
+    my %match_index;
+    my $dbm = "mgblast_matchpairs.dbm";
+    my $dbi = "mgblast_matchindex.dbm";
 
-	while (<$fh>) {
-	    chomp;
-	    $self->_validate_format($_);
-	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
-		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
-	    
-	    my $pair            = $self->mk_key($q_name, $s_name);
-	    my $revpair         = $self->mk_key($s_name, $q_name);
-	    my $subj_hit_length = ($s_end - $s_start) + 1;
-	    my $subj_cov        = $subj_hit_length/$s_len;
+    unless ($self->in_memory) {
+        unlink $dbm if -e $dbm;
+        unlink $dbi if -e $dbi;
 
-	    if ($q_start > $q_end) {
-		$total_hits++;
-		my $neg_query_hit_length = ($q_start - $q_end) + 1;
-		my $neg_query_cov        = $neg_query_hit_length/$q_len;
-
-		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
-		    if (exists $match_pairs{$pair}) {
-			push @{$match_pairs{$pair}}, $score;
-		    }
-		    elsif (exists $match_pairs{$revpair}) {
-			push @{$match_pairs{$revpair}}, $score;
-		    }
-		    else {
-			$match_pairs{$pair}   = [$score];
-			$match_index{$q_name} = $index unless exists $match_index{$q_name};
-			$index++;
-			$match_index{$s_name} = $index unless exists $match_index{$s_name};
-			$index++;
-		    }
-		}
-	    }
-	    else {
-		$total_hits++;
-                my $pos_query_hit_length = ($q_end - $q_start) + 1;
-                my $pos_query_cov        = $pos_query_hit_length/$q_len;
-
-                if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
-                    if (exists $match_pairs{$pair}) {
-                        push @{$match_pairs{$pair}}, $score;
-                    }
-                    elsif (exists $match_pairs{$revpair}) {
-                        push @{$match_pairs{$revpair}}, $score;
-                    }
-                    else {
-                        $match_pairs{$pair}   = [$score];
-                        $match_index{$q_name} = $index unless exists $match_index{$q_name};
-                        $index++;
-                        $match_index{$s_name} = $index unless exists $match_index{$s_name};
-                        $index++;
-                    }
-                }
-            }
-        }
-        close $fh;
-
-	open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
-
-        for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
-            say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
-        }
-        close $idx;
-
-	open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
-	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
-
-        while (my ($match, $scores) = each %match_pairs) {
-            my $match_score = max(@$scores);
-            my ($qry, $sbj) = $self->mk_vec($match);
-            my $revmatch = $self->mk_key($sbj, $qry);
-            if (exists $match_pairs{$revmatch}) {
-                my $rev_match_score = max(@{$match_pairs{$revmatch}});
-                if ($rev_match_score > $match_score) {
-                    if (exists $match_index{$sbj} && exists $match_index{$qry}) {
-			say $hs join "\t", $sbj, $qry, $rev_match_score;
-                        say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-                        delete $match_pairs{$match};
-                    }
-                }
-                else {
-                    delete $match_pairs{$revmatch};
-                }
-	    }
-	    else {
-		if (exists $match_index{$qry} && exists $match_index{$sbj}) {
-		    say $hs join "\t", $qry, $sbj, $match_score;
-		    say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
-		}
-	    }
-	}
-	close $int;
-	close $hs;
-
-	# log results
-	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
-	    if Log::Log4perl::initialized();
-	$self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
-            if Log::Log4perl::initialized();
-
-	return ($idx_path, $int_path, $hs_path);
-    }
-    else {
-	my $dbm = "mgblast_matchpairs.dbm";
-	my $dbi = "mgblast_matchindex.dbm";
-	
-	unlink $dbm if -e $dbm;
-	unlink $dbi if -e $dbi;
-	
-	my $db = DBM::Deep->new( file      => $dbm,
-			         locking   => 1,
-				 autoflush => 1,
-				 type      => DBM::Deep::TYPE_HASH );
-
-	my %match_index;
-
+	tie %match_pairs, 'DBM::Deep', { file => $dbm, locking => 1, autoflush => 0, type => DBM::Deep::TYPE_HASH };
 	tie %match_index, 'BerkeleyDB::Btree', -Filename => $dbi, -Flags => DB_CREATE
-            or die "\n[ERROR]: Could not open DBM file: $dbi: $! $BerkeleyDB::Error\n";
+	    or die "\n[ERROR]: Could not open DBM file: $dbi: $! $BerkeleyDB::Error\n";
+    }
 
-	while (<$fh>) {
-	    chomp;
-	    my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
-		$s_start, $s_end, $pid, $score, $e_val, $strand) = split;
-
-	    my $pair            = $self->mk_key($q_name, $s_name);
-	    my $revpair         = $self->mk_key($s_name, $q_name);
-	    my $subj_hit_length = ($s_end - $s_start) + 1;
-	    my $subj_cov        = $subj_hit_length/$s_len;
-
-	    if ($q_start > $q_end) {
-		$total_hits++;
-		my $neg_query_hit_length = ($q_start - $q_end) + 1;
-		my $neg_query_cov        = $neg_query_hit_length/$q_len;
-
-		if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
-		    if (exists $db->{$pair}) {
-			push @{$db->{$pair}}, $score;
-		    }
-		    elsif (exists $db->{$revpair}) {
-			push @{$db->{$revpair}}, $score;
-		    }
-		    else {
-			$db->{$pair}          = [$score];
-			$match_index{$q_name} = $index unless exists $match_index{$q_name};
-			$index++;
-			$match_index{$s_name} = $index unless exists $match_index{$s_name};
-			$index++;
-		    }
+    while (<$fh>) {
+	chomp;
+	next if /^#/;
+	$self->_validate_format($_);
+	my ($q_name, $s_name, $pid, $aln_len, $mistmatch, $gaps, $q_start, $q_end,
+	    $s_start, $s_end, $e_val, $score) = split;
+	
+	my $pair            = $self->mk_key($q_name, $s_name);
+	my $revpair         = $self->mk_key($s_name, $q_name);
+	my $subj_hit_length = ($s_end - $s_start) + 1;
+	
+	if ($q_start > $q_end) {
+	    $total_hits++;
+	    my $neg_query_hit_length = ($q_start - $q_end) + 1;
+	    
+	    if ( ($neg_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+		if (exists $match_pairs{$pair}) {
+		    push @{$match_pairs{$pair}}, $score;
 		}
-	    }
-	    else {
-		$total_hits++;
-		my $pos_query_hit_length = ($q_end - $q_start) + 1;
-		my $pos_query_cov        = $pos_query_hit_length/$q_len;
-
-		if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
-		    if (exists $db->{$pair}) {
-			push @{$db->{$pair}}, $score;
+		elsif (exists $match_pairs{$revpair}) {
+		    push @{$match_pairs{$revpair}}, $score;
 		    }
-		    elsif (exists $db->{$revpair}) {
-			push @{$db->{$revpair}}, $score;
-		    }
-		    else {
-			$db->{$pair}          = [$score];
-			$match_index{$q_name} = $index unless exists $match_index{$q_name};
-			$index++;
-			$match_index{$s_name} = $index unless exists $match_index{$s_name};
-			$index++;
-		    }
+		else {
+		    $match_pairs{$pair}   = [$score];
+		    $match_index{$q_name} = $index unless exists $match_index{$q_name};
+		    $index++;
+		    $match_index{$s_name} = $index unless exists $match_index{$s_name};
+		    $index++;
 		}
 	    }
 	}
-	close $fh;
-
-	open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
-
-	for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
-	    say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
-	}
-	close $idx;
- 
-	open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
-	open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";	
-
-	while (my ($match, $scores) = each %$db) {
-	    my $match_score = max(@$scores);
-	    my ($qry, $sbj) = $self->mk_vec($match);
-	    my $revmatch    = $self->mk_key($sbj, $qry);
-	    if (exists $db->{$revmatch}) {
-		my $rev_match_score = max(@{$db->{$revmatch}});
-		if ($rev_match_score > $match_score) {
-		    if (exists $match_index{$sbj} && exists $match_index{$qry}) {
-			say $hs join "\t", $sbj, $qry, $rev_match_score;
-			say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-			delete $db->{$match};
-		    }
+	else {
+	    $total_hits++;
+	    my $pos_query_hit_length = ($q_end - $q_start) + 1;
+	    
+	    if ( ($pos_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+		if (exists $match_pairs{$pair}) {
+		    push @{$match_pairs{$pair}}, $score;
+		}
+		elsif (exists $match_pairs{$revpair}) {
+		    push @{$match_pairs{$revpair}}, $score;
 		}
 		else {
-		    delete $db->{$revmatch};
-		}
-	    }
-	    else {
-		if (exists $match_index{$qry} && exists $match_index{$sbj}) {
-		    say $hs join "\t", $qry, $sbj, $match_score;
-		    say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
+		    $match_pairs{$pair}   = [$score];
+		    $match_index{$q_name} = $index unless exists $match_index{$q_name};
+		    $index++;
+		    $match_index{$s_name} = $index unless exists $match_index{$s_name};
+		    $index++;
 		}
 	    }
 	}
-	close $int;
-	close $hs;
-
-	untie %match_index;
-	unlink $dbi;
-	unlink $dbm;
-
-	# log results
-	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
-	    if Log::Log4perl::initialized();
-	$self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
-	    if Log::Log4perl::initialized();
-
-	return ($idx_path, $int_path, $hs_path);
     }
+    close $fh;
+
+    open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
+    
+    for my $idx_mem (sort { $match_index{$a} <=> $match_index{$b} } keys %match_index) {
+	say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
+    }
+    close $idx;
+
+    open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+    open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
+    
+    while (my ($match, $scores) = each %match_pairs) {
+	my $match_score = max(@$scores);
+	my ($qry, $sbj) = $self->mk_vec($match);
+	my $revmatch = $self->mk_key($sbj, $qry);
+	if (exists $match_pairs{$revmatch}) {
+	    my $rev_match_score = max(@{$match_pairs{$revmatch}});
+	    if ($rev_match_score > $match_score) {
+		if (exists $match_index{$sbj} && exists $match_index{$qry}) {
+		    say $hs join "\t", $sbj, $qry, $rev_match_score;
+		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
+		    delete $match_pairs{$match} if $self->in_memory;
+		}
+	    }
+	    else {
+		delete $match_pairs{$revmatch} if $self->in_memory;
+	    }
+	}
+	else {
+	    if (exists $match_index{$qry} && exists $match_index{$sbj}) {
+		say $hs join "\t", $qry, $sbj, $match_score;
+		say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
+	    }
+	}
+    }
+    close $int;
+    close $hs;
+
+    untie %match_index unless $self->in_memory;
+    untie %match_pairs unless $self->in_memory;
+    unlink $dbi if -e $dbi;
+    unlink $dbm if -e $dbm;
+
+    # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
+    $self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
+	if Log::Log4perl::initialized();
+    $self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
+	if Log::Log4perl::initialized();
+
+    return ($idx_path, $int_path, $hs_path);
 }
 
 =head2 _validate_format
