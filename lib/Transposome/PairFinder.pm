@@ -20,7 +20,7 @@ with 'MooseX::Log::Log4perl',
 
 =head1 NAME
 
-Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
+Transposome::PairFinder - Parse megablast and find best scoring unique matches.
 
 =head1 VERSION
 
@@ -39,7 +39,7 @@ $VERSION = eval $VERSION;
                                                   dir               => 'transposome_out',
                                                   in_memory         => 1,
                                                   percent_identity  => 90.0,
-                                                  fraction_coverage => 0.55 );
+                                                  alignment_length  => 55 );
 
 =cut
 
@@ -59,12 +59,12 @@ has 'percent_identity' => (
     default   => 90.0,
 );
 
-has 'fraction_coverage' => (
+has 'alignment_length' => (
     is        => 'ro',
     isa       => 'Num',
-    predicate => 'has_percent_coverage',
+    predicate => 'has_alignment_length',
     lazy      => 1,
-    default   => 0.55,
+    default   => 55,
 );
 
 method BUILD (@_) {
@@ -126,7 +126,7 @@ method parse_blast {
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::PairFinder::parse_blast started at: $st.")
         if Log::Log4perl::initialized();
-    
+
     my %match_pairs;
     my %match_index;
     my $dbm = "mgblast_matchpairs.dbm";
@@ -247,19 +247,19 @@ method parse_blast {
     }
     close $int;
     close $hs;
-    
+
     untie %match_index unless $self->in_memory;
     untie %match_pairs unless $self->in_memory;
     unlink $dbi if -e $dbi;
     unlink $dbm if -e $dbm;
-    
+
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
 	if Log::Log4perl::initialized();
     $self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
 	if Log::Log4perl::initialized();
-    
+
     return ($idx_path, $int_path, $hs_path);
 }
 
