@@ -112,7 +112,7 @@ method _build_config_data {
     say $tmpyml "clustering_options:";
     say $tmpyml "  - in_memory:         1";
     say $tmpyml "  - percent_identity:  90";
-    say $tmpyml "  - fraction_coverage: 0.55";
+    say $tmpyml "  - alignment_length:  55";
     say $tmpyml "  - merge_threshold:   2";
     say $tmpyml "annotation_input:";
     say $tmpyml "  - repeat_database:  $repeat_db";
