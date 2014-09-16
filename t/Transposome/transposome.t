@@ -52,8 +52,8 @@ ok(
     'Can set percent identity for configuration'
 );
 ok(
-    defined( $config->{fraction_coverage} ),
-    'Can set fraction coverage for configuration'
+    defined( $config->{alignment_length} ),
+    'Can set alignment length for configuration'
 );
 ok(
     defined( $config->{merge_threshold} ),
@@ -61,7 +61,7 @@ ok(
 );
 is( $config->{percent_identity}, 90, 
     'Can correctly set percent identity for analysis' );
-is( $config->{fraction_coverage}, 0.55, 
+is( $config->{alignment_length}, 55, 
     'Can correctly set fraction coverage for analysis' );
 is( $config->{merge_threshold}, 2, 
     'Can correctly set merge threshold for analysis' );
@@ -113,6 +113,7 @@ my $blast = Transposome::Run::Blast->new(
 );
 
 my $blastdb = $blast->run_allvall_blast;
+say "DEBUG: blastdb is: $blastdb";
 ok( defined($blastdb), 'Can run all vs. all blast correctly' );
 
 my $blast_res = Transposome::PairFinder->new(
@@ -120,7 +121,7 @@ my $blast_res = Transposome::PairFinder->new(
     dir               => $config->{output_directory},
     in_memory         => $config->{in_memory},
     percent_identity  => $config->{percent_identity},
-    fraction_coverage => $config->{fraction_coverage}
+    alignment_length  => $config->{alignment_length}
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -170,7 +171,7 @@ my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
 
 ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 48, 'The expected number of reads went into clusters' );
+is( $cls_tot, 61, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new(
     database => $config->{repeat_database},
@@ -189,7 +190,7 @@ my ( $anno_rp_path,
      $superfams )
      = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
-is( $total_readct, 48,       'Correct number of reads annotated' );
+is( $total_readct, 61,       'Correct number of reads annotated' );
 is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
 
 ok( ref($blasts) eq 'ARRAY',

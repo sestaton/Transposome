@@ -32,7 +32,7 @@ my $blast_res = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
-    fraction_coverage => 0.55
+    alignment_length  => 55
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -73,7 +73,7 @@ my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
 
 ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 46, 'The expected number of reads went into clusters' );
+is( $cls_tot, 59, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new(
     database => $db_fas,
@@ -102,10 +102,10 @@ ok(
 );
 
 ok(
-    $annotation->has_makeblastdb_exec,
+    $annotation->has_formatdb_exec,
     'Can make blast database for annotation'
 );
-ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
+ok( $annotation->has_blastall_exec, 'Can perform blastn for annotation' );
 
 my ( $anno_rp_path, 
      $anno_sum_rep_path, 
@@ -118,7 +118,7 @@ my ( $anno_rp_path,
 
 like( $total_readct, qr/\d+/,
     'Returned the expected type for the total number of reads clustered' );
-is( $total_readct, 46,       'Correct number of reads annotated' );
+is( $total_readct, 59,       'Correct number of reads annotated' );
 is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
 ok( ref($blasts) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
