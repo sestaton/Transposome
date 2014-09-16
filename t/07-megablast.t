@@ -60,7 +60,7 @@ sub mgblast_fasta {
 
     remove_tree("t/test_transposome_cli_out");
     unlink glob("t/transposome_config*");
-    unlink glob("t/transposome_mgblast*");
+    unlink glob("t/transposome_allvall_megablast*");
     unlink "t/$config->{run_log_file}";
     unlink "t_log.txt";
     unlink "formatdb.log";
@@ -106,7 +106,7 @@ sub mgblast_fastq {
 
     remove_tree("t/test_transposome_cli_out");
     unlink glob("t/transposome_config*");
-    unlink glob("t/transposome_mgblast*");
+    unlink glob("t/transposome_allvall_megablast*");
     unlink "t/$config->{run_log_file}";
     unlink "t_log.txt";
     unlink "formatdb.log";
