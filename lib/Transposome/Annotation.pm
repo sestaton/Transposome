@@ -87,49 +87,49 @@ has 'report' => (
       coerce   => 1,
 );
 
-has 'blastn_exec' => (
+has 'blastall_exec' => (
     is        => 'rw',
     isa       => 'Str',
-    reader    => 'get_blastn_exec',
-    writer    => 'set_blastn_exec',
-    predicate => 'has_blastn_exec',
+    reader    => 'get_blastall_exec',
+    writer    => 'set_blastall_exec',
+    predicate => 'has_blastall_exec',
 );
 
-has 'makeblastdb_exec' => (
+has 'formatdb_exec' => (
     is        => 'rw',
     isa       => 'Str',
-    reader    => 'get_makeblastdb_exec',
-    writer    => 'set_makeblastdb_exec',
-    predicate => 'has_makeblastdb_exec',
+    reader    => 'get_formatdb_exec',
+    writer    => 'set_formatdb_exec',
+    predicate => 'has_formatdb_exec',
 );
 
 method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-	my $bl = File::Spec->catfile($p, 'blastn');
-	my $mb = File::Spec->catfile($p, 'makeblastdb');
+	my $bl = File::Spec->catfile($p, 'blastall');
+	my $mb = File::Spec->catfile($p, 'formatdb');
 
         if (-e $bl && -x $bl && -e $mb && -x $mb) {
-            $self->set_blastn_exec($bl);
-            $self->set_makeblastdb_exec($mb);
+            $self->set_blastall_exec($bl);
+            $self->set_formatdb_exec($mb);
         }
     }
 
     try {
-        die unless $self->has_makeblastdb_exec;
+        die unless $self->has_formatdb_exec;
     }
     catch {
-        $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.") 
+        $self->log->error("Unable to find formatdb. Check you PATH to see that it is installed. Exiting.") 
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
 
     try {
-        die unless $self->has_blastn_exec;
+        die unless $self->has_blastall_exec;
     }
     catch {
-        $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.")
+        $self->log->error("Unable to find blastall. Check you PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -171,7 +171,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my $database = $self->database->absolute;
     my $db_path  = $self->_make_blastdb($database);
     my $out_dir  = $self->dir->relative;
-    my $blastn   = $self->get_blastn_exec;
+    my $blastall = $self->get_blastall_exec;
 
     # cluster report path
     my $report   = $self->file->relative;
@@ -240,7 +240,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 						      $thread_range, 
 						      $db_path, 
 						      $out_dir, 
-						      $blastn);
+						      $blastall);
 
     my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
     my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
@@ -256,7 +256,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
         $blast_res .= "_blast_$evalue.tsv";
 	my $blast_file_path = Path::Class::File->new($out_path, $blast_res);
 
-        my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
+        my @blastcmd = "$blastall -p blastn -F F -i $query -e $evalue -d $db_path -m 8 -a $thread_range | ".
                        "sort -k1,1 -u | ".                       # count each read in the report only once
 		       "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
@@ -441,7 +441,7 @@ method _annotate_singletons ($repeats,
 			     $thread_range, 
 			     $db_path, 
 			     $out_dir, 
-			     $blastn) {
+			     $blastall) {
 
     my $top_hit_superfam = {};
     my $hit_superfam     = {};
@@ -457,9 +457,18 @@ method _annotate_singletons ($repeats,
     my $singles_rep_sum     = $rpname."_singletons_annotations_summary.tsv";
     my $singles_rp_sum_path = Path::Class::File->new($out_dir, $singles_rep_sum);
 
-    my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
-                   "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
-                   "sort -k1,1 -u > $singles_rp_path";
+    my @blastcmd = "$blastall -p blastn ".
+	           "-F F ".
+		   "-i $singletons_file_path ".
+		   "-e $evalue ".
+		   "-d $db_path ".
+                   "-m 8 ".
+		   "-a $thread_range ".
+		   "-K 1 | sort -k1,1 -u > $singles_rp_path";
+
+    #my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
+    #               "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
+    #               "sort -k1,1 -u > $singles_rp_path";
 
     my $exit_code;
     try {
@@ -535,7 +544,7 @@ method _annotate_singletons ($repeats,
 =cut 
 
 method _make_blastdb (Path::Class::File $db_fas) {
-    my $makeblastdb = $self->get_makeblastdb_exec;
+    my $formatdb = $self->get_formatdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
 
     my $db = $dbname."_blastdb";
@@ -543,14 +552,14 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	system([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")
 	    if Log::Log4perl::initialized();
 	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.")
 	    if Log::Log4perl::initialized();
-        $self->log->error("These cause problems with BLAST+. Exiting.")
+        $self->log->error("These cause problems with BLAST. Exiting.")
             if Log::Log4perl::initialized();
 	exit(1);
     };
