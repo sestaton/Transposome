@@ -144,20 +144,21 @@ method parse_blast {
     
     while (<$fh>) {
 	chomp;
-	next if /^#/;
 	$self->_validate_format($_);
-	my ($q_name, $s_name, $pid, $aln_len, $mistmatch, $gaps, $q_start, $q_end,
-	    $s_start, $s_end, $e_val, $score) = split;
+	my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
+	    $s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 	
 	my $pair            = $self->mk_key($q_name, $s_name);
 	my $revpair         = $self->mk_key($s_name, $q_name);
 	my $subj_hit_length = ($s_end - $s_start) + 1;
-	
+	my $subj_cov        = $subj_hit_length/$s_len;
+
 	if ($q_start > $q_end) {
 	    $total_hits++;
 	    my $neg_query_hit_length = ($q_start - $q_end) + 1;
-	    
-	    if ( ($neg_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+	    my $neg_query_cov        = $neg_query_hit_length/$q_len;
+
+	    if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
 		    push @{$match_pairs{$pair}}, $score;
 		}
@@ -176,8 +177,9 @@ method parse_blast {
 	else {
 	    $total_hits++;
 	    my $pos_query_hit_length = ($q_end - $q_start) + 1;
-	    
-	    if ( ($pos_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+	    my $pos_query_cov        = $pos_query_hit_length/$q_len;
+
+	    if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
 		    push @{$match_pairs{$pair}}, $score;
 		}
@@ -216,11 +218,11 @@ method parse_blast {
 		if (exists $match_index{$sbj} && exists $match_index{$qry}) {
 		    say $hs join "\t", $sbj, $qry, $rev_match_score;
 		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-		    delete $match_pairs{$match} if $self->in_memory;
+		    delete $match_pairs{$match}; # if $self->in_memory;
 		}
 	    }
 	    else {
-		delete $match_pairs{$revmatch} if $self->in_memory;
+		delete $match_pairs{$revmatch}; # if $self->in_memory;
 	    }
 	}
 	else {
