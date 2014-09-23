@@ -14,6 +14,7 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string>
