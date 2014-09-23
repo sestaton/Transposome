@@ -77,7 +77,7 @@ has 'percent_identity' => (
     isa       => 'Num',
     predicate => 'has_percent_identity',
     lazy      => 1,
-    default   => 85.0,
+    default   => 90.0,
 );
 
 has 'min_overlap' => (
@@ -388,8 +388,10 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
                     "-D 3 ".               # one-line output
                     "-m 8 ".               # tab-delimited ouput
                     "-V T ".
-#                    "-p $pid ".            # min percent identity of match 
-                    "-W 18 ".               # word size
+		    "-q -5 ".              # NEW: the penalty for a mismatch
+		    "-G -5 ".              # NEW: the cost to open a gap
+                    "-p $pid ".            # min percent identity of match 
+                    "-W 32 ".               # word size
                     "-U T ".                # use lowercase filtering
                     "-X 40 ".               # Xdrop for gapped alignment                             
 #                    "-KT ".                # database slice
