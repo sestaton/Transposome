@@ -1,13 +1,19 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.7	9/25/2014	Vancouver, BC
+
+- Update deps to include stable version of MooseX-Getopt-Usage
+  on CPAN.
+
 0.07.6	9/23/2014	Vancouver, BC
 
 - Add tied hash indexing method to Pairfinder class. This allowed
   the code to be reduced by almost half as compared to using a tied
   object for indexing.
-- Add developmental release of MooseX-GetOpt-Usage which fixes a 
-  bug for Moose 2.014.
+- Add developmental release of MooseX-Getopt-Usage which fixes a 
+  bug for Moose 2.014 (because this fix involves some trickery requiring
+  cpanm, no release will be made for this version).
 - Add import for main_community.cpp file that will allow compilation on
   Debian machines without editing the code.
 
