@@ -11,11 +11,11 @@ Transposome::Types - Types used by Transposome. Not meant to be used directly.
 
 =head1 VERSION
 
-Version 0.07.6
+Version 0.07.7
 
 =cut
 
-our $VERSION = '0.07.6';
+our $VERSION = '0.07.7';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
