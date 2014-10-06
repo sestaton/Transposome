@@ -388,6 +388,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
                     "-D 3 ".               # one-line output
                     "-m 8 ".               # tab-delimited ouput
                     "-V T ".
+                    "-e 1e-20 ".             # NEW: set the evalue threshold higher
 		    "-q -5 ".              # NEW: the penalty for a mismatch
 		    "-G -5 ".              # NEW: the cost to open a gap
                     "-p $pid ".            # min percent identity of match 
