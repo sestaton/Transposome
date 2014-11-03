@@ -1,6 +1,6 @@
 package Transposome::Role::Types;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;

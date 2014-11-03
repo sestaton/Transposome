@@ -1,6 +1,6 @@
 package Transposome::SeqUtil;
 
-use 5.012;
+use 5.010;
 use Moose;
 use Method::Signatures;
 use BerkeleyDB;

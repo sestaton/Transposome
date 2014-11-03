@@ -1,6 +1,6 @@
 package Transposome::Annotation;
 
-use 5.012;
+use 5.010;
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
 use Method::Signatures;

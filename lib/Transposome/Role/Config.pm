@@ -1,6 +1,6 @@
 package Transposome::Role::Config;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use Method::Signatures;
 

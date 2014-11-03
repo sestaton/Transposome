@@ -1,6 +1,6 @@
 package Transposome::Annotation::Typemap;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use Method::Signatures;
 use Storable qw(freeze);

@@ -1,6 +1,6 @@
 package Transposome::Cluster;
 
-use 5.012;
+use 5.010;
 use Moose;
 use MooseX::Types::Moose qw(HashRef);
 use Method::Signatures;
