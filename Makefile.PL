@@ -1,4 +1,4 @@
-use 5.012;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -35,7 +35,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Transposome.pm',
     LICENSE          => 'MIT',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.012,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 6.5503,
     },
@@ -56,7 +56,7 @@ WriteMakefile(
 	'BerkeleyDB'                       => 0.54,
 	'Module::Path'                     => 0.09,
 	'Path::Class'                      => 0.32,
-	'YAML'                             => 0.84,
+	'YAML::Tiny'                       => 1.62,
 	'Parallel::ForkManager'            => 0.7,
 	'Log::Log4perl'                    => 1.40,
 	'DateTime'                         => 1.03,
