@@ -9,7 +9,7 @@ perl:
 before_install: 
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y csh xorg-dev openbox lesstif2-dev libdb-dev libdb++-dev ncbi-blast+
-  - ./build/ci/run_build.sh
+  - ./build/ci/run_build.sh 2>&1 > /dev/null
 
 script: ./build/ci/run_tests.sh
 
