@@ -1,6 +1,14 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.8	11/05/2014	Vancouver, BC
+
+- Remove use of BerkeleyDB for indexing methods and use SQLite
+  instead. This makes installation easier as the BerkeleyDB module
+  required C libraries installed at the system level.
+- Fix dependencies listed in Makefile (YAML was listed, though it is
+  no longer used).
+
 0.07.7	9/25/2014	Vancouver, BC
 
 - Update deps to include stable version of MooseX-Getopt-Usage
