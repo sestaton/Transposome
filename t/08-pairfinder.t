@@ -5,6 +5,7 @@ use strict;
 use warnings;
 #use Data::Dump qw(dd); # for debugging, not required
 use autodie qw(open);
+use File::Spec;
 use File::Temp;
 use File::Path qw(remove_tree);
 use lib qw(../blib/lib t/lib);
@@ -13,8 +14,10 @@ use TestUtils;
 
 use Test::Most tests => 505;
 
-my $outdir = 't/transposome_pairfinder_t';
-my $test = TestUtils->new( build_proper => 1, destroy => 0 );
+my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');
+my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+#my $index  = "mgblast_matchindex.dbm";
+#my $pairs  = "mgblast_matchpairs.dbm";
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 unlink glob("t/transposome_mgblast_*");
 
@@ -29,8 +32,12 @@ my $tmpbln = File::Temp->new(
                              UNLINK   => 0
                              );
 
-dies_ok { Transposome::Pairfinder->new( file => $tmpbln, dir => $outdir, in_memory => 1, percent_identity => 90, fraction_coverage => 0.55 ); }
-  'Transpsome::Pairfinder dies as expected when given empty input file';
+dies_ok { Transposome::Pairfinder->new( file              => $tmpbln, 
+					dir               => $outdir, 
+					in_memory         => 1, 
+					percent_identity  => 90, 
+					fraction_coverage => 0.55 ); } 
+'Transpsome::Pairfinder dies as expected when given empty input file';
 
 unlink $tmpbln;
 
@@ -105,7 +112,8 @@ is( $mem_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
 is( $mem_hs_recct, $mem_int_recct,
     'Index and integer mapping files contain the same records' );
 
-remove_tree("t/$outdir");
+my $test_dir = File::Spec->catdir('t', $outdir);
+remove_tree($test_dir);
 
 ## test on-file processing
 my $file_test = Transposome::PairFinder->new(
@@ -188,5 +196,8 @@ is( $mem_hs_recct, $file_hs_recct,
 END {
     remove_tree($outdir, $blfl);
 }
+
+#unlink $index;
+#unlink $pairs;
 
 done_testing();
