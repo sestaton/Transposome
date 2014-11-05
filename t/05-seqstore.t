@@ -10,8 +10,8 @@ use Transposome::SeqIO;
 
 use Test::More tests => 48;
 
-my $test = TestUtils->new( build_proper => 1, destroy => 0 );
-
+my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+my $dbmf   = "transposome_seqstore.dbm";
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;
 
@@ -42,7 +42,6 @@ for my $fa (@$fa_arr) {
                 is( $seqct, $idct,
                     'The same number of Fasta sequences were read and stored on file'
                 );
-                system("rm transposome_seqstore.dbm");
             }
         }
     }
@@ -76,11 +75,12 @@ for my $fq (@$fq_arr) {
                 is( $seqct, $idct,
                     'The same number of Fastq sequences were read and stored on file'
                 );
-                system("rm transposome_seqstore.dbm");
             }
         }
     }
     unlink $fq;
 }
+
+unlink $dbmf;
 
 done_testing();
