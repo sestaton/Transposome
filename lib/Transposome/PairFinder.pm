@@ -1,11 +1,10 @@
 package Transposome::PairFinder;
 
 use 5.012;
-use utf8;
 use Moose;
 use Method::Signatures;
-use Encode qw(encode decode);
-use BerkeleyDB;
+use DBI;
+use Tie::Hash::DBD;
 use Try::Tiny;
 use DBM::Deep;
 use File::Spec;
@@ -137,9 +136,23 @@ method parse_blast {
 	unlink $dbm if -e $dbm;
 	unlink $dbi if -e $dbi;
 	
-	tie %match_pairs, 'DBM::Deep', { file => $dbm, locking => 1, autoflush => 0, type => DBM::Deep::TYPE_HASH };
-	tie %match_index, 'BerkeleyDB::Btree', -Filename => $dbi, -Flags => DB_CREATE
-	    or die "\n[ERROR]: Could not open DBM file: $dbi: $! $BerkeleyDB::Error\n";
+	tie %match_pairs, 'DBM::Deep', { 
+	    file      => $dbm, 
+	    locking   => 1, 
+	    autoflush => 0, 
+	    type      => DBM::Deep::TYPE_HASH 
+	};
+
+	my $dsn  = "dbi:SQLite:dbname=$dbi";
+        my $user = "";
+        my $pass = "";
+
+	tie %match_index, "Tie::Hash::DBD", $dsn, {
+	    PrintError       => 0, 
+	    RaiseError       => 1,
+	    AutoCommit       => 1,
+	    FetchHashKeyName => 'NAME_lc'
+	};
     }
     
     while (<$fh>) {
@@ -207,22 +220,22 @@ method parse_blast {
 
     open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
     open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
-    
+
     while (my ($match, $scores) = each %match_pairs) {
 	my $match_score = max(@$scores);
 	my ($qry, $sbj) = $self->mk_vec($match);
-	my $revmatch = $self->mk_key($sbj, $qry);
+	my $revmatch    = $self->mk_key($sbj, $qry);
 	if (exists $match_pairs{$revmatch}) {
 	    my $rev_match_score = max(@{$match_pairs{$revmatch}});
 	    if ($rev_match_score > $match_score) {
 		if (exists $match_index{$sbj} && exists $match_index{$qry}) {
 		    say $hs join "\t", $sbj, $qry, $rev_match_score;
 		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-		    delete $match_pairs{$match}; # if $self->in_memory;
+		    delete $match_pairs{$match};
 		}
 	    }
 	    else {
-		delete $match_pairs{$revmatch}; # if $self->in_memory;
+		delete $match_pairs{$revmatch};
 	    }
 	}
 	else {
