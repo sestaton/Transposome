@@ -3,7 +3,8 @@ package Transposome::SeqUtil;
 use 5.012;
 use Moose;
 use Method::Signatures;
-use BerkeleyDB;
+use DBI;
+use Tie::Hash::DBD;
 use Transposome::SeqIO;
 use namespace::autoclean;
 
@@ -104,12 +105,22 @@ Returns : In order, 1) a hash containing the id, sequence      HashRef
 
 method store_seq {
     my %seqhash;
+    my $dbh;
 
     unless ($self->in_memory) {
         my $seq_dbm = "transposome_seqstore.dbm";
         unlink $seq_dbm if -e $seq_dbm;
-        tie %seqhash, 'BerkeleyDB::Btree', -Filename => $seq_dbm, -Flags => DB_CREATE
-            or die "\n[ERROR]: Could not open DBM file: $seq_dbm: $! $BerkeleyDB::Error\n";
+
+	my $dsn  = "dbi:SQLite:dbname=$seq_dbm";
+        my $user = "";
+        my $pass = "";
+
+	tie %seqhash, "Tie::Hash::DBD", $dsn, {
+	    PrintError       => 0, 
+	    RaiseError       => 0,
+	    AutoCommit       => 1,
+	    FetchHashKeyName => 'NAME_lc',
+	};
     }
 
     my $filename = $self->file->relative;
