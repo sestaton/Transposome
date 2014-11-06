@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Fetch mgblast and modify the makefile for the location of NCBI Toolkit
-wget sourceforge.net/projects/gicl/files/mgblast.tar.gz && tar xzf mgblast.tar.gz
+wget ftp://occams.dfci.harvard.edu/pub/bio/tgi/software/tgicl/mgblast.tar.gz && tar xzf mgblast.tar.gz
 cd mgblast
 dir=`pwd`
 sed "s,NCBIDIR = .*,NCBIDIR = $dir/ncbi," Makefile > Makefile.bak
