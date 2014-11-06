@@ -8,6 +8,11 @@ Version	Date	Location
   required C libraries installed at the system level.
 - Fix dependencies listed in Makefile (YAML was listed, though it is
   no longer used).
+- Add binary for mgblast for CI testing. This solves two main issues, 1)
+  we don't have to rely on remote servers for getting deps, and 2) the 
+  build process is about 10X faster now. The latter point means that
+  adding/removing features should be painless now, instead of waiting a
+  long time to get test results.
 
 0.07.7	9/25/2014	Vancouver, BC
 
