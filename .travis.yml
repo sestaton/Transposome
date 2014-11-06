@@ -8,8 +8,8 @@ perl:
 
 before_install: 
   - sudo apt-get update -qq
-  - sudo apt-get install -y csh xorg-dev openbox ncbi-blast+
-  - ./build/ci/run_build.sh 2>&1 > /dev/null
+#  - sudo apt-get install -y csh xorg-dev openbox ncbi-blast+
+#  - ./build/ci/run_build.sh 2>&1 > /dev/null
 
 script: ./build/ci/run_tests.sh
 
