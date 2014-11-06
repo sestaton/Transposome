@@ -1,6 +1,6 @@
 bin/transposome
 Changes
-README.pod
+README.md
 lib/Transposome.pm
 lib/Transposome/Annotation.pm
 lib/Transposome/Cluster.pm
