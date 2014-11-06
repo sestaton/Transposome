@@ -30,7 +30,7 @@ If your system lacks git or cpanm, you don't have to bother installing either of
     cpan Module::CPANfile
     cpan `dump-cpanfile`
 
-If you run into issues, you may download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) will the following commands.
+If you run into issues, you may download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
     tar xzf Transposome.tar.gz
     cd Transposome
