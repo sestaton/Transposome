@@ -17,21 +17,29 @@ To use this package, you will need Perl version 5.12 (or greater) installed and 
 
 **INSTALLATION**
 
-The recommened method to satisfy the Perl dependencies is to install [cpanminus](https://metacpan.org/pod/App::cpanminus), and run the following command:
+The fastest way to install Transposome is to get [cpanminus](https://metacpan.org/pod/App::cpanminus), and run the following command (note that this requires [git](http://git-scm.com/)):
 
     cpanm git://github.com/sestaton/Transposome.git
 
-If you run into any installation issues, it may be necessary to download the code and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information):
+If your system lacks git or cpanm, you don't have to bother installing either of those programs. The following commands will get the latest code and install Transposome.
 
-    git clone https://github.com/sestaton/Transposome.git
+    curl -L https://api.github.com/repos/sestaton/Transposome/tarball > trans.tar.gz
+    tar xzf trans.tar.gz
+    mv sestaton-Transposome* Transposome               
     cd Transposome
-    cpanm --installdeps .
+    cpan Module::CPANfile
+    cpan `dump-cpanfile`
+
+If you run into issues, you may download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) will the following commands.
+
+    tar xzf Transposome.tar.gz
+    cd Transposome
     perl Makefile.PL
     make
     make test
-    make install
+    make install 
 
-Updating your installation can be achieved by simply running the same commands.
+Updating your installation can be achieved by simply running the same commands. Please report any issues.
 
 **BASIC USAGE**
 
