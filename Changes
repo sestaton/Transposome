@@ -5,7 +5,8 @@ Version	Date	Location
 
 - Remove use of BerkeleyDB for indexing methods and use SQLite
   instead. This makes installation easier as the BerkeleyDB module
-  required C libraries installed at the system level.
+  required C libraries installed at the system level. Also, this change
+  adds a major improvement in performance for large data sets.
 - Fix dependencies listed in Makefile (YAML was listed, though it is
   no longer used).
 - Add binary for mgblast for CI testing. This solves two main issues, 1)
