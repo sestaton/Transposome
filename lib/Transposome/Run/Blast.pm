@@ -116,7 +116,7 @@ method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-	my $mg = File::Spec->catfile($p, 'megablast');
+	my $mg = File::Spec->catfile($p, 'blastall');
 	my $fd = File::Spec->catfile($p, 'formatdb');
 
         if (-e $mg && -x $mg) {
@@ -382,16 +382,17 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
 
     my $exit_value;
     my @blast_cmd = "$megablast ".           # program
+	            " -p blastn ".
                     "-i $subseq_file ".    # query
                     "-d $database ".       # db
                     "-F T ".           # filter with dust
-                    "-D 3 ".               # one-line output
+#                    "-D 3 ".               # one-line output
                     "-m 8 ".               # tab-delimited ouput
-                    "-V T ".
-                    "-e 1e-20 ".             # NEW: set the evalue threshold higher
+#                    "-V T ".
+                    "-e 1e-10 ".             # NEW: set the evalue threshold higher
 		    "-q -5 ".              # NEW: the penalty for a mismatch
 		    "-G -5 ".              # NEW: the cost to open a gap
-                    "-p $pid ".            # min percent identity of match 
+#                    "-p $pid ".            # min percent identity of match 
                     "-W 32 ".               # word size
                     "-U T ".                # use lowercase filtering
                     "-X 40 ".               # Xdrop for gapped alignment                             
@@ -404,6 +405,30 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
 #                    "-o $subseq_out ".     # output file
                     "-a $cpu ".            # number of cpus assigned 
 		    "| grep -v \"^#\" > $subseq_out";
+
+#    my @blast_cmd = "$megablast ".           # program
+#                    "-i $subseq_file ".    # query
+#                    "-d $database ".       # db
+#                    "-F T ".           # filter with dust
+#                    "-D 3 ".               # one-line output
+#                    "-m 8 ".               # tab-delimited ouput
+#                    "-V T ".
+#		        "-q -5 ".              # NEW: the penalty for a mismatch
+#			    "-G -5 ".              # NEW: the cost to open a gap
+#                    "-p $pid ".            # min percent identity of match 
+#                    "-W 32 ".               # word size
+#                    "-U T ".                # use lowercase filtering
+#                    "-X 40 ".               # Xdrop for gapped alignment                             
+#                    "-KT ".                # database slice
+#                    "-J F ".                # whether to believe the defline
+#                    "-v $desc_num ".        # number of descriptions to keep per query
+#                    "-b $aln_num ".         # number of alignments to keep per query
+#                    "-C$min_overlap ".     # minimum overlap for matches
+#                    "-H $max_mismatch ".   # maximum mismatch allowed for matches
+#                    "-o $subseq_out ".     # output file
+#                    "-a $cpu ".            # number of cpus assigned 
+#		    "| grep -v \"^#\" > $subseq_out";
+
     try {
         $exit_value = system([0..5], @blast_cmd);
     }
