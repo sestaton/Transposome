@@ -8,7 +8,7 @@ perl:
 
 before_install: 
   - sudo apt-get update -qq
-  - sudo apt-get install -y ncbi-blast+ blast2
+  - sudo apt-get install -y ia32-libs ncbi-blast+ blast2
 
 script: ./build/ci/run_tests.sh
 
