@@ -74,6 +74,8 @@ ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
 is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
+#exit;
+
 my $annotation = Transposome::Annotation->new(
     database => $db_fas,
     dir      => $outdir,
@@ -106,6 +108,7 @@ ok(
 );
 ok( $annotation->has_blastall_exec, 'Can perform blastn for annotation' );
 
+#exit;
 my ( $anno_rp_path, 
      $anno_sum_rep_path, 
      $singles_rp_path, 
