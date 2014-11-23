@@ -3,16 +3,16 @@ package Transposome::Annotation;
 use 5.012;
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
+use IPC::System::Simple  qw(system capture EXIT_ANY);
+use List::Util           qw(sum max);
+use File::Path           qw(make_path);
+use Storable             qw(thaw);
+use POSIX                qw(strftime);
 use Method::Signatures;
-use List::Util qw(sum max);
-use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
-use File::Path qw(make_path);
 use File::Basename;
 use File::Spec;
 use Try::Tiny;
-use Storable qw(thaw);
-use POSIX qw(strftime);
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',

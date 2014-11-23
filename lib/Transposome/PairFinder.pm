@@ -11,7 +11,7 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
-use POSIX qw(strftime);
+use POSIX      qw(strftime);
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',

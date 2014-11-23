@@ -3,15 +3,15 @@ package Transposome::Cluster;
 use 5.012;
 use Moose;
 use MooseX::Types::Moose qw(HashRef);
+use IPC::System::Simple  qw(system capture EXIT_ANY);
+use File::Path           qw(make_path);
+use POSIX                qw(strftime);
 use Method::Signatures;
 use Graph::UnionFind;
 use File::Spec;
 use File::Basename;
 use Try::Tiny;
-use IPC::System::Simple qw(system capture EXIT_ANY);
-use File::Path qw(make_path);
 use Path::Class::File;
-use POSIX qw(strftime);
 use Config;
 use namespace::autoclean;
 
