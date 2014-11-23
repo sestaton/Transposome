@@ -110,7 +110,7 @@ sub init_transposome {
     my $t0 = [Time::HiRes::gettimeofday()];
     my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
-    $log->info("Log file for monitoring progress and errors: $config->{output_directory}/$config->{run_log_file}");
+    $log->info("Log file for monitoring progress and errors: $config->{run_log_file}");
 
     return ($t0, $log);
 }
