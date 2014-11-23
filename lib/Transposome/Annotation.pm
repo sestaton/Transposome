@@ -510,11 +510,13 @@ method _annotate_singletons ($repeats,
     my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
     next unless defined $top_hit && defined $hit_ct;
 
-    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, $top_hit, $top_hit_perc);
+    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
+									      $top_hit, $top_hit_perc);
 
     for my $hit (keys %blasthits) {
 	my $hit_perc = sprintf("%.12f", $blasthits{$hit} / $single_tot);
-	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, \$hit, \$hit_perc);
+	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
+								      \$hit, \$hit_perc);
 	push @superfams, $hit_superfam unless !%$hit_superfam;
 	push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
     }
@@ -554,7 +556,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	system([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
+	my @formatout = capture([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")

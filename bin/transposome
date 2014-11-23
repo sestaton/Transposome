@@ -3,6 +3,11 @@
 use 5.012;
 use strict;
 use warnings;
+use Transposome;
+use File::Path;
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
 
 =head1 NAME
 
@@ -24,9 +29,37 @@ our $VERSION = '0.07.9';
 =cut 
 
 #
+# Parse command line
+#
+my %opts;
+
+GetOptions(\%opts,
+	   'c|config=s' => \$opts{config},
+	   'v|version'  => \$opts{version},
+	   'h|help'     => \$opts{help},
+	   'm|man'      => \$opts{man},
+	   ) or pod2usage( "Try '$0 --man' for more information." );
+#
 # get configuration using Transposome class
 #
-my $config = parse_argv();
+usage() and exit(0) if $opts{help};
+pod2usage( -verbose => 2 ) if $opts{man};
+say $VERSION and exit(0) if $opts{version};
+
+if ( !$opts{config} ) {
+    say "\nERROR: No arguments were given.\n";
+    usage();
+    exit(1);
+}
+
+my $trans_obj = Transposome->new( config => $opts{config} );
+
+# parse configuration
+my $config = $trans_obj->get_configuration;
+
+unless (-d $config->{output_directory}) {
+    make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
+}
 
 #
 # initialize log and timers
@@ -63,28 +96,6 @@ log_interval($t0, $log);
 #
 # Methods
 # 
-sub parse_argv {
-    load_classes('Transposome', 'File::Path');
-
-    my $trans_obj = Transposome->new_with_options();
-
-    # check options
-    say $VERSION and exit(0) if $trans_obj->version;
-
-    if (! $trans_obj->config) {
-	print $trans_obj->getopt_usage;
-	exit(0);
-    }
-
-    # parse configuration
-    my $config = $trans_obj->get_configuration;
-
-    unless (-d $config->{output_directory}) {
-	File::Path::make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
-    }
-    return $config;
-}
-
 sub init_transposome {
     my ($config) = @_;
 
@@ -239,6 +250,21 @@ sub load_classes {
                 "Here is the exception: $error." if $error;
         };
     }
+}
+
+sub usage {
+    my $prog = basename($0);
+    print STDERR <<END
+USAGE: $prog [-c] [-v] [-h] [-m]
+
+Required:
+    -c|config  :    The Transposome configuration file.
+
+Options:
+    -v|version :    Print the program version and exit.
+    -h|help    :    Print a usage statement.
+    -m|man     :    Print the full documentation.
+END
 }
 
 =head1 AUTHOR

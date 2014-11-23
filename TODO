@@ -1,0 +1,4 @@
+- remove ===== from log
+- add newlines to long lines for readability
+- remove blast processes from log
+- line up timestamps in log
