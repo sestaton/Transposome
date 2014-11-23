@@ -1,6 +1,19 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.07.9
+
+- Rework test framework to be under the Transposome namespace. This
+  will make maintenance and adding new features/tests much simpler.
+  This also avoids hardcoding paths in test files or manually add the
+  include paths.
+- Add mgblast executable for Linux to be installed, which will keep
+  users (at least on Linux) from having to compile this by hand.
+- Remove use of BLAST+ for annotation since this required both
+  Legacy BLAST (for the use of formatdb) and BLAST+ to be present.
+  At this release, only Legacy BLAST is required (for annotation
+  and for formatting the database for the all-vs-all search).
+
 0.07.8	11/05/2014	Vancouver, BC
 
 - Remove use of BerkeleyDB for indexing methods and use SQLite

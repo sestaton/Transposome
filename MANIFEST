@@ -9,6 +9,8 @@ lib/Transposome/SeqUtil.pm
 lib/Transposome/Role/Util.pm
 lib/Transposome/Role/File.pm
 lib/Transposome/Role/Types.pm
+lib/Transposome/Test/TestUtils.pm
+lib/Transposome/Test/TestUtils/TestConfig.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -23,9 +25,7 @@ t/07-megablast.t
 t/08-pairfinder.t
 t/09-cluster.t
 t/10-annotation.t
-t/lib/TestUtils.pm
-t/lib/TestUtils/TestConfig.pm
-t/Transposome/transposome.t
+t/11-transposome.t
 xt/00-pod.t
 xt/01-pod-coverage.t
 src/Makefile
