@@ -184,7 +184,7 @@ method run_allvall_blast {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started at: $st. Results from mgblast processes to follow.")
+    $self->log->info("Transposome::Run::Blast::run_allvall_blast started at: $st.")
 	if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
@@ -203,12 +203,12 @@ method run_allvall_blast {
 				  close $report;
 				  unlink $bl;
 			      }
-			      my $t1 = gettimeofday();
-			      my $elapsed = $t1 - $t0;
-			      my $time = sprintf("%.2f",$elapsed/60);
-			      my $base = basename($ident);
-			      $self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.") 
-				  if Log::Log4perl::initialized();
+			      #my $t1 = gettimeofday();
+			      #my $elapsed = $t1 - $t0;
+			      #my $time = sprintf("%.2f",$elapsed/60);
+			      #my $base = basename($ident);
+			      #$self->log->info("$base just finished with PID $pid and exit code: $exit_code in $time minutes.") 
+				  #if Log::Log4perl::initialized();
 			} );
 
     for my $seqs (@$seq_files) {
@@ -227,11 +227,11 @@ method run_allvall_blast {
     my $total_elapsed = $t2 - $t0;
     my $final_time = sprintf("%.2f",$total_elapsed/60);
 
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.")
+    $self->log->info("Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.")
 	if Log::Log4perl::initialized();
 
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is: $outfile.")
+    $self->log->info("Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is:\n$outfile.")
 	if Log::Log4perl::initialized();
     
     unlink glob("$database*");
@@ -370,7 +370,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
     my ($dbfile, $dbdir, $dbext)    = fileparse($database, qr/\.[^.]*/);
     my ($subfile, $subdir, $subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
-    my $subseq_out   = Path::Class::File->new($dbdir, $subfile."_".$dbfile.$suffix);
+    my $subseq_out = Path::Class::File->new($dbdir, $subfile."_".$dbfile.$suffix);
 
     my $min_overlap  = $self->min_overlap;
     my $max_mismatch = $self->max_mismatch;
