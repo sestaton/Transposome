@@ -25,7 +25,6 @@ BEGIN {
     system("cp louvain_convert ../bin; cp louvain_community ../bin; cp louvain_hierarchy ../bin;");
     system("make clean 2>&1 > /dev/null");
     chdir("..");
-    system("chmod +x bin/transposome");
 }
 
 WriteMakefile(
@@ -65,9 +64,10 @@ WriteMakefile(
 	'DBM::Deep'                        => 0,
 	'File::Path'                       => 0,
 	'Graph'                            => 0,
+	'aliased'                          => 0,
     },
     INST_SCRIPT => 'blib/bin',
-    EXE_FILES => [ 'bin/louvain_convert', 'bin/louvain_community', 'bin/louvain_hierarchy', 'bin/transposome' ],
+    EXE_FILES => [ 'bin/louvain_convert', 'bin/louvain_community', 'bin/louvain_hierarchy', 'bin/transposome', 'bin/mgblast' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Transposome-* bin/louvain_*' },
     test  => { TESTS => 't/*.t t/Transposome/*.t' },
