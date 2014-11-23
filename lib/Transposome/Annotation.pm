@@ -12,9 +12,11 @@ use Method::Signatures;
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
+use File::Find;
 use Try::Tiny;
 use namespace::autoclean;
 
+use Data::Dump;
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
      'Transposome::Role::File', 
@@ -195,16 +197,23 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-        $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
+        $self->log->info("Transposome::Annotation::annotate_clusters started at: $st.");
     }
 
     my $repeat_typemap = $self->map_repeat_types($database);
     my %repeats        = %{ thaw($repeat_typemap) };
 
     ## get input files
-    opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
-    my @clus_fas_files = grep /^CL.*fa.*$|^G.*fa.*$/, readdir $dir;
-    closedir $dir;
+    my @clus_fas_files;
+    #opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
+    #my @clus_fas_files = grep /^CL.*fa.*$|^G.*fa.*$/, readdir $dir;
+    #closedir $dir;
+    find( sub {
+	push @clus_fas_files, $_ if -f and /^CL.*fa.*$|^G.*fa.*$/;
+          }, $cls_with_merges_dir);
+
+    #require Data::Dump;
+    #dd \@clus_fas_files and exit;
 
     if (@clus_fas_files < 1) {
         $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.")
@@ -298,7 +307,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.");
+	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
 	$self->log->info("Total sequences: $seqct");
 	$self->log->info("Total sequences clustered: $cls_tot");
 	$self->log->info("Total sequences unclustered: $single_tot");
@@ -347,7 +356,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
+    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
         if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
@@ -410,7 +419,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
+    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
         if Log::Log4perl::initialized();
 }
 
@@ -510,11 +519,13 @@ method _annotate_singletons ($repeats,
     my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
     next unless defined $top_hit && defined $hit_ct;
 
-    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, $top_hit, $top_hit_perc);
+    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
+									      $top_hit, $top_hit_perc);
 
     for my $hit (keys %blasthits) {
 	my $hit_perc = sprintf("%.12f", $blasthits{$hit} / $single_tot);
-	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, \$hit, \$hit_perc);
+	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
+								      \$hit, \$hit_perc);
 	push @superfams, $hit_superfam unless !%$hit_superfam;
 	push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
     }
@@ -554,7 +565,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	system([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
+	my @dbcapture = capture([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")

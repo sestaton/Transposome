@@ -124,7 +124,7 @@ method parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::PairFinder::parse_blast started at: $st.")
+    $self->log->info("Transposome::PairFinder::parse_blast started at: $st.")
         if Log::Log4perl::initialized();
     
     my %match_pairs;
@@ -255,9 +255,9 @@ method parse_blast {
     
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
+    $self->log->info("Transposome::PairFinder::parse_blast completed at: $ft.")
 	if Log::Log4perl::initialized();
-    $self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
+    $self->log->info("Final output files are:\n$int_file,\n$idx_file,\n$hs_file.")
 	if Log::Log4perl::initialized();
     
     return ($idx_path, $int_path, $hs_path);
