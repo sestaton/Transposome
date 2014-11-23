@@ -98,8 +98,8 @@ method _validate_params ($config) {
 	my $v = $config->{$k};
         if (not defined $v) {
             die "\n[ERROR]: '$k' is not defined after parsing configuration file.\n".
-	        "           This indicates there may be a blank line in your configuration file.\n".
-	        "           Please check your configuration file and try again. Exiting.\n";
+	        "         This indicates there may be a blank line in your configuration file.\n".
+	        "         Please check your configuration file and try again. Exiting.\n";
         }
         elsif ($v =~ /^~/) {
             $v =~ s/^~/$ENV{"HOME"}/;
