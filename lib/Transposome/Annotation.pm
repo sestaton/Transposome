@@ -565,7 +565,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	my @dbcapture = capture([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
+	my @formatdbout = capture([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")

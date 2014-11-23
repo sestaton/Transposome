@@ -6,9 +6,7 @@ use Method::Signatures;
 use YAML::Tiny;
 use namespace::autoclean;
 
-with 'MooseX::Getopt::Usage',
-     'MooseX::Getopt::Usage::Role::Man',
-     'MooseX::Log::Log4perl',
+with 'MooseX::Log::Log4perl',
      'Transposome::Role::Config';
 
 =head1 NAME
@@ -37,14 +35,14 @@ has 'config' => (
     documentation => qq{The Transposome configuration file},
 );
 
-has 'version' => ( 
-    is            => 'ro', 
-    isa           => 'Bool', 
-    required      => 0,
-    documentation => qq{Get version information and exit},
-);
+#has 'version' => ( 
+#    is            => 'ro', 
+#    isa           => 'Bool', 
+#    required      => 0,
+#    documentation => qq{Get version information and exit},
+#);
 
-has '+logger' => ( traits => ['NoGetopt'], );
+#has '+logger' => ( traits => ['NoGetopt'], );
 
 method get_configuration {
     my $configfile   = YAML::Tiny->read( $self->config );
@@ -52,12 +50,12 @@ method get_configuration {
     return $valid_config;
 }
 
-method getopt_usage_config {
-   return (
-       format   => "Usage: %c [OPTIONS]",
-       headings => 1,
-   );
-}
+#method getopt_usage_config {
+#   return (
+#       format   => "Usage: %c [OPTIONS]",
+#       headings => 1,
+#   );
+#}
 
 =head1 AUTHOR
 
