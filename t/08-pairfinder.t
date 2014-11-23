@@ -12,14 +12,14 @@ use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
 use TestUtils;
 
-use Test::Most;
+use Test::Most tests => 505;
 
 my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
 #my $index  = "mgblast_matchindex.dbm";
 #my $pairs  = "mgblast_matchpairs.dbm";
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
-unlink glob("t/transposome_allvall_megablast_*");
+unlink glob("t/transposome_mgblast_*");
 
 my $blast = $test->blast_constructor;
 my ($blfl) = @$blast;
@@ -47,7 +47,7 @@ my $mem_test = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
-    alignment_length  => 55
+    fraction_coverage => 0.55
 );
 
 ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
@@ -77,7 +77,7 @@ while (<$mem_idx>) {
 }
 close $mem_idx;
 
-is( $mem_idx_recct, 69, 'Correct number of unique pairs found in index' );
+is( $mem_idx_recct, 46, 'Correct number of unique pairs found in index' );
 
 while (<$mem_int>) {
     chomp;
@@ -93,7 +93,7 @@ while (<$mem_int>) {
 }
 close $mem_int;
 
-is( $mem_int_recct, 32,
+is( $mem_int_recct, 25,
     'Correct number of unique pairs found in integer mapping' );
 
 while (<$mem_hs>) {
@@ -108,7 +108,7 @@ while (<$mem_hs>) {
 }
 close $mem_hs;
 
-is( $mem_hs_recct, 32, 'Correct number of unique pairs found in ID mapping' );
+is( $mem_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
 is( $mem_hs_recct, $mem_int_recct,
     'Index and integer mapping files contain the same records' );
 
@@ -121,7 +121,7 @@ my $file_test = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 0,
     percent_identity  => 90.0,
-    alignment_length  => 55
+    fraction_coverage => 0.55
 );
 
 ok( $file_test->parse_blast, 'Can build database on file and parse blast' );
@@ -148,7 +148,7 @@ while (<$file_idx>) {
 }
 close $file_idx;
 
-is( $file_idx_recct, 69, 'Correct number of unique pairs found in index' );
+is( $file_idx_recct, 46, 'Correct number of unique pairs found in index' );
 
 while (<$file_int>) {
     chomp;
@@ -164,7 +164,7 @@ while (<$file_int>) {
 }
 close $file_int;
 
-is( $file_int_recct, 32,
+is( $file_int_recct, 25,
     'Correct number of unique pairs found in integer mapping' );
 
 while (<$file_hs>) {
@@ -179,7 +179,7 @@ while (<$file_hs>) {
 }
 close $file_hs;
 
-is( $file_hs_recct, 32, 'Correct number of unique pairs found in ID mapping' );
+is( $file_hs_recct, 25, 'Correct number of unique pairs found in ID mapping' );
 is( $file_hs_recct, $file_int_recct,
     'Index and integer mapping files contain the same records' );
 

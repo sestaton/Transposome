@@ -20,15 +20,15 @@ with 'MooseX::Log::Log4perl',
 
 =head1 NAME
 
-Transposome::PairFinder - Parse megablast and find best scoring unique matches.
+Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -39,7 +39,7 @@ $VERSION = eval $VERSION;
                                                   dir               => 'transposome_out',
                                                   in_memory         => 1,
                                                   percent_identity  => 90.0,
-                                                  alignment_length  => 55 );
+                                                  fraction_coverage => 0.55 );
 
 =cut
 
@@ -59,12 +59,12 @@ has 'percent_identity' => (
     default   => 90.0,
 );
 
-has 'alignment_length' => (
+has 'fraction_coverage' => (
     is        => 'ro',
     isa       => 'Num',
-    predicate => 'has_alignment_length',
+    predicate => 'has_percent_coverage',
     lazy      => 1,
-    default   => 55,
+    default   => 0.55,
 );
 
 method BUILD (@_) {
@@ -126,7 +126,7 @@ method parse_blast {
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::PairFinder::parse_blast started at: $st.")
         if Log::Log4perl::initialized();
-
+    
     my %match_pairs;
     my %match_index;
     my $dbm = "mgblast_matchpairs.dbm";
@@ -157,20 +157,21 @@ method parse_blast {
     
     while (<$fh>) {
 	chomp;
-	next if /^#/;
 	$self->_validate_format($_);
-	my ($q_name, $s_name, $pid, $aln_len, $mistmatch, $gaps, $q_start, $q_end,
-	    $s_start, $s_end, $e_val, $score) = split;
+	my ($q_name, $q_len, $q_start, $q_end, $s_name, $s_len,
+	    $s_start, $s_end, $pid, $score, $e_val, $strand) = split;
 	
 	my $pair            = $self->mk_key($q_name, $s_name);
 	my $revpair         = $self->mk_key($s_name, $q_name);
 	my $subj_hit_length = ($s_end - $s_start) + 1;
-	
+	my $subj_cov        = $subj_hit_length/$s_len;
+
 	if ($q_start > $q_end) {
 	    $total_hits++;
 	    my $neg_query_hit_length = ($q_start - $q_end) + 1;
-	        
-	    if ( ($neg_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+	    my $neg_query_cov        = $neg_query_hit_length/$q_len;
+
+	    if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
 		    push @{$match_pairs{$pair}}, $score;
 		}
@@ -189,8 +190,9 @@ method parse_blast {
 	else {
 	    $total_hits++;
 	    my $pos_query_hit_length = ($q_end - $q_start) + 1;
-	        
-	    if ( ($pos_query_hit_length >= $self->alignment_length) && ($pid >= $self->percent_identity) ) {
+	    my $pos_query_cov        = $pos_query_hit_length/$q_len;
+
+	    if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
 		    push @{$match_pairs{$pair}}, $score;
 		}
@@ -245,19 +247,19 @@ method parse_blast {
     }
     close $int;
     close $hs;
-
+    
     untie %match_index unless $self->in_memory;
     untie %match_pairs unless $self->in_memory;
     unlink $dbi if -e $dbi;
     unlink $dbm if -e $dbm;
-
+    
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $self->log->info("======== Transposome::PairFinder::parse_blast completed at: $ft.")
 	if Log::Log4perl::initialized();
     $self->log->info("======== Final output files are: $int_file, $idx_file, and $hs_file.")
 	if Log::Log4perl::initialized();
-
+    
     return ($idx_path, $int_path, $hs_path);
 }
 

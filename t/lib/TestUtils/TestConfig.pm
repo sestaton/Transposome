@@ -14,11 +14,11 @@ TestUtils::TestConfig - Methods for mocking configuration data for Transposome.
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -112,7 +112,7 @@ method _build_config_data {
     say $tmpyml "clustering_options:";
     say $tmpyml "  - in_memory:         1";
     say $tmpyml "  - percent_identity:  90";
-    say $tmpyml "  - alignment_length:  55";
+    say $tmpyml "  - fraction_coverage: 0.55";
     say $tmpyml "  - merge_threshold:   2";
     say $tmpyml "annotation_input:";
     say $tmpyml "  - repeat_database:  $repeat_db";

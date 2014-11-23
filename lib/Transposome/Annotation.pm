@@ -26,11 +26,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -480,16 +480,18 @@ method _annotate_singletons ($repeats,
 	exit(1);
     };
     
-    my ($singleton_hits, $singleton_rep_frac) = (0, 0);
+    my ($singleton_hits, $singleton_rep_frac, $min_aln_len) = (0, 0, 55);
     my (%blasthits, @blct_out);
 
    if (-s $singles_rp_path) {
         open my $singles_fh, '<', $singles_rp_path or die "\n[ERROR]: Could not open file: $singles_rp_path\n";
 	while (<$singles_fh>) {
 	    chomp;
-	    $singleton_hits++;
 	    my @f = split;
-	    $blasthits{$f[1]}++;
+	    if ($f[3] >= $min_aln_len) {
+		$singleton_hits++;
+		$blasthits{$f[1]}++;
+	    }
         }
 	close $singles_fh;
     }
@@ -648,8 +650,6 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
     my %top_hit_superfam;
     my %cluster_annot;
 
-    ##NB: The 'each @array' syntax used in this method requires 5.12. This is another reason we should avoid
-    ##    unrolling this complex structure and use an external method to pull out what we need, if that is possible.
     for my $type (keys %$repeats) {
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
             if ($type eq 'pseudogene' && $$top_hit =~ /rrna|trna|snrna/i) {
@@ -687,7 +687,7 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
             next;
         }
         for my $class (keys %{$repeats->{$type}}) {
-	    while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
+            while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
                 for my $superfam_h (keys %$superfam) {
                     if ($superfam_h =~ /sine/i) {
                         while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {

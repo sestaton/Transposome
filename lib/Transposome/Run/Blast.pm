@@ -27,11 +27,11 @@ Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -77,7 +77,7 @@ has 'percent_identity' => (
     isa       => 'Num',
     predicate => 'has_percent_identity',
     lazy      => 1,
-    default   => 90.0,
+    default   => 85.0,
 );
 
 has 'min_overlap' => (
@@ -104,35 +104,34 @@ has 'formatdb_exec' => (
     predicate => 'has_formatdb_exec',
 );
 
-has 'megablast_exec' => (
+has 'mgblast_exec' => (
     is        => 'rw',
     isa       => 'Str',
-    reader    => 'get_megablast_exec',
-    writer    => 'set_megablast_exec',
-    predicate => 'has_megablast_exec',
+    reader    => 'get_mgblast_exec',
+    writer    => 'set_mgblast_exec',
+    predicate => 'has_mgblast_exec',
 );
 
 method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-	my $mg = File::Spec->catfile($p, 'blastall');
+	my $mg = File::Spec->catfile($p, 'mgblast');
 	my $fd = File::Spec->catfile($p, 'formatdb');
 
         if (-e $mg && -x $mg) {
-            $self->set_megablast_exec($mg);
+            $self->set_mgblast_exec($mg);
         }
-	
-        if (-e $fd && -x $fd) {
+        elsif (-e $fd && -x $fd) {
             $self->set_formatdb_exec($fd);
         }
     }
 
     try {
-        die unless $self->has_megablast_exec;
+        die unless $self->has_mgblast_exec;
     }
     catch {
-        $self->log->error("Unable to find megablast. Check your PATH to see that it is installed. Exiting.")
+        $self->log->error("Unable to find mgblast. Check your PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -158,7 +157,7 @@ method BUILD (@_) {
  Usage   : my $blast_file = $blast->run_allvall_blast;
            
  Function: Runs all vs. all blast comparison of sequence
-           data using megablast. The output of this blast
+           data using mgblast. The output of this blast
            is the input to the clustering methods.
            
                                                                    Return_type
@@ -185,12 +184,12 @@ method run_allvall_blast {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started at: $st. Results from megablast processes to follow.")
+    $self->log->info("======== Transposome::Run::Blast::run_allvall_blast started at: $st. Results from mgblast processes to follow.")
 	if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
     
-    my $database = $self->_make_megablastdb;
+    my $database = $self->_make_mgblastdb;
     my $files_ct = @$seq_files;
     my %blasts;
 
@@ -256,13 +255,13 @@ method run_allvall_blast {
 
 =cut 
 
-method _make_megablastdb {
+method _make_mgblastdb {
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
     my $formatdb = $self->get_formatdb_exec;
     $fname =~ s/\.f.*//;
-    my $db    = $fname."_allvall_megablastdb";
+    my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
@@ -378,56 +377,26 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
     my $pid          = $self->percent_identity;
     my $desc_num     = $self->desc_num;
     my $aln_num      = $self->aln_num;
-    my $megablast    = $self->get_megablast_exec;
+    my $mgblast      = $self->get_mgblast_exec;
 
     my $exit_value;
-    my @blast_cmd = "$megablast ".           # program
-	            " -p blastn ".
+    my @blast_cmd = "$mgblast ".           # program
                     "-i $subseq_file ".    # query
                     "-d $database ".       # db
-                    "-F T ".           # filter with dust
-#                    "-D 3 ".               # one-line output
-                    "-m 8 ".               # tab-delimited ouput
-#                    "-V T ".
-                    "-e 1e-10 ".             # NEW: set the evalue threshold higher
-		    "-q -5 ".              # NEW: the penalty for a mismatch
-		    "-G -5 ".              # NEW: the cost to open a gap
-#                    "-p $pid ".            # min percent identity of match 
-                    "-W 32 ".               # word size
-                    "-U T ".                # use lowercase filtering
-                    "-X 40 ".               # Xdrop for gapped alignment                             
-#                    "-KT ".                # database slice
-                    "-J F ".                # whether to believe the defline
-                    "-v $desc_num ".        # number of descriptions to keep per query
-                    "-b $aln_num ".         # number of alignments to keep per query
-#                    "-C$min_overlap ".     # minimum overlap for matches
-#                    "-H $max_mismatch ".   # maximum mismatch allowed for matches
-#                    "-o $subseq_out ".     # output file
-                    "-a $cpu ".            # number of cpus assigned 
-		    "| grep -v \"^#\" > $subseq_out";
-
-#    my @blast_cmd = "$megablast ".           # program
-#                    "-i $subseq_file ".    # query
-#                    "-d $database ".       # db
-#                    "-F T ".           # filter with dust
-#                    "-D 3 ".               # one-line output
-#                    "-m 8 ".               # tab-delimited ouput
-#                    "-V T ".
-#		        "-q -5 ".              # NEW: the penalty for a mismatch
-#			    "-G -5 ".              # NEW: the cost to open a gap
-#                    "-p $pid ".            # min percent identity of match 
-#                    "-W 32 ".               # word size
-#                    "-U T ".                # use lowercase filtering
-#                    "-X 40 ".               # Xdrop for gapped alignment                             
-#                    "-KT ".                # database slice
-#                    "-J F ".                # whether to believe the defline
-#                    "-v $desc_num ".        # number of descriptions to keep per query
-#                    "-b $aln_num ".         # number of alignments to keep per query
-#                    "-C$min_overlap ".     # minimum overlap for matches
-#                    "-H $max_mismatch ".   # maximum mismatch allowed for matches
-#                    "-o $subseq_out ".     # output file
-#                    "-a $cpu ".            # number of cpus assigned 
-#		    "| grep -v \"^#\" > $subseq_out";
+                    "-F \"m D\" ".         # filter with dust
+                    "-D 4 ".               # tab-delimited ouput
+                    "-p $pid ".            # min percent identity of match 
+                    "-W18 ".               # word size
+                    "-UT ".                # use lowercase filtering
+                    "-X40 ".               # Xdrop for gapped alignment                             
+                    "-KT ".                # database slice
+                    "-JF ".                # whether to believe the defline
+                    "-v$desc_num ".        # number of descriptions to keep per query
+                    "-b$aln_num ".         # number of alignments to keep per query
+                    "-C$min_overlap ".     # minimum overlap for matches
+                    "-H $max_mismatch ".   # maximum mismatch allowed for matches
+                    "-o $subseq_out ".     # output file
+                    "-a $cpu ";            # number of cpus assigned 
 
     try {
         $exit_value = system([0..5], @blast_cmd);

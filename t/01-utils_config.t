@@ -60,4 +60,4 @@ my $trans_obj4 = Transposome->new( config => $test4_conf_file );
 
 dies_ok { $trans_obj4->get_configuration } 'Correctly handled missing repeat database file in configuration';
 
-system("rm t/transposome_allvall_megablast_* t/transposome_config_*");
+system("rm t/transposome_mgblast_* t/transposome_config_*");

@@ -13,7 +13,7 @@ use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 
-use Test::More;
+use Test::More tests => 51;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');
 my $outdir  = File::Spec->catdir('t', 'cluster_t');
@@ -28,7 +28,7 @@ my $blast_res = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
-    alignment_length  => 55
+    fraction_coverage => 0.55
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -107,7 +107,7 @@ my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
 
 ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 59, 'The expected number of reads went into clusters' );
+is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
 my $repfile = File::Spec->catfile($outdir, $report);
 open my $rep, '<', $repfile;
@@ -154,12 +154,10 @@ while (<$singfh>) {
 }
 close $singfh;
 
-is( $single_ct, 11, 'Expected number of reads went into singletons file' );
+is( $single_ct, 24, 'Expected number of reads went into singletons file' );
 is( $cls_tot + $single_ct, 70, 'Expected number of reads went into clusters and singletons file' );
 
 END {
     remove_tree( $outdir, { safe => 1 } );
     unlink $blfl;
 }
-
-done_testing();

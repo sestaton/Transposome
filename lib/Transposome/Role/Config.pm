@@ -10,11 +10,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -57,7 +57,7 @@ method parse_configuration ($yaml) {
     # clustering options from config
     $config{in_memory}         = $yaml->[0]->{clustering_options}->[0]->{in_memory};
     $config{percent_identity}  = $yaml->[0]->{clustering_options}->[1]->{percent_identity};
-    $config{alignment_length}  = $yaml->[0]->{clustering_options}->[2]->{alignment_length};
+    $config{fraction_coverage} = $yaml->[0]->{clustering_options}->[2]->{fraction_coverage};
     $config{merge_threshold}   = $yaml->[0]->{clustering_options}->[3]->{merge_threshold};
 
     # annotation options from config
