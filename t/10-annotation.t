@@ -1,20 +1,19 @@
 #!/usr/bin/env perl
 
-use 5.010;
+use 5.012;
 use strict;
 use warnings;
 use File::Spec;
 use File::Basename;
-use File::Path qw(make_path);
-use Module::Path qw(module_path);
+use File::Path          qw(make_path);
+use Module::Path        qw(module_path);
 use IPC::System::Simple qw(system EXIT_ANY);
-use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
-use TestUtils;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 20;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');

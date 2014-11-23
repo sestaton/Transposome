@@ -4,11 +4,10 @@ use 5.012;
 use strict;
 use warnings;
 use IPC::System::Simple qw(capture);
-use lib qw(../blib/lib t/lib);
-use TestUtils;
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 8;
 
 my $seqfile  = 'seqsample_t.out';

@@ -5,14 +5,13 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Basename;
-use File::Path qw(make_path remove_tree);
+use File::Path   qw(make_path remove_tree);
 use Module::Path qw(module_path);
-use lib qw(../blib/lib t/lib);
-use TestUtils;
 use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 51;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');

@@ -4,17 +4,16 @@ use 5.012;
 use strict;
 use warnings;
 use File::Spec;
-use Module::Path qw(module_path);
+use Module::Path  qw(module_path);
 use Log::Log4perl qw(:easy);
-use lib qw(../../blib/lib t/lib);
 use Transposome;
 use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
-use TestUtils;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 33;
 
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');

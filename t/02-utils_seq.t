@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 use autodie qw(open);
-use lib qw(../blib/lib t/lib);
-use TestUtils;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 10;
 
 my ($fact, $fqct) = (0, 0);

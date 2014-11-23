@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use lib qw(../blib/lib t/lib);
-use TestUtils;
 use Transposome::SeqIO;
+
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 36;
 
 my $test_proper = TestUtils->new( build_proper => 1, destroy => 0 );

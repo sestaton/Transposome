@@ -8,10 +8,9 @@ use autodie qw(open);
 use File::Spec;
 use File::Temp;
 use File::Path qw(remove_tree);
-use lib qw(../blib/lib t/lib);
 use Transposome::PairFinder;
-use TestUtils;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::Most tests => 505;
 
 my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');

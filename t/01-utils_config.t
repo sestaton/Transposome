@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 use File::Spec;
-use lib qw(../blib/lib t/lib);
 use Transposome;
-use TestUtils;
+
+use aliased 'Transposome::Test::TestUtils';
 use Test::Most tests => 4;
 
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');

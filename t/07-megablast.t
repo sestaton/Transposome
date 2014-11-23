@@ -5,12 +5,11 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Path qw(remove_tree);
-use lib qw(../../blib/lib t/lib);
 use Transposome;
 use Transposome::Run::Blast;
-use TestUtils;
 use Log::Log4perl;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 4;
 
 my $fasfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');

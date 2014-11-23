@@ -4,7 +4,7 @@ use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use File::Spec;
-use lib qw(../blib/lib);
+
 use Test::More tests => 12;
 
 BEGIN {
@@ -21,30 +21,25 @@ BEGIN {
       || print "[Error]: Could not load Transposome::PairFinder.\n";
     use_ok('Transposome::Run::Blast')
       || print "[Error]: Could not load Transposome::Run::Blast.\n";
+    use_ok('Transposome::Test::TestUtils')
+	|| print "[Error]: Could not load Transposome::Test::TestUtils.\n";
 }
 
 diag("Testing Transposome $Transposome::VERSION, Perl $], $^X");
 
-##See if we can load mgblast, formatdb, makeblastdb, and blastn, which are required
+##See if we can load mgblast, formatdb, and blastall, which are required
 my @path = split /:|;/, $ENV{PATH};
 
 #say "PATH: ",$ENV{PATH}; # for debug
 
-my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0);
+my ($ex, $bl_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0);
 for my $p (@path) {
-    my $bl = File::Spec->catfile($p, 'blastn');
-    my $mb = File::Spec->catfile($p, 'makeblastdb');
+    my $bl = File::Spec->catfile($p, 'blastall');
 
-    if ( -e $mb && -x $mb ) {
-        next if $mb_seen;
-        $ex++;
-        ok( -e $mb & -x $mb, 'makeblastdb exists' );
-        $mb_seen = 1;
-    }
     if ( -e $bl && -x $bl ) {
         next if $bl_seen;
         $ex++;
-        ok( -e $bl && -x $bl, 'blastn exists and is executable' );
+        ok( -e $bl && -x $bl, 'blastall exists and is executable' );
         $bl_seen = 1;
     }
 
@@ -65,6 +60,8 @@ for my $p (@path) {
     }
 }
 
-is( $ex, 4,
+is( $ex, 3,
     'All required external programs for clustering and analysis exist and appear usable'
 );
+
+done_testing();

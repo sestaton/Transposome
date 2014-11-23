@@ -3,11 +3,10 @@
 use 5.012;
 use strict;
 use warnings;
-use lib qw(../blib/lib t/lib);
-use TestUtils;
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
+use aliased 'Transposome::Test::TestUtils';
 use Test::More tests => 48;
 
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
