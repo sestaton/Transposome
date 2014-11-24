@@ -3,20 +3,18 @@ package Transposome::Annotation;
 use 5.012;
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
-use IPC::System::Simple  qw(system capture EXIT_ANY);
-use List::Util           qw(sum max);
-use File::Path           qw(make_path);
-use Storable             qw(thaw);
-use POSIX                qw(strftime);
 use Method::Signatures;
+use List::Util qw(sum max);
+use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
+use File::Path qw(make_path);
 use File::Basename;
 use File::Spec;
-use File::Find;
 use Try::Tiny;
+use Storable qw(thaw);
+use POSIX qw(strftime);
 use namespace::autoclean;
 
-use Data::Dump;
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
      'Transposome::Role::File', 
@@ -28,11 +26,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.07.8
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.07.8';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -89,49 +87,49 @@ has 'report' => (
       coerce   => 1,
 );
 
-has 'blastall_exec' => (
+has 'blastn_exec' => (
     is        => 'rw',
     isa       => 'Str',
-    reader    => 'get_blastall_exec',
-    writer    => 'set_blastall_exec',
-    predicate => 'has_blastall_exec',
+    reader    => 'get_blastn_exec',
+    writer    => 'set_blastn_exec',
+    predicate => 'has_blastn_exec',
 );
 
-has 'formatdb_exec' => (
+has 'makeblastdb_exec' => (
     is        => 'rw',
     isa       => 'Str',
-    reader    => 'get_formatdb_exec',
-    writer    => 'set_formatdb_exec',
-    predicate => 'has_formatdb_exec',
+    reader    => 'get_makeblastdb_exec',
+    writer    => 'set_makeblastdb_exec',
+    predicate => 'has_makeblastdb_exec',
 );
 
 method BUILD (@_) {
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
-	my $bl = File::Spec->catfile($p, 'blastall');
-	my $mb = File::Spec->catfile($p, 'formatdb');
+	my $bl = File::Spec->catfile($p, 'blastn');
+	my $mb = File::Spec->catfile($p, 'makeblastdb');
 
         if (-e $bl && -x $bl && -e $mb && -x $mb) {
-            $self->set_blastall_exec($bl);
-            $self->set_formatdb_exec($mb);
+            $self->set_blastn_exec($bl);
+            $self->set_makeblastdb_exec($mb);
         }
     }
 
     try {
-        die unless $self->has_formatdb_exec;
+        die unless $self->has_makeblastdb_exec;
     }
     catch {
-        $self->log->error("Unable to find formatdb. Check you PATH to see that it is installed. Exiting.") 
+        $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.") 
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
 
     try {
-        die unless $self->has_blastall_exec;
+        die unless $self->has_blastn_exec;
     }
     catch {
-        $self->log->error("Unable to find blastall. Check you PATH to see that it is installed. Exiting.")
+        $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.")
 	    if Log::Log4perl::initialized(); 
 	exit(1);
     };
@@ -173,7 +171,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my $database = $self->database->absolute;
     my $db_path  = $self->_make_blastdb($database);
     my $out_dir  = $self->dir->relative;
-    my $blastall = $self->get_blastall_exec;
+    my $blastn   = $self->get_blastn_exec;
 
     # cluster report path
     my $report   = $self->file->relative;
@@ -197,23 +195,16 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-        $self->log->info("Transposome::Annotation::annotate_clusters started at: $st.");
+        $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
     }
 
     my $repeat_typemap = $self->map_repeat_types($database);
     my %repeats        = %{ thaw($repeat_typemap) };
 
     ## get input files
-    my @clus_fas_files;
-    #opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
-    #my @clus_fas_files = grep /^CL.*fa.*$|^G.*fa.*$/, readdir $dir;
-    #closedir $dir;
-    find( sub {
-	push @clus_fas_files, $_ if -f and /^CL.*fa.*$|^G.*fa.*$/;
-          }, $cls_with_merges_dir);
-
-    #require Data::Dump;
-    #dd \@clus_fas_files and exit;
+    opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
+    my @clus_fas_files = grep /^CL.*fa.*$|^G.*fa.*$/, readdir $dir;
+    closedir $dir;
 
     if (@clus_fas_files < 1) {
         $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.")
@@ -249,7 +240,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 						      $thread_range, 
 						      $db_path, 
 						      $out_dir, 
-						      $blastall);
+						      $blastn);
 
     my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
     my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
@@ -265,7 +256,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
         $blast_res .= "_blast_$evalue.tsv";
 	my $blast_file_path = Path::Class::File->new($out_path, $blast_res);
 
-        my @blastcmd = "$blastall -p blastn -F F -i $query -e $evalue -d $db_path -m 8 -a $thread_range | ".
+        my @blastcmd = "$blastn -dust no -query $query -evalue $evalue -db $db_path -outfmt 6 -num_threads $thread_range | ".
                        "sort -k1,1 -u | ".                       # count each read in the report only once
 		       "cut -f2 | ".                             # keep only the ssids        
                        "sort | ".                                # sort the list
@@ -307,7 +298,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
+	$self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.");
 	$self->log->info("Total sequences: $seqct");
 	$self->log->info("Total sequences clustered: $cls_tot");
 	$self->log->info("Total sequences unclustered: $single_tot");
@@ -356,7 +347,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
         if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
@@ -419,7 +410,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
+    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
         if Log::Log4perl::initialized();
 }
 
@@ -450,7 +441,7 @@ method _annotate_singletons ($repeats,
 			     $thread_range, 
 			     $db_path, 
 			     $out_dir, 
-			     $blastall) {
+			     $blastn) {
 
     my $top_hit_superfam = {};
     my $hit_superfam     = {};
@@ -466,18 +457,9 @@ method _annotate_singletons ($repeats,
     my $singles_rep_sum     = $rpname."_singletons_annotations_summary.tsv";
     my $singles_rp_sum_path = Path::Class::File->new($out_dir, $singles_rep_sum);
 
-    my @blastcmd = "$blastall -p blastn ".
-	           "-F F ".
-		   "-i $singletons_file_path ".
-		   "-e $evalue ".
-		   "-d $db_path ".
-                   "-m 8 ".
-		   "-a $thread_range ".
-		   "-K 1 | sort -k1,1 -u > $singles_rp_path";
-
-    #my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
-    #               "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
-    #               "sort -k1,1 -u > $singles_rp_path";
+    my @blastcmd = "$blastn -dust no -query $singletons_file_path -evalue $evalue -db $db_path ".
+                   "-outfmt 6 -num_threads $thread_range -max_target_seqs 1 |".
+                   "sort -k1,1 -u > $singles_rp_path";
 
     my $exit_code;
     try {
@@ -489,18 +471,16 @@ method _annotate_singletons ($repeats,
 	exit(1);
     };
     
-    my ($singleton_hits, $singleton_rep_frac, $min_aln_len) = (0, 0, 55);
+    my ($singleton_hits, $singleton_rep_frac) = (0, 0);
     my (%blasthits, @blct_out);
 
    if (-s $singles_rp_path) {
         open my $singles_fh, '<', $singles_rp_path or die "\n[ERROR]: Could not open file: $singles_rp_path\n";
 	while (<$singles_fh>) {
 	    chomp;
+	    $singleton_hits++;
 	    my @f = split;
-	    if ($f[3] >= $min_aln_len) {
-		$singleton_hits++;
-		$blasthits{$f[1]}++;
-	    }
+	    $blasthits{$f[1]}++;
         }
 	close $singles_fh;
     }
@@ -519,13 +499,11 @@ method _annotate_singletons ($repeats,
     my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
     next unless defined $top_hit && defined $hit_ct;
 
-    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
-									      $top_hit, $top_hit_perc);
+    ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, $top_hit, $top_hit_perc);
 
     for my $hit (keys %blasthits) {
 	my $hit_perc = sprintf("%.12f", $blasthits{$hit} / $single_tot);
-	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, 
-								      \$hit, \$hit_perc);
+	($hit_superfam, $cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, \$hit, \$hit_perc);
 	push @superfams, $hit_superfam unless !%$hit_superfam;
 	push @cluster_annotations, $cluster_annot unless !%$cluster_annot;
     }
@@ -557,7 +535,7 @@ method _annotate_singletons ($repeats,
 =cut 
 
 method _make_blastdb (Path::Class::File $db_fas) {
-    my $formatdb = $self->get_formatdb_exec;
+    my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
 
     my $db = $dbname."_blastdb";
@@ -565,14 +543,14 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	my @formatdbout = capture([0..5], "$formatdb -p F -i $db_fas -t $db -n $db_path 2>&1 > /dev/null");
+	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")
 	    if Log::Log4perl::initialized();
 	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.")
 	    if Log::Log4perl::initialized();
-        $self->log->error("These cause problems with BLAST. Exiting.")
+        $self->log->error("These cause problems with BLAST+. Exiting.")
             if Log::Log4perl::initialized();
 	exit(1);
     };
@@ -661,6 +639,8 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
     my %top_hit_superfam;
     my %cluster_annot;
 
+    ##NB: The 'each @array' syntax used in this method requires 5.12. This is another reason we should avoid
+    ##    unrolling this complex structure and use an external method to pull out what we need, if that is possible.
     for my $type (keys %$repeats) {
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
             if ($type eq 'pseudogene' && $$top_hit =~ /rrna|trna|snrna/i) {
@@ -698,7 +678,7 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
             next;
         }
         for my $class (keys %{$repeats->{$type}}) {
-            while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
+	    while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
                 for my $superfam_h (keys %$superfam) {
                     if ($superfam_h =~ /sine/i) {
                         while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
