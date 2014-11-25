@@ -195,7 +195,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
         my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-        $self->log->info("======== Transposome::Annotation::annotate_clusters started at: $st.");
+        $self->log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
     }
 
     my $repeat_typemap = $self->map_repeat_types($database);
@@ -298,13 +298,13 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     # log results
     if (Log::Log4perl::initialized()) {
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-	$self->log->info("======== Transposome::Annotation::annotate_clusters completed at: $ft.");
-	$self->log->info("Total sequences: $seqct");
-	$self->log->info("Total sequences clustered: $cls_tot");
-	$self->log->info("Total sequences unclustered: $single_tot");
-	$self->log->info("Repeat fraction from clusters: $rep_frac");
-	$self->log->info("Singleton repeat fraction: $singleton_rep_frac");
-	$self->log->info("Total repeat fraction: $total_rep_frac");
+	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
+	$self->log->info("Total sequences:                        $seqct");
+	$self->log->info("Total sequences clustered:              $cls_tot");
+	$self->log->info("Total sequences unclustered:            $single_tot");
+	$self->log->info("Repeat fraction from clusters:          $rep_frac");
+	$self->log->info("Singleton repeat fraction:              $singleton_rep_frac");
+	$self->log->info("Total repeat fraction:                  $total_rep_frac");
     }
 
     return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
@@ -347,8 +347,8 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
-        if Log::Log4perl::initialized();
+    #$self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
+        #if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
@@ -410,7 +410,9 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
+    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.")
+	if Log::Log4perl::initialized();
+    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
         if Log::Log4perl::initialized();
 }
 
@@ -543,7 +545,7 @@ method _make_blastdb (Path::Class::File $db_fas) {
     unlink $db_path if -e $db_path;
 
     try {
-	system([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
+	my @makedbout = capture([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
 	$self->log->error("Unable to make blast database. Here is the exception: $_.")

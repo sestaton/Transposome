@@ -124,7 +124,7 @@ method parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::PairFinder::parse_blast started at: $st.")
+    $self->log->info("Transposome::PairFinder::parse_blast started at:   $st.")
         if Log::Log4perl::initialized();
     
     my %match_pairs;

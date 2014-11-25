@@ -184,7 +184,7 @@ method run_allvall_blast {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::Run::Blast::run_allvall_blast started at: $st.")
+    $self->log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.")
 	if Log::Log4perl::initialized();
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
