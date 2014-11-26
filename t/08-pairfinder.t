@@ -15,8 +15,6 @@ use Test::Most tests => 505;
 
 my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');
 my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
-#my $index  = "mgblast_matchindex.dbm";
-#my $pairs  = "mgblast_matchpairs.dbm";
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 unlink glob("t/transposome_mgblast_*");
 
@@ -195,8 +193,5 @@ is( $mem_hs_recct, $file_hs_recct,
 END {
     remove_tree($outdir, $blfl);
 }
-
-#unlink $index;
-#unlink $pairs;
 
 done_testing();

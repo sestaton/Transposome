@@ -36,8 +36,8 @@ local $ENV{PATH} = "$bin:$ENV{PATH}";
 ##See if we can load mgblast, formatdb, and blastall, which are required
 my @path = split /:|;/, $ENV{PATH};
 
-my ($ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen)  = (0, 0, 0, 0, 0);
-for my $p (@path) {
+my ( $ex, $bl_seen, $mb_seen, $mg_seen, $fd_seen )  = ( 0, 0, 0, 0, 0 );
+for my $p ( @path ) {
     my $bl = File::Spec->catfile($p, 'blastn');
     my $mb = File::Spec->catfile($p, 'makeblastdb');
 

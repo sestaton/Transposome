@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Basename;
-use File::Path          qw(make_path);
+use File::Path          qw(make_path remove_tree);
 use Module::Path        qw(module_path);
 use IPC::System::Simple qw(system EXIT_ANY);
 use Transposome::PairFinder;
@@ -74,8 +74,6 @@ ok( defined($cls_dir_path),
     'Can successfully merge communities based on paired-end information' );
 is( $cls_tot, 46, 'The expected number of reads went into clusters' );
 
-#exit;
-
 my $annotation = Transposome::Annotation->new(
     database => $db_fas,
     dir      => $outdir,
@@ -108,7 +106,6 @@ ok(
 );
 ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
 
-#exit;
 my ( $anno_rp_path, 
      $anno_sum_rep_path, 
      $singles_rp_path, 
@@ -137,7 +134,11 @@ $annotation->clusters_annotation_to_summary( $anno_rp_path,
                                              $superfams );
 
 END {
-    system("rm -rf $outdir $blfl t/cluster_test_rep* $db");
+    #system("rm -rf $outdir $blfl t/cluster_test_rep* $db");
+    remove_tree( $outdir, { safe => 1 } );
+    unlink glob("t/cluster_test_rep*");
+    unlink $blfl;
+    unlink $db;
 }
 
 done_testing();

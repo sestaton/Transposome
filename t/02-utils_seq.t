@@ -19,7 +19,7 @@ ok( $test2->fastq_constructor, 'Can build proper Fastq data for testing' );
 
 my $test3 = TestUtils->new( build_proper => 1, destroy => 0 );
 my $fa_arr = $test3->fasta_constructor;
-for my $fa (@$fa_arr) {
+for my $fa ( @$fa_arr ) {
     open my $fafh, '<', $fa;
     while (<$fafh>) {
 	$fact++ if /^>/;
@@ -31,7 +31,7 @@ for my $fa (@$fa_arr) {
 }
 
 my $fq_arr = $test3->fastq_constructor;
-for my $fq (@$fq_arr) {
+for my $fq ( @$fq_arr ) {
     open my $fqfh, '<', $fq;
     while (<$fqfh>) {
 	$fqct++ if /^\@HWI/;
@@ -50,7 +50,7 @@ ok( $test4->fastq_constructor,
 
 my $test5 = TestUtils->new( build_problematic => 1, destroy => 0 );
 my $fa_arr2 = $test5->fasta_constructor;
-for my $fa (@$fa_arr2) {
+for my $fa ( @$fa_arr2 ) {
     open my $fafh, '<', $fa;
     while (<$fafh>) {
         $fact++ if /^>/;
@@ -62,7 +62,7 @@ for my $fa (@$fa_arr2) {
 }
 
 my $fq_arr2 = $test5->fastq_constructor;
-for my $fq (@$fq_arr2) {
+for my $fq ( @$fq_arr2 ) {
     open my $fqfh, '<', $fq;
     while (<$fqfh>) {
         $fqct++ if /^\+$/;

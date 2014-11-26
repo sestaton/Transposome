@@ -14,7 +14,7 @@ my $dbmf   = "transposome_seqstore.dbm";
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;
 
-for my $fa (@$fa_arr) {
+for my $fa ( @$fa_arr ) {
     my $seqio = Transposome::SeqIO->new( file => $fa );
     while ( my $seq = $seqio->next_seq ) {
         if ( $seq->has_id && $seq->has_seq && !$seq->has_qual ) {
@@ -47,7 +47,7 @@ for my $fa (@$fa_arr) {
     unlink $fa;
 }
 
-for my $fq (@$fq_arr) {
+for my $fq ( @$fq_arr ) {
     my $seqio = Transposome::SeqIO->new( file => $fq );
     while ( my $seq = $seqio->next_seq ) {
         if ( $seq->has_id && $seq->has_seq && $seq->has_qual ) {

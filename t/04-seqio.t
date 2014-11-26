@@ -14,7 +14,7 @@ my $proper_fa_arr = $test_proper->fasta_constructor;
 my $proper_fq_arr = $test_proper->fastq_constructor;
 
 # test parsing correctly formatted sequence files
-for my $fa (@$proper_fa_arr) {
+for my $fa ( @$proper_fa_arr ) {
     my $seqio_fa = Transposome::SeqIO->new( file => $fa );
     while ( my $seq = $seqio_fa->next_seq ) {
         ok( $seq->has_id,  "Fasta sequence $seq_num has an ID" );

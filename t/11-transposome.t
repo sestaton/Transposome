@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Spec;
+use File::Path    qw(remove_tree);
 use Module::Path  qw(module_path);
 use Log::Log4perl qw(:easy);
 use Transposome;
@@ -164,6 +165,7 @@ my $memstore = Transposome::SeqUtil->new(
     file      => $config->{sequence_file},
     in_memory => $config->{in_memory}
 );
+
 my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
@@ -213,5 +215,10 @@ $annotation->clusters_annotation_to_summary( $anno_rp_path,
 					     $blasts, 
 					     $superfams );
 
-system("rm -rf $config->{output_directory} t/$config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file formatdb.log");
-
+#system("rm -rf $config->{output_directory} t/$config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file formatdb.log");
+unlink glob("t/transposome_mgblast*");
+unlink glob("t_rep*");
+remove_tree( $config->{output_directory}, { safe => 1 } );
+unlink "t/$config->{run_log_file}";
+unlink $conf_file;
+unlink "formatdb.log";

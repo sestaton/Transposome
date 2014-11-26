@@ -19,7 +19,7 @@ my $fq_arr = $test->fastq_constructor;
 
 my ( $seqct, $seqsamp, $stdoutct, $stdoutct2, $seqs ) = ( 0, 0, 0, 0, {} );
 
-for my $fa (@$fa_arr) {
+for my $fa ( @$fa_arr ) {
     my $memstore =
 	Transposome::SeqUtil->new( file => $fa, sample_size => 2 );
     ( $seqs, $seqct ) = $memstore->sample_seq;
@@ -72,7 +72,7 @@ for my $fa (@$fa_arr) {
     $stdoutct = 0;
 }
 
-for my $fq (@$fq_arr) {
+for my $fq ( @$fq_arr ) {
     my $memstore =
 	Transposome::SeqUtil->new( file => $fq, sample_size => 2 );
     ( $seqs, $seqct ) = $memstore->sample_seq;
