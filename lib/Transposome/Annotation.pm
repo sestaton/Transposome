@@ -3,16 +3,16 @@ package Transposome::Annotation;
 use 5.012;
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
+use IPC::System::Simple  qw(system capture EXIT_ANY);
+use List::Util           qw(sum max);
+use File::Path           qw(make_path);
+use Storable             qw(thaw);
+use POSIX                qw(strftime);
 use Method::Signatures;
-use List::Util qw(sum max);
-use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
-use File::Path qw(make_path);
 use File::Basename;
 use File::Spec;
 use Try::Tiny;
-use Storable qw(thaw);
-use POSIX qw(strftime);
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -218,10 +218,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     make_path($annodir, {verbose => 0, mode => 0711,});
 
     # data structures for holding mapping results
-    #my @blasts;                  # container for each report (hash) 
     my @blast_out;               # container for blastn output
-    #my @superfams;               # container for top hit superfamilies from each cluster
-    #my @cluster_annotations;     # container for cluster annotations
     my %all_cluster_annotations; # container for annotations; used for creating summary
 
     ## annotate singletons, then add total to results
@@ -347,8 +344,6 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #$self->log->info("======== Transposome::Annotation::clusters_annotation_to_summary started at: $st.")
-        #if Log::Log4perl::initialized();
 
     my %top_hit_superfam;
     @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
