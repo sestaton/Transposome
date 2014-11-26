@@ -4,7 +4,7 @@ use 5.012;
 use strict;
 use warnings;
 use Transposome;
-use File::Path;
+use File::Path qw(make_path);
 use File::Basename;
 use Getopt::Long;
 use Pod::Usage;
@@ -28,9 +28,6 @@ our $VERSION = '0.07.9';
 
 =cut 
 
-#
-# Parse command line
-#
 my %opts;
 
 GetOptions(\%opts,
@@ -39,9 +36,8 @@ GetOptions(\%opts,
 	   'h|help'     => \$opts{help},
 	   'm|man'      => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
-#
-# get configuration using Transposome class
-#
+
+# Get configuration using Transposome class
 usage() and exit(0) if $opts{help};
 pod2usage( -verbose => 2 ) if $opts{man};
 say $VERSION and exit(0) if $opts{version};
@@ -54,44 +50,32 @@ if ( !$opts{config} ) {
 
 my $trans_obj = Transposome->new( config => $opts{config} );
 
-# parse configuration
+# Parse configuration
 my $config = $trans_obj->get_configuration;
 
-unless (-d $config->{output_directory}) {
-    make_path($config->{output_directory}, {verbose => 0, mode => 0771,});
+unless ( -d $config->{output_directory} ) {
+    make_path( $config->{output_directory}, {verbose => 0, mode => 0771,} );
 }
 
-#
-# initialize log and timers
-#
-my ($t0, $log) = init_transposome($config);
+# Initialize log and timers
+my ( $t0, $log ) = init_transposome( $config );
 
-#
-# perform the all vs. all blast
-#
-my $blastdb = run_blast($config);
+# Perform the all vs. all blast
+my $blastdb = run_blast( $config );
 die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
     unless -s $blastdb;
 
-#
 # parse mglblast results to find best scoring pairwise matches
-#
-my ($idx_file, $int_file, $hs_file) = find_pairs($config, $blastdb);
+my ( $idx_file, $int_file, $hs_file ) = find_pairs( $config, $blastdb );
 
-#
-# cluster sequences and analyze groupings
-#
-my ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = make_clusters($config, $idx_file, $int_file, $hs_file);
+# Cluster sequences and analyze groupings
+my ( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $hs_file );
 
-#
-# annotate clusters and generate whole-genome summary of results
-#
-annotate_clusters($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+# Annotate clusters and generate whole-genome summary of results
+annotate_clusters( $config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
 
-#
-# log summary of results
-#
-log_interval($t0, $log);
+# Log summary of results
+log_interval( $t0, $log );
 
 #
 # Methods
@@ -121,7 +105,20 @@ sub init_transposome {
     my $t0 = [Time::HiRes::gettimeofday()];
     my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
-    $log->info("Log file for monitoring progress and errors: $config->{run_log_file}");
+    $log->info("Configuration - Log file for monitoring progress and errors: $config->{run_log_file}");
+    $log->info("Configuration - Sequence file:                               $config->{sequence_file}");
+    $log->info("Configuration - Sequence number for each BLAST process:      $config->{sequence_num}");
+    $log->info("Configuration - Number of CPUs per thread:                   $config->{cpu}");
+    $log->info("Configuration - Number of threads:                           $config->{thread}");
+    $log->info("Configuration - Output directory:                            $config->{output_directory}");
+    $log->info("Configuration - In-memory analysis:                          $config->{in_memory}");
+    $log->info("Configuration - Percent identity for matches:                $config->{percent_identity}");
+    $log->info("Configuration - Fraction coverage for pairwise matches:      $config->{fraction_coverage}");
+    $log->info("Configuration - Merge threshold for clusters:                $config->{merge_threshold}");
+    $log->info("Configuration - Minimum cluster size for annotation:         $config->{cluster_size}");
+    $log->info("Configuration - BLAST e-value threshold for annotation:      $config->{blast_evalue}"); 
+    $log->info("Configuration - Repeat database for annotation:              $config->{repeat_database}");
+    $log->info("Configuration - Log file for clustering/merging results:     $config->{cluster_log_file}");
 
     return ($t0, $log);
 }
@@ -219,9 +216,10 @@ sub log_interval {
     
     load_classes('DateTime', 'Time::HiRes', 'Lingua::EN::Inflect', 'POSIX');
 
-    my $t1 = [Time::HiRes::gettimeofday()];
+    my $t1    = [Time::HiRes::gettimeofday()];
     my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
-    my $dt = DateTime->from_epoch( epoch => 0 );
+    my $dt    = DateTime->from_epoch( epoch => 0 );
+
     $dt = $dt->add( seconds => $t0_t1 );
     $dt = $dt - DateTime->from_epoch( epoch => 0 );
     
@@ -266,6 +264,34 @@ Options:
     -m|man     :    Print the full documentation.
 END
 }
+
+=head1 REQUIRED ARGUMENTS
+
+=over 2
+
+=item -c, --config
+
+The Transposome configuration file.
+
+=back 
+
+=head1 OPTIONS
+
+=over 2
+
+=item -v, --version
+
+Print the Transposome version and exit.
+
+=item -h, --help
+
+Print a usage statement. 
+
+=item -m, --man
+
+Print the full documentation.
+
+=back
 
 =head1 AUTHOR
 
