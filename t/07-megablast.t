@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
+use Cwd;
 use File::Spec;
 use File::Path qw(remove_tree);
 use Transposome;
@@ -30,7 +31,12 @@ sub mgblast_fasta {
 
     my $conf = $test->config_constructor;
     my ($conf_file) = @$conf;
-    
+
+    my $cwd      = getcwd();
+    my $bin      = File::Spec->catdir($cwd, 'bin');
+    my $mgblast  = File::Spec->catfile($bin, 'mgblast');
+    my $formatdb = File::Spec->catfile($bin, 'formatdb');
+
     my $trans_obj = Transposome->new( config => $conf_file );
     ok( $trans_obj->get_configuration, 'Configuration data loaded from file correctly' );
     my $config = $trans_obj->get_configuration;
@@ -47,11 +53,13 @@ sub mgblast_fasta {
     Log::Log4perl::init( \$log_conf );
     
     my $blast = Transposome::Run::Blast->new(
-					     file    => $config->{sequence_file},
-					     dir     => $config->{output_directory},
-					     threads => 1,
-					     cpus    => 1,
-					     seq_num => $config->{sequence_num}
+					     file          => $config->{sequence_file},
+					     dir           => $config->{output_directory},
+					     threads       => 1,
+					     cpus          => 1,
+					     seq_num       => $config->{sequence_num},
+					     mgblast_exec  => $mgblast,
+					     formatdb_exec => $formatdb
 					     );
     
     my $blastdb = $blast->run_allvall_blast;
@@ -77,6 +85,11 @@ sub mgblast_fastq {
     my $conf = $test->config_constructor;
     my ($conf_file) = @$conf;
     
+    my $cwd      = getcwd();
+    my $bin      = File::Spec->catdir($cwd, 'bin');
+    my $mgblast  = File::Spec->catfile($bin, 'mgblast');
+    my $formatdb = File::Spec->catfile($bin, 'formatdb');
+
     my $trans_obj = Transposome->new( config => $conf_file );
     ok( $trans_obj->get_configuration, 'Configuration data loaded from file correctly' );
     my $config = $trans_obj->get_configuration;
@@ -93,11 +106,13 @@ sub mgblast_fastq {
     Log::Log4perl::init( \$log_conf );
     
     my $blast = Transposome::Run::Blast->new(
-                                             file    => $config->{sequence_file},
-                                             dir     => $config->{output_directory},
-                                             threads => 1,
-                                             cpus    => 1,
-                                             seq_num => $config->{sequence_num}
+                                             file          => $config->{sequence_file},
+                                             dir           => $config->{output_directory},
+                                             threads       => 1,
+                                             cpus          => 1,
+                                             seq_num       => $config->{sequence_num},
+					     mgblast_exec  => $mgblast,
+					     formatdb_exec => $formatdb
                                              );
     
     my $blastdb = $blast->run_allvall_blast;

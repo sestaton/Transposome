@@ -3,7 +3,9 @@
 use 5.012;
 use strict;
 use warnings FATAL => 'all';
+use Cwd;
 use File::Spec;
+use File::Basename;
 
 use Test::More tests => 13;
 
@@ -26,6 +28,10 @@ BEGIN {
 }
 
 diag("Testing Transposome $Transposome::VERSION, Perl $], $^X");
+
+my $cwd = getcwd();
+my $bin = File::Spec->catdir($cwd, 'bin');
+local $ENV{PATH} = "$bin:$ENV{PATH}";
 
 ##See if we can load mgblast, formatdb, and blastall, which are required
 my @path = split /:|;/, $ENV{PATH};

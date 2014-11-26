@@ -3,6 +3,7 @@
 use 5.012;
 use strict;
 use warnings;
+use Cwd;
 use File::Spec;
 use Module::Path  qw(module_path);
 use Log::Log4perl qw(:easy);
@@ -103,12 +104,19 @@ my $log_conf = qq{
 
 Log::Log4perl::init( \$log_conf );
 
+my $cwd      = getcwd();
+my $bin      = File::Spec->catdir($cwd, 'bin');
+my $mgblast  = File::Spec->catfile($bin, 'mgblast');
+my $formatdb = File::Spec->catfile($bin, 'formatdb');
+
 my $blast = Transposome::Run::Blast->new(
-    file    => $config->{sequence_file},
-    dir     => $config->{output_directory},
-    threads => 1,
-    cpus    => 1,
-    seq_num => $config->{sequence_num}
+    file          => $config->{sequence_file},
+    dir           => $config->{output_directory},
+    threads       => 1,
+    cpus          => 1,
+    seq_num       => $config->{sequence_num},
+    mgblast_exec  => $mgblast,
+    formatdb_exec => $formatdb
 );
 
 my $blastdb = $blast->run_allvall_blast;
