@@ -103,10 +103,10 @@ ok(
 );
 
 ok(
-    $annotation->has_formatdb_exec,
+    $annotation->has_makeblastdb_exec,
     'Can make blast database for annotation'
 );
-ok( $annotation->has_blastall_exec, 'Can perform blastn for annotation' );
+ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
 
 #exit;
 my ( $anno_rp_path, 
