@@ -1,7 +1,7 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.07.9
+0.07.9	11/26/2014	Vancouver, BC
 
 - Rework test framework to be under the Transposome namespace. This
   will make maintenance and adding new features/tests much simpler.
@@ -12,6 +12,9 @@ Version	Date	Location
 - Remove use of MooseX roles for handling options in favor of core Getopt::Long.
 - Reduce verbosity in log by not logging output of each blast process. Clean up 
   log formatting for readability.
+- Rework tests to use local bin, so tests will pass without modifying the PATH.
+- Add configuration details to log.
+- Update documentation for all options to main application.
 
 0.07.8	11/05/2014	Vancouver, BC
 
