@@ -1,6 +1,4 @@
 requires 'Moose',                      '2.0802';
-requires 'MooseX::Getopt',             '0.56';
-requires 'MooseX::Getopt::Usage',      '0.24';
 requires 'MooseX::Log::Log4perl',      '0.46';
 requires 'MooseX::Types::Path::Class', '0.06';
 requires 'MooseX::Types',              '0.38';
