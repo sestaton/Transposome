@@ -35,27 +35,11 @@ has 'config' => (
     documentation => qq{The Transposome configuration file},
 );
 
-#has 'version' => ( 
-#    is            => 'ro', 
-#    isa           => 'Bool', 
-#    required      => 0,
-#    documentation => qq{Get version information and exit},
-#);
-
-#has '+logger' => ( traits => ['NoGetopt'], );
-
 method get_configuration {
     my $configfile   = YAML::Tiny->read( $self->config );
     my $valid_config = $self->parse_configuration( $configfile );
     return $valid_config;
 }
-
-#method getopt_usage_config {
-#   return (
-#       format   => "Usage: %c [OPTIONS]",
-#       headings => 1,
-#   );
-#}
 
 =head1 AUTHOR
 
