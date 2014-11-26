@@ -95,6 +95,7 @@ WriteMakefile(
 	'File::Path'                       => 0,
 	'Graph'                            => 0,
 	'aliased'                          => 0,
+	'autodie'                          => 0,
     },
     INST_SCRIPT => 'blib/bin',
     EXE_FILES => [ 'bin/louvain_convert', 'bin/louvain_community', 'bin/louvain_hierarchy', 
