@@ -13,7 +13,7 @@ There is also a Perl API which allows you to build custom analysis pipelines, re
 
 **DEPENDENCIES**
 
-To use Transposome, you will need Perl version 5.12 (or greater) installed and it is very simple to upgrade with a tool called perlbrew. A [step-by-steop set of instructions](https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl) is provided for installing a newer Perl. That wiki page also explains the commands below.
+To use Transposome, you will need Perl version 5.12 (or greater) installed but it is very simple to upgrade Perl with a tool called perlbrew. A [step-by-steop set of instructions](https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl) is provided for installing a newer Perl version. That wiki page also explains the commands below.
 
 **INSTALLATION**
 
