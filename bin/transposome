@@ -262,6 +262,7 @@ Options:
     -v|version :    Print the program version and exit.
     -h|help    :    Print a usage statement.
     -m|man     :    Print the full documentation.
+
 END
 }
 
