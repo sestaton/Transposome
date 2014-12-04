@@ -13,24 +13,22 @@ There is also a Perl API which allows you to build custom analysis pipelines, re
 
 **DEPENDENCIES**
 
-To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the [installing dependencies](https://github.com/sestaton/Transposome/wiki/Installing-dependencies) page for a walk through of how to install the dependencies. 
+To use Transposome, you will need Perl version 5.12 (or greater) installed and it is very simple to upgrade with a tool called perlbrew. A [step-by-steop set of instructions](https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl) is provided for installing a newer Perl. That wiki page also explains the commands below.
 
 **INSTALLATION**
 
-The fastest way to install Transposome is to get [cpanminus](https://metacpan.org/pod/App::cpanminus), and run the following command (note that this requires [git](http://git-scm.com/)):
+The following commands will install Transposome (assuming Ubuntu/Debian as the OS):
 
-    cpanm git://github.com/sestaton/Transposome.git
+    apt-get install -y build-essential lib32z1 git ncbi-blast+
+    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
-If your system lacks git or cpanm, you don't have to bother installing either of those programs. The following commands will get the latest code and install Transposome.
+For RHEL/Fedora:
 
-    curl -L https://api.github.com/repos/sestaton/Transposome/tarball > trans.tar.gz
-    tar xzf trans.tar.gz
-    mv sestaton-Transposome* Transposome               
-    cd Transposome
-    cpan Module::CPANfile
-    cpan `dump-cpanfile`
+    yum groupinstall "Development Tools"
+    yum install -y glibc.i686 gcc-c++ git ncbi-blast+
+    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
-If you run into issues, you may download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
+If you run into issues, it may be easier to download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
     tar xzf Transposome.tar.gz
     cd Transposome
