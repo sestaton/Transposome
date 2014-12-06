@@ -13,11 +13,13 @@ There is also a Perl API which allows you to build custom analysis pipelines, re
 
 **DEPENDENCIES**
 
-To use Transposome, you will need Perl version 5.12 (or greater) installed but it is very simple to upgrade Perl with a tool called perlbrew. A [step-by-steop set of instructions](https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl) is provided for installing a newer Perl version. That wiki page also explains the commands below.
+To use Transposome, you will need Perl version 5.12 (or greater) installed but it is very simple to upgrade Perl with a tool called perlbrew. A [step-by-step set of instructions](https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl) is provided for installing a newer Perl version. That wiki page also explains the commands below.
 
 **INSTALLATION**
 
-The following commands will install Transposome (assuming Ubuntu/Debian as the OS):
+Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. Therefore, it is likely that some of the dependencies such as a C++ compiler and the BLAST+ package are already available. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
+
+For Ubuntu/Debian as the OS:
 
     apt-get install -y build-essential lib32z1 git ncbi-blast+
     curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
