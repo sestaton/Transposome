@@ -17,7 +17,7 @@ To use Transposome, you will need Perl version 5.12 (or greater) installed but i
 
 **INSTALLATION**
 
-Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. Therefore, it is likely that some of the dependencies such as a C++ compiler and the BLAST+ package are already available. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
+Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
 
 For Ubuntu/Debian as the OS:
 
