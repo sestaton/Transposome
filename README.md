@@ -64,6 +64,7 @@ using. For example,
 
 Available classes are: 
 
+    Transposome
     Transposome::Annotation
     Transposome::Cluster
     Transposome::PairFinder
@@ -74,13 +75,7 @@ Available classes are:
 
 **SUPPORT AND DOCUMENTATION**
 
-After installing, you can find documentation for the Transposome package with the
-`perldoc` command.
-
-    perldoc Transposome
-
-If you are not interested in using Transposome programmatically or inspecting the class methods, simply type
-`perldoc` followed by the name of main program to run the full analysis.
+You can get usage information at the command line with the following command:
 
     perldoc transposome 
 
