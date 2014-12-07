@@ -7,7 +7,7 @@ blast_input:
 clustering_options:
   - in_memory:          1
   - percent_identity:   90
-  - alignment_length:   55
+  - fraction_coverage:  55
   - merge_threshold:    2
 annotation_input:
   - repeat_database:    repeats.fas
