@@ -8,12 +8,18 @@ use List::Util           qw(sum max);
 use File::Path           qw(make_path);
 use Storable             qw(thaw);
 use POSIX                qw(strftime);
+use List::MoreUtils      qw(first_index);
 use Method::Signatures;
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
+#use Var::Pairs;
 use Try::Tiny;
+
+use Data::Dump;
 use namespace::autoclean;
+
+#use Data::Dump;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
@@ -26,11 +32,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.07.8
+Version 0.07.9
 
 =cut
 
-our $VERSION = '0.07.8';
+our $VERSION = '0.07.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -200,6 +206,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
     my $repeat_typemap = $self->map_repeat_types($database);
     my %repeats        = %{ thaw($repeat_typemap) };
+
+    #dd \%repeats;
 
     ## get input files
     opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
@@ -636,9 +644,12 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
     my %top_hit_superfam;
     my %cluster_annot;
 
+    keys %$repeats;
+
     ##NB: The 'each @array' syntax used in this method requires 5.12. This is another reason we should avoid
     ##    unrolling this complex structure and use an external method to pull out what we need, if that is possible.
     for my $type (keys %$repeats) {
+	#my $type = $pair->key;
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
             if ($type eq 'pseudogene' && $$top_hit =~ /rrna|trna|snrna/i) {
                 my $anno_key = $self->mk_key($filebase, $type, $$top_hit, $$top_hit_perc);
@@ -675,10 +686,20 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
             next;
         }
         for my $class (keys %{$repeats->{$type}}) {
-	    while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
+	    #my $class      = $class_pair->key;
+	    for my $superfam (@{$repeats->{$type}{$class}}) {
+	    #for my $superfam_pair (pairs @{$repeats->{$type}{$class}}) {
+		#while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
+		my $superfam_index = first_index { $_ eq $superfam } @{$repeats->{$type}{$class}};
+		#my $superfam       = $class_pair->value;
                 for my $superfam_h (keys %$superfam) {
                     if ($superfam_h =~ /sine/i) {
-                        while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
+			for my $sine_fam_h (@{$superfam->{$superfam_h}}) {
+			    
+			#for my $sine_fam_pair (pairs @{$superfam->{$superfam_h}}) {
+			    my $sine_fam_index = first_index { $_ eq $sine_fam_h } @{$superfam->{$superfam_h}};
+			    #my $sine_fam_h     = $sine_fam_pair->value;
+                        #while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
                             for my $sine_fam_mem (keys %$sine_fam_h) {
                                 for my $sines (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}[$sine_fam_index]{$sine_fam_mem}}) {
                                     for my $sine (@$sines) {
@@ -695,9 +716,9 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
                             }
                         }
                     }
-		    elsif ($superfam_h =~ /gypsy/i && $$top_hit =~ /^RLG|Gyp/i) {
+		    elsif ($superfam_h =~ /gypsy/i) {# && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam = $$top_hit; 
-                        if ($gypsy_fam =~ /(^RLG[_|-][a-zA-Z]+)/) {
+                        if ($gypsy_fam =~ /(^RLG[_-][a-zA-Z]+)/) {
                             $gypsy_fam = $1;
                         }
                         $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I_|_I$/;
@@ -707,9 +728,9 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
                         $cluster_annot{$readct} = $anno_key;
                         last;
                     }
-                    elsif ($superfam_h =~ /copia/i && $$top_hit =~ /^RLC|Cop/i) {
+                    elsif ($superfam_h =~ /copia/i) { # && $$top_hit =~ /^RLC|Cop/i) {
                         my $copia_fam = $$top_hit;
-                        if ($copia_fam =~ /(^RLC[_|-][a-zA-Z]+)/) {
+                        if ($copia_fam =~ /(^RLC[_-][a-zA-Z]+)/) {
                             $copia_fam = $1;
                         }
                         $copia_fam =~ s/_I// if $copia_fam =~ /_I_|_I$/;                                               
@@ -735,8 +756,10 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
                         for my $fam (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}}) {
                             for my $mem (@$fam) {
                                 if ($mem =~ /$$top_hit/i) {
-			            $$top_hit =~ s/_I_// if $$top_hit =~ /_I_|_I$/;
-			            $$top_hit =~ s/_LTR_// if $$top_hit =~ /_LTR_|_LTR$/;
+			            $$top_hit =~ s/_I_// if $$top_hit =~ /_I_/;
+			            $$top_hit =~ s/_LTR_// if $$top_hit =~ /_LTR_/;
+				    $$top_hit =~ s/_I// if $$top_hit =~ /_I$/;
+                                    $$top_hit =~ s/_LTR// if $$top_hit =~ /LTR$/;
                                     $top_hit_superfam{$$top_hit} = $superfam_h;
 				    my $unk_fam = q{ };
                                     my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $unk_fam, $$top_hit, $$top_hit_perc);

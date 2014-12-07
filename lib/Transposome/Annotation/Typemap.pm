@@ -3,7 +3,8 @@ package Transposome::Annotation::Typemap;
 use 5.012;
 use Moose::Role;
 use Method::Signatures;
-use Storable qw(freeze);
+use Storable        qw(freeze);
+use List::MoreUtils qw(first_index);
 
 =head1 NAME
 
@@ -96,14 +97,18 @@ method map_repeat_types ($infile) {
     for my $type (keys %$matches) {
 	unless ($type eq 'pseudogene' || $type eq 'integrated_virus') {
 	    for my $class (keys %{$matches->{$type}}) {
-		while ( my ($superfam_index, $superfam) = each @{$matches->{$type}{$class}} ) {
+		for my $superfam (@{$matches->{$type}{$class}}) {
+		    my $superfam_index = first_index { $_ eq $superfam } @{$matches->{$type}{$class}};
+		#while ( my ($superfam_index, $superfam) = each @{$matches->{$type}{$class}} ) {
 		    for my $superfam_h (keys %$superfam) {
 			my $superfam_cp = lc($superfam_h);
 			for my $mapped_fam (keys %family_map) {
 			    my $mapped_fam_cp = lc($mapped_fam);
 			    if (length($superfam_cp) > 1 && length($mapped_fam_cp) > 1) {
 				if ($mapped_fam_cp =~ /sine/i && $superfam_cp =~ /sine/i) {
-				    while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
+				    for my $sine_fam_h (@{$superfam->{$superfam_h}}) {
+					my $sine_fam_index = first_index { $_ eq $sine_fam_h } @{$superfam->{$superfam_h}};
+				    #while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
 					for my $sine_fam_mem (keys %$sine_fam_h) {
 					    if ($sine_fam_mem =~ /$mapped_fam_cp/i && $mapped_fam_cp =~ /^(?!sine$)/) {
 						push @{$matches->{$type}{$class}[$superfam_index]{$superfam_h}[$sine_fam_index]{$sine_fam_mem}}, 
