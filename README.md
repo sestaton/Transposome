@@ -43,8 +43,11 @@ Updating your installation can be achieved by simply running the same commands. 
 
 **BASIC USAGE**
 
-Following installation, fill out the sample configuration file in the 'config' directory
-in the Transposome distribution, specifying the location of data files and parameters for analysis.
+Following installation, get the Transposome configuration file:
+
+    curl -L tr.im/aca4d > transposome_config.yml 
+
+Next, edit the configuration file by specifying the location of data files and parameters for analysis. Note that if you downloaded manually, a configuration file can be found in the 'config' directory, or the configuration file on the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) page can be copied into a text editor and saved locally. It makes no difference which way you create the configuration file, though the `curl` method is faster.
 
 Then, simply run the `transposome` program, specifying your configuration file:
 
