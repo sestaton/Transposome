@@ -1,4 +1,4 @@
-package Transposome::Test::TestUtils;
+package Transposome::Test::TestFixture;
 
 use 5.010;
 use Moose;
@@ -7,11 +7,11 @@ use Method::Signatures;
 use File::Temp;
 use namespace::autoclean;
 
-with 'Transposome::Test::TestUtils::TestConfig';
+with 'Transposome::Test::TestFixture::TestConfig';
 
 =head1 NAME
 
-Transposome::Test::TestUtils - Methods for mocking data or data structures for testing Transposome.
+Transposome::Test::TestFixture - Methods for mocking data or data structures for testing Transposome.
 
 =head1 VERSION
 
@@ -24,9 +24,9 @@ $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
-    use Transposome::Test::TestUtils;
+    use Transposome::Test::TestFixture;
 
-    my $test = Transposome::Test::TestUtils->new( build_all => 1, destroy => 0 );
+    my $test = Transposome::Test::TestFixture->new( build_all => 1, destroy => 0 );
     my $fa_arr = $test->fasta_constructor;
 
 =cut
@@ -63,7 +63,7 @@ has 'build_all' => (
 
  Title   : fasta_constructor
 
- Usage   : my $test = Transposome::Test::TestUtils->new( build_all => 1, destroy => 0 );                                                                                                         
+ Usage   : my $test = Transposome::Test::TestFixture->new( build_all => 1, destroy => 0 );                                                                                                         
            my $fa_arr = $test->fasta_constructor; 
            
  Function: Create temporary sequence files for testing Transposome.
@@ -111,7 +111,7 @@ method fasta_constructor {
 
  Title   : fastq_constructor
 
- Usage   : my $test = Transposome::Test::TestUtils->new( build_all => 1, destroy => 0 );                                                                                                         
+ Usage   : my $test = Transposome::Test::TestFixture->new( build_all => 1, destroy => 0 );                                                                                                         
            my $fq_arr = $test->fastq_constructor; 
            
  Function: Create temporary sequence files for testing Transposome.
@@ -159,7 +159,7 @@ method fastq_constructor {
 
  Title   : blast_constructor
 
- Usage   : my $test = Transposome::Test::TestUtils->new( build_proper => 1, destroy => 0 );                                                                                                         
+ Usage   : my $test = Transposome::Test::TestFixture->new( build_proper => 1, destroy => 0 );                                                                                                         
            my $bl_arr = $test->blast_constructor; 
            
  Function: Create temporary blast files for testing Transposome.

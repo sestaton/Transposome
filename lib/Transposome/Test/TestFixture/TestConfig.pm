@@ -1,16 +1,16 @@
-package Transposome::Test::TestUtils::TestConfig;
+package Transposome::Test::TestFixture::TestConfig;
 
 use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
 use Method::Signatures;
 use File::Temp;
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use namespace::autoclean;
 
 =head1 NAME
 
-Transposome::Test::TestUtils::TestConfig - Methods for mocking configuration data for Transposome.
+Transposome::Test::TestFixture::TestConfig - Methods for mocking configuration data for Transposome.
 
 =head1 VERSION
 
@@ -23,9 +23,9 @@ $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
-    use Transposome::Test::TestUtils;
+    use Transposome::Test::TestFixture;
 
-    my $test = Transposome::Test::TestUtils->new( build_proper => 1, destroy => 0 );
+    my $test = Transposome::Test::TestFixture->new( build_proper => 1, destroy => 0 );
     my $config_arr = $test->config_constructor;
 
 =cut
@@ -48,7 +48,7 @@ has 'repeat_db' => (
 
  Title   : config_constructor
 
- Usage   : my $test = Transposome::Test::TestUtils->new( build_proper => 1, destroy => 0 );                                                                                                         
+ Usage   : my $test = Transposome::Test::TestFixture->new( build_proper => 1, destroy => 0 );                                                                                                         
            my $fa_arr = $test->config_constructor; 
            
  Function: Create temporary configuration files for testing Transposome.
@@ -56,7 +56,7 @@ has 'repeat_db' => (
                                                                             Return_type
  Returns : An array of config files.                                         ArrayRef
            
- Args    : None. This is a class method called on TestUtils object.
+ Args    : None. This is a class method called on TestFixture object.
 
 =cut
 
@@ -83,7 +83,7 @@ method config_constructor {
                                                                             Return_type
  Returns : A config file                                                    Scalar
            
- Args    : None. This is a class method called on TestUtils object.
+ Args    : None. This is a class method called on TestFixture object.
 
 =cut
 
@@ -99,7 +99,7 @@ method _build_config_data {
 
     my $seq_file  = $self->seq_file;
     my $repeat_db = $self->repeat_db;
-    my $test      = TestUtils->new( build_proper => 1, destroy => 0 );
+    my $test      = TestFixture->new( build_proper => 1, destroy => 0 );
     my $blast     = $test->blast_constructor;
     my ($blfl)    = @$blast;
 
