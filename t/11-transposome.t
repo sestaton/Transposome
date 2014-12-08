@@ -15,13 +15,13 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 use Transposome::Run::Blast;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 33;
 
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 
-my $test = TestUtils->new(
+my $test = TestFixture->new(
     seq_file     => $seqfile,
     repeat_db    => $repeatdb,
     destroy      => 0,

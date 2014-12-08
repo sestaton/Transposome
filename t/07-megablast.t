@@ -10,7 +10,7 @@ use Transposome;
 use Transposome::Run::Blast;
 use Log::Log4perl;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 4;
 
 my $fasfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
@@ -22,7 +22,7 @@ mgblast_fastq($fqfile,  $repeatdb);
 
 sub mgblast_fasta {
     my ($fasfile, $repeatdb) = @_;
-    my $test = TestUtils->new(
+    my $test = TestFixture->new(
 			      seq_file     => $fasfile,
 			      repeat_db    => $repeatdb,
 			      destroy      => 0,
@@ -75,7 +75,7 @@ sub mgblast_fasta {
 
 sub mgblast_fastq {
     my ($fqfile, $repeatdb) = @_;
-    my $test = TestUtils->new(
+    my $test = TestFixture->new(
                               seq_file     => $fqfile,
                               repeat_db    => $repeatdb,
                               destroy      => 0,

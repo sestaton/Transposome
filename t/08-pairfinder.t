@@ -10,11 +10,11 @@ use File::Temp;
 use File::Path qw(remove_tree);
 use Transposome::PairFinder;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::Most tests => 505;
 
 my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');
-my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 unlink glob("t/transposome_mgblast_*");
 

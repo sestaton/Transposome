@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Transposome::SeqIO;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 36;
 
-my $test_proper = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test_proper = TestFixture->new( build_proper => 1, destroy => 0 );
 my $seq_num = 1;
 
 my $proper_fa_arr = $test_proper->fasta_constructor;

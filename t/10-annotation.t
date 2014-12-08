@@ -13,7 +13,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 use Transposome::Annotation;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 20;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');
@@ -22,7 +22,7 @@ my $report  = 'cluster_test_rep.txt';
 my $db_fas  = File::Spec->catfile('t', 'test_data', 't_db.fas');
 my $db      = File::Spec->catfile('t', 'test_data', 't_db_blastdb');
 
-my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
 my ($blfl) = @$blast;
 

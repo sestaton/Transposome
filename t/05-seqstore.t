@@ -6,10 +6,10 @@ use warnings;
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 48;
 
-my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 my $dbmf   = "transposome_seqstore.dbm";
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;

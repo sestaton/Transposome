@@ -7,12 +7,12 @@ use IPC::System::Simple qw(capture);
 use Transposome::SeqUtil;
 use Transposome::SeqIO;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 8;
 
 my $seqfile  = 'seqsample_t.out';
 my $seqfile2 = 'seqsample2_t.out';
-my $test = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test = TestFixture->new( build_proper => 1, destroy => 0 );
 
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;

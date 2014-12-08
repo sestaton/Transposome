@@ -5,13 +5,13 @@ use warnings;
 use File::Spec;
 use Transposome;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::Most tests => 4;
 
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
  
-my $test = TestUtils->new(
+my $test = TestFixture->new(
     seq_file     => $seqfile,
     repeat_db    => $repeatdb,
     destroy      => 1,
@@ -20,7 +20,7 @@ my $test = TestUtils->new(
 
 ok( $test->config_constructor, 'Can build all configuration data for testing' );
 
-my $test2 = TestUtils->new(
+my $test2 = TestFixture->new(
     seq_file     => $seqfile,
     repeat_db    => $repeatdb,
     destroy      => 0,
@@ -32,7 +32,7 @@ my ($test2_conf_file) = @$test2_conf;
 
 ok( defined($test2_conf_file), 'Correctly build configuration data for testing' );
 
-my $test3 = TestUtils->new(
+my $test3 = TestFixture->new(
     seq_file     => 'test_seqfile', # does not exist
     repeat_db    => $repeatdb,      
     destroy      => 0,
@@ -46,7 +46,7 @@ my $trans_obj3 = Transposome->new( config => $test3_conf_file );
 
 dies_ok { $trans_obj3->get_configuration } 'Correctly handled missing sequence file in configuration';
 
-my $test4 = TestUtils->new(
+my $test4 = TestFixture->new(
     seq_file     => $seqfile,
     repeat_db    => 'test_db',      # does not exist
     destroy      => 0,

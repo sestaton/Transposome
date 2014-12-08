@@ -23,8 +23,8 @@ BEGIN {
       || print "[Error]: Could not load Transposome::PairFinder.\n";
     use_ok('Transposome::Run::Blast')
       || print "[Error]: Could not load Transposome::Run::Blast.\n";
-    use_ok('Transposome::Test::TestUtils')
-	|| print "[Error]: Could not load Transposome::Test::TestUtils.\n";
+    use_ok('Transposome::Test::TestFixture')
+	|| print "[Error]: Could not load Transposome::Test::TestFixture.\n";
 }
 
 diag("Testing Transposome $Transposome::VERSION, Perl $], $^X");

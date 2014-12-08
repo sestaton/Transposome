@@ -11,14 +11,14 @@ use Transposome::PairFinder;
 use Transposome::Cluster;
 use Transposome::SeqUtil;
 
-use aliased 'Transposome::Test::TestUtils';
+use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 51;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas');
 my $outdir  = File::Spec->catdir('t', 'cluster_t');
 my $report  = 'cluster_test_rep.txt';
 
-my $test   = TestUtils->new( build_proper => 1, destroy => 0 );
+my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
 my ($blfl) = @$blast;
 
