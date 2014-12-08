@@ -1,6 +1,18 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.08.0	12/07/14	Vancouver, BC
+
+- Rework annotation method by removing use of 'each' operator, which
+  fixes a bug determining TE family name.
+- Lower version requirement to 5.10 from 5.12, because of the above change.
+- Improve installation instructions in the README file by putting deps in one command
+  and removing the need to install cpanminus. Also, improve wiki documentation for
+  installation and configuration of the package.
+- Rename main test class from "TestUtils" to "TestFixture" because that is a more appropriate name.
+  When used with the aliased module in tests, it is now very clear what "TestFixture->new()"
+  is doing, which is setting up test data.
+
 0.07.9	11/26/2014	Vancouver, BC
 
 - Rework test framework to be under the Transposome namespace. This
