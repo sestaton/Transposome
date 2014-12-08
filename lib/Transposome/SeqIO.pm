@@ -109,7 +109,9 @@ method next_seq {
             last if $sline =~ />/;
             $seq .= $sline;
         }
-        seek $fh, -length($sline)-1, 1 if length $sline;
+	if ($sline) {
+	    seek $fh, -length($sline)-1, 1 if length $sline;
+	}
 
         if (!length($seq)) {
             $self->log->error("No sequence for Fasta record '$name'.")

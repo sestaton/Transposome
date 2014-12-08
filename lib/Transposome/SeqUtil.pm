@@ -7,6 +7,7 @@ use DBI;
 use Tie::Hash::DBD;
 use Transposome::SeqIO;
 use namespace::autoclean;
+use feature 'say';
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Role::File',
