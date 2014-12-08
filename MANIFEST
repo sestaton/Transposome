@@ -9,8 +9,8 @@ lib/Transposome/SeqUtil.pm
 lib/Transposome/Role/Util.pm
 lib/Transposome/Role/File.pm
 lib/Transposome/Role/Types.pm
-lib/Transposome/Test/TestUtils.pm
-lib/Transposome/Test/TestUtils/TestConfig.pm
+lib/Transposome/Test/TestFixture.pm
+lib/Transposome/Test/TestFixture/TestConfig.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
