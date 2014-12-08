@@ -1,6 +1,6 @@
 package Transposome::Cluster;
 
-use 5.012;
+use 5.010;
 use Moose;
 use MooseX::Types::Moose qw(HashRef);
 use IPC::System::Simple  qw(system capture EXIT_ANY);
@@ -25,11 +25,11 @@ Transposome::Cluster - Clustering and cluster analysis routines in Transposome.
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

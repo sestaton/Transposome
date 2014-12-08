@@ -1,6 +1,6 @@
 package Transposome::Annotation;
 
-use 5.012;
+use 5.010;
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
 use IPC::System::Simple  qw(system capture EXIT_ANY);
@@ -32,11 +32,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -686,20 +686,12 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
             next;
         }
         for my $class (keys %{$repeats->{$type}}) {
-	    #my $class      = $class_pair->key;
 	    for my $superfam (@{$repeats->{$type}{$class}}) {
-	    #for my $superfam_pair (pairs @{$repeats->{$type}{$class}}) {
-		#while ( my ($superfam_index, $superfam) = each @{$repeats->{$type}{$class}} ) {
 		my $superfam_index = first_index { $_ eq $superfam } @{$repeats->{$type}{$class}};
-		#my $superfam       = $class_pair->value;
                 for my $superfam_h (keys %$superfam) {
                     if ($superfam_h =~ /sine/i) {
 			for my $sine_fam_h (@{$superfam->{$superfam_h}}) {
-			    
-			#for my $sine_fam_pair (pairs @{$superfam->{$superfam_h}}) {
 			    my $sine_fam_index = first_index { $_ eq $sine_fam_h } @{$superfam->{$superfam_h}};
-			    #my $sine_fam_h     = $sine_fam_pair->value;
-                        #while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
                             for my $sine_fam_mem (keys %$sine_fam_h) {
                                 for my $sines (@{$repeats->{$type}{$class}[$superfam_index]{$superfam_h}[$sine_fam_index]{$sine_fam_mem}}) {
                                     for my $sine (@$sines) {
@@ -718,26 +710,30 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
                     }
 		    elsif ($superfam_h =~ /gypsy/i) {# && $$top_hit =~ /^RLG|Gyp/i) {
                         my $gypsy_fam = $$top_hit; 
-                        if ($gypsy_fam =~ /(^RLG[_-][a-zA-Z]+)/) {
-                            $gypsy_fam = $1;
-                        }
-                        $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I_|_I$/;
-                        $gypsy_fam =~ s/_LTR// if $gypsy_fam =~ /_LTR_|_LTR$/;
-                        $top_hit_superfam{$$top_hit} = $superfam_h;
-                        my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $gypsy_fam, $$top_hit, $$top_hit_perc);
-                        $cluster_annot{$readct} = $anno_key;
+			if ($gypsy_fam =~ /^RLG|Gyp/i) {
+			    if ($gypsy_fam =~ /(^RLG[_-][a-zA-Z]+)/) {
+				$gypsy_fam = $1;
+			    }
+			    $gypsy_fam =~ s/_I// if $gypsy_fam =~ /_I_|_I$/;
+			    $gypsy_fam =~ s/_LTR// if $gypsy_fam =~ /_LTR_|_LTR$/;
+			    $top_hit_superfam{$$top_hit} = $superfam_h;
+			    my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $gypsy_fam, $$top_hit, $$top_hit_perc);
+			    $cluster_annot{$readct} = $anno_key;
+			}
                         last;
                     }
                     elsif ($superfam_h =~ /copia/i) { # && $$top_hit =~ /^RLC|Cop/i) {
                         my $copia_fam = $$top_hit;
-                        if ($copia_fam =~ /(^RLC[_-][a-zA-Z]+)/) {
-                            $copia_fam = $1;
-                        }
-                        $copia_fam =~ s/_I// if $copia_fam =~ /_I_|_I$/;                                               
-                        $copia_fam =~ s/_LTR// if $copia_fam =~ /_LTR_|_LTR$/;
-                        $top_hit_superfam{$$top_hit} = $superfam_h;
-                        my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
-                        $cluster_annot{$readct} = $anno_key;
+			if ($copia_fam =~ /^RLC|Cop/i) {
+			    if ($copia_fam =~ /(^RLC[_-][a-zA-Z]+)/) {
+				$copia_fam = $1;
+			    }
+			    $copia_fam =~ s/_I// if $copia_fam =~ /_I_|_I$/;                                               
+			    $copia_fam =~ s/_LTR// if $copia_fam =~ /_LTR_|_LTR$/;
+			    $top_hit_superfam{$$top_hit} = $superfam_h;
+			    my $anno_key = $self->mk_key($filebase, $type, $class, $superfam_h, $copia_fam, $$top_hit, $$top_hit_perc);
+			    $cluster_annot{$readct} = $anno_key;
+			}
                         last;
                     }
 		    elsif ($superfam_h =~ /bel|pao/i && $$top_hit =~ /^RLB|BEL/i) {

@@ -1,6 +1,6 @@
 package Transposome::Test::TestUtils::TestConfig;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
 use Method::Signatures;
@@ -14,11 +14,11 @@ Transposome::Test::TestUtils::TestConfig - Methods for mocking configuration dat
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

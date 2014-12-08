@@ -1,4 +1,4 @@
-use 5.012;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -66,7 +66,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Transposome.pm',
     LICENSE          => 'MIT',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.012,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 6.5503,
     },

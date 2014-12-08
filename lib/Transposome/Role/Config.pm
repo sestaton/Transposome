@@ -1,6 +1,6 @@
 package Transposome::Role::Config;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use Method::Signatures;
 
@@ -10,11 +10,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

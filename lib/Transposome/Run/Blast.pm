@@ -1,6 +1,6 @@
 package Transposome::Run::Blast;
 
-use 5.012;
+use 5.010;
 use Moose;
 use Cwd;
 use File::Basename;
@@ -27,11 +27,11 @@ Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

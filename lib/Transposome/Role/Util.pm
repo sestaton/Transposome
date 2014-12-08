@@ -1,6 +1,6 @@
 package Transposome::Role::Util;
 
-use 5.012;
+use 5.010;
 use Moose::Role;
 use MooseX::Types::Moose qw(Str);
 use Method::Signatures;
@@ -11,11 +11,11 @@ Transposome::Role::Util - Numerous utility routines for Transposome.
 
 =head1 VERSION
 
-Version 0.07.9
+Version 0.08.0
 
 =cut
 
-our $VERSION = '0.07.9';
+our $VERSION = '0.08.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
