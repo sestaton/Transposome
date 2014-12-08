@@ -99,7 +99,6 @@ method map_repeat_types ($infile) {
 	    for my $class (keys %{$matches->{$type}}) {
 		for my $superfam (@{$matches->{$type}{$class}}) {
 		    my $superfam_index = first_index { $_ eq $superfam } @{$matches->{$type}{$class}};
-		#while ( my ($superfam_index, $superfam) = each @{$matches->{$type}{$class}} ) {
 		    for my $superfam_h (keys %$superfam) {
 			my $superfam_cp = lc($superfam_h);
 			for my $mapped_fam (keys %family_map) {
@@ -108,7 +107,6 @@ method map_repeat_types ($infile) {
 				if ($mapped_fam_cp =~ /sine/i && $superfam_cp =~ /sine/i) {
 				    for my $sine_fam_h (@{$superfam->{$superfam_h}}) {
 					my $sine_fam_index = first_index { $_ eq $sine_fam_h } @{$superfam->{$superfam_h}};
-				    #while (my ($sine_fam_index, $sine_fam_h) = each @{$superfam->{$superfam_h}}) {
 					for my $sine_fam_mem (keys %$sine_fam_h) {
 					    if ($sine_fam_mem =~ /$mapped_fam_cp/i && $mapped_fam_cp =~ /^(?!sine$)/) {
 						push @{$matches->{$type}{$class}[$superfam_index]{$superfam_h}[$sine_fam_index]{$sine_fam_mem}}, 

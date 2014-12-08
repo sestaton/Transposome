@@ -13,13 +13,8 @@ use Method::Signatures;
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
-#use Var::Pairs;
 use Try::Tiny;
-
-use Data::Dump;
 use namespace::autoclean;
-
-#use Data::Dump;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Typemap', 
@@ -206,8 +201,6 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
     my $repeat_typemap = $self->map_repeat_types($database);
     my %repeats        = %{ thaw($repeat_typemap) };
-
-    #dd \%repeats;
 
     ## get input files
     opendir my $dir, $cls_with_merges_dir || die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
@@ -646,10 +639,7 @@ method _blast_to_annotation (HashRef $repeats, Str $filebase, Int $readct, Scala
 
     keys %$repeats;
 
-    ##NB: The 'each @array' syntax used in this method requires 5.12. This is another reason we should avoid
-    ##    unrolling this complex structure and use an external method to pull out what we need, if that is possible.
     for my $type (keys %$repeats) {
-	#my $type = $pair->key;
         if ($type eq 'pseudogene' || $type eq 'simple_repeat' || $type eq 'integrated_virus') {
             if ($type eq 'pseudogene' && $$top_hit =~ /rrna|trna|snrna/i) {
                 my $anno_key = $self->mk_key($filebase, $type, $$top_hit, $$top_hit_perc);
