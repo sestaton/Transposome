@@ -5,6 +5,8 @@ Version	Date	Location
 
 - Fix a bug with Transposome::Run::Blast class not being
   able to find executables.
+- Add results section to log so results can be easily grepped 
+  at the command line.
 
 0.08.0	12/07/14	Vancouver, BC
 

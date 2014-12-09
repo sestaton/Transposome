@@ -297,12 +297,12 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     if (Log::Log4perl::initialized()) {
 	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
-	$self->log->info("Total sequences:                        $seqct");
-	$self->log->info("Total sequences clustered:              $cls_tot");
-	$self->log->info("Total sequences unclustered:            $single_tot");
-	$self->log->info("Repeat fraction from clusters:          $rep_frac");
-	$self->log->info("Singleton repeat fraction:              $singleton_rep_frac");
-	$self->log->info("Total repeat fraction:                  $total_rep_frac");
+	$self->log->info("Results - Total sequences:                        $seqct");
+	$self->log->info("Results - Total sequences clustered:              $cls_tot");
+	$self->log->info("Results - Total sequences unclustered:            $single_tot");
+	$self->log->info("Results - Repeat fraction from clusters:          $rep_frac");
+	$self->log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
+	$self->log->info("Results - Total repeat fraction:                  $total_rep_frac");
     }
 
     return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
