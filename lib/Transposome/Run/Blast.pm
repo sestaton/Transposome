@@ -3,7 +3,7 @@ package Transposome::Run::Blast;
 use 5.010;
 use Moose;
 use Cwd;
-use File::Basename;
+use Config;
 use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes         qw(gettimeofday);
@@ -11,6 +11,7 @@ use POSIX               qw(strftime);
 use File::Path          qw(make_path);
 use File::Temp;
 use Path::Class::File;
+use File::Basename;
 use Parallel::ForkManager;
 use Try::Tiny;
 use Transposome::SeqIO;
@@ -112,39 +113,13 @@ has 'mgblast_exec' => (
     predicate => 'has_mgblast_exec',
 );
 
-method BUILD (@_) {
-    my @path = split /:|;/, $ENV{PATH};
-
-    for my $p (@path) {
-	my $mg = File::Spec->catfile($p, 'mgblast');
-	my $fd = File::Spec->catfile($p, 'formatdb');
-
-        if (-e $mg && -x $mg) {
-            $self->set_mgblast_exec($mg);
-        }
-        elsif (-e $fd && -x $fd) {
-            $self->set_formatdb_exec($fd);
-        }
-    }
-
-    try {
-        die unless $self->has_mgblast_exec;
-    }
-    catch {
-        $self->log->error("Unable to find mgblast. Check your PATH to see that it is installed. Exiting.")
-	    if Log::Log4perl::initialized();
-	exit(1);
-    };
-
-    try {
-        die unless $self->has_formatdb_exec;
-    }
-    catch {
-        $self->log->error("Unable to find formatdb. Check your PATH to see that it is installed. Exiting.")
-	    if Log::Log4perl::initialized();
-	exit(1);
-    };
-}
+has 'bin_dir' => (
+    is       => 'rw',
+    isa      => 'Path::Class::Dir',
+    default  => sub {
+        return Path::Class::Dir->new($Config{sitebin})
+    },
+);
 
 =head1 METHODS
 
@@ -176,7 +151,9 @@ method run_allvall_blast {
     my $thread  = $self->threads;
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
-    
+    my $realbin = $self->bin_dir->resolve;
+
+    my ($formatdb, $mgblast) = $self->_find_mgblast_exes($realbin);
     $outfile =~ s/\.f.*//;
     $outfile .= "_allvall_blast.bln";
     make_path($dir, {verbose => 0, mode => 0771,});
@@ -189,7 +166,7 @@ method run_allvall_blast {
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs);
     
-    my $database = $self->_make_mgblastdb;
+    my $database = $self->_make_mgblastdb($formatdb);
     my $files_ct = @$seq_files;
     my %blasts;
 
@@ -213,7 +190,7 @@ method run_allvall_blast {
 
     for my $seqs (@$seq_files) {
 	$pm->start($seqs) and next;
-	my $blast_out = $self->_run_blast($seqs, $database, $cpu);
+	my $blast_out = $self->_run_blast($mgblast, $seqs, $database, $cpu);
 	$blasts{$blast_out} = 1;
     
 	unlink $seqs;
@@ -255,11 +232,11 @@ method run_allvall_blast {
 
 =cut 
 
-method _make_mgblastdb {
+method _make_mgblastdb ($formatdb) {
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
-    my $formatdb = $self->get_formatdb_exec;
+    #my $formatdb = $self->get_formatdb_exec;
     $fname =~ s/\.f.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
@@ -366,7 +343,7 @@ method _make_fasta_from_fastq ($file, $fname, $dir) {
 
 =cut 
 
-method _run_blast ($subseq_file, $database, Int $cpu) {
+method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
     my ($dbfile, $dbdir, $dbext)    = fileparse($database, qr/\.[^.]*/);
     my ($subfile, $subdir, $subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
@@ -377,7 +354,7 @@ method _run_blast ($subseq_file, $database, Int $cpu) {
     my $pid          = $self->percent_identity;
     my $desc_num     = $self->desc_num;
     my $aln_num      = $self->aln_num;
-    my $mgblast      = $self->get_mgblast_exec;
+    #my $mgblast      = $self->get_mgblast_exec;
 
     my $exit_value;
     my @blast_cmd = "$mgblast ".           # program
@@ -472,6 +449,54 @@ method _split_reads (Int $numseqs) {
     }
     close $out;
     return (\@split_files, $count);
+}
+
+=head2 _find_mgblast_exes
+
+ Title : _find_mgblast_exes
+ 
+ Usage   : my ($formatdb, $mgblast) = $self->_find_mgblast_exes($realbin);
+           
+ Function: Locates the mgblast executables shipped with Transposome.
+           Depending on the Perl installation, these may be installed in
+           different locations. For example, with local::lib installed,
+           the executables will not be in the default location.
+           
+                                                                                 Return_type
+ Returns : The path to the default location with standard                        Scalar
+           Perl installation.
+                                                                                 Arg_type
+ Args    : Returns : In order, 1) path to the formatdb program                   Scalar
+                               2) path to the mgblast program                    Scalar
+
+=cut 
+
+method _find_mgblast_exes (Path::Class::Dir $realbin) {
+    my $formatdb = File::Spec->catfile($realbin, 'formatdb');
+    my $mgblast  = File::Spec->catfile($realbin, 'mgblast');
+    
+    if (-e $formatdb && -x $formatdb &&
+	-e $mgblast && -x $mgblast) {
+	return ($formatdb, $mgblast);
+    }
+    elsif (! -e $formatdb) {
+	my @path = split /:|;/, $ENV{PATH};
+
+	for my $p (@path) {
+	    my $formatdb = File::Spec->catfile($p, 'formatdb');
+	    my $mgblast  = File::Spec->catfile($p, 'mgblast');
+
+	    if (-e $formatdb && -x $formatdb &&
+		-e $mgblast && -x $mgblast) {
+		return ($formatdb, $mgblast);
+	    }
+	}
+    }
+    else {
+	$self->log->error("Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.")
+	    if Log::Log4perl::initialized();
+	exit(1);
+    }
 }
 
 =head1 AUTHOR

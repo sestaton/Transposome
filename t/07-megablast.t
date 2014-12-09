@@ -58,8 +58,8 @@ sub mgblast_fasta {
 					     threads       => 1,
 					     cpus          => 1,
 					     seq_num       => $config->{sequence_num},
-					     mgblast_exec  => $mgblast,
-					     formatdb_exec => $formatdb
+#					     mgblast_exec  => $mgblast,
+#					     formatdb_exec => $formatdb
 					     );
     
     my $blastdb = $blast->run_allvall_blast;
