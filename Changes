@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.08.1	12/08/14	Vancouver, BC
+
+- Fix a bug with Transposome::Run::Blast class not being
+  able to find executables.
+
 0.08.0	12/07/14	Vancouver, BC
 
 - Rework annotation method by removing use of 'each' operator, which
