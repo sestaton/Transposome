@@ -472,10 +472,17 @@ method _split_reads (Int $numseqs) {
 =cut 
 
 method _find_mgblast_exes (Path::Class::Dir $realbin) {
-    my $formatdb = File::Spec->catfile($realbin, 'formatdb');
-    my $mgblast  = File::Spec->catfile($realbin, 'mgblast');
-    
-    if (-e $formatdb && -x $formatdb &&
+    my $formatdb = File::Spec->catfile($realbin, 'formatdb'); # installed in 'sitebin' though not available for testing
+    my $mgblast  = File::Spec->catfile($realbin, 'mgblast');  # installed in 'sitebin' though not available for testing
+    my $fmtexe   = $self->get_formatdb_exec;                  # set during class initialization
+    my $mgexe    = $self->get_mgblast_exec;                   # set during class initialization
+
+    # check if the executable path was set first
+    if (-e $fmtexe && -x $fmtexe &&
+        -e $mgexe && -x $mgexe) {
+        return ($fmtexe, $mgexe);
+    }
+    elsif (-e $formatdb && -x $formatdb &&
 	-e $mgblast && -x $mgblast) {
 	return ($formatdb, $mgblast);
     }
