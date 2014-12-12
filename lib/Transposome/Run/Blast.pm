@@ -478,12 +478,12 @@ method _find_mgblast_exes (Path::Class::Dir $realbin) {
     my $mgexe    = $self->get_mgblast_exec;                   # set during class initialization
 
     # check if the executable path was set first
-    if (-e $fmtexe && -x $fmtexe &&
-        -e $mgexe && -x $mgexe) {
+    if (defined $fmtexe && -e $fmtexe && -x $fmtexe &&
+        defined $mgexe  && -e $mgexe  && -x $mgexe) {
         return ($fmtexe, $mgexe);
     }
     elsif (-e $formatdb && -x $formatdb &&
-	-e $mgblast && -x $mgblast) {
+	   -e $mgblast  && -x $mgblast) {
 	return ($formatdb, $mgblast);
     }
     elsif (! -e $formatdb) {
@@ -494,7 +494,7 @@ method _find_mgblast_exes (Path::Class::Dir $realbin) {
 	    my $mgblast  = File::Spec->catfile($p, 'mgblast');
 
 	    if (-e $formatdb && -x $formatdb &&
-		-e $mgblast && -x $mgblast) {
+		-e $mgblast  && -x $mgblast) {
 		return ($formatdb, $mgblast);
 	    }
 	}
