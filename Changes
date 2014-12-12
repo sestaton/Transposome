@@ -1,6 +1,8 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.08.2	12/12/14	Vancouver, BC
+
 - Fix bug with variables for blast paths not being defined when
   searching path.
 - Add comments to example configuration, and provide real values for all slots instead
