@@ -567,7 +567,7 @@ method _find_community_exes (Path::Class::Dir $realbin) {
     my $lcommunity = File::Spec->catfile($realbin, 'louvain_community');
     my $lhierarchy = File::Spec->catfile($realbin, 'louvain_hierarchy');
     
-    if (-e $lconvert && -x $lconvert &&
+    if (-e $lconvert   && -x $lconvert &&
 	-e $lcommunity && -x $lcommunity &&
 	-e $lhierarchy && -x $lhierarchy) {
 	return ($lconvert, $lcommunity, $lhierarchy);
@@ -580,7 +580,7 @@ method _find_community_exes (Path::Class::Dir $realbin) {
 	    my $lcommunity = File::Spec->catfile($p, 'louvain_community');
 	    my $lhierarchy = File::Spec->catfile($p, 'louvain_hierarchy');
 
-	    if (-e $lconvert && -x $lconvert &&
+	    if (-e $lconvert   && -x $lconvert &&
 		-e $lcommunity && -x $lcommunity &&
 		-e $lhierarchy && -x $lhierarchy) {
 		return ($lconvert, $lcommunity, $lhierarchy);
