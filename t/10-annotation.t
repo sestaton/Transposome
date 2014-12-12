@@ -134,7 +134,6 @@ $annotation->clusters_annotation_to_summary( $anno_rp_path,
                                              $superfams );
 
 END {
-    #system("rm -rf $outdir $blfl t/cluster_test_rep* $db");
     remove_tree( $outdir, { safe => 1 } );
     unlink glob("t/cluster_test_rep*");
     unlink $blfl;

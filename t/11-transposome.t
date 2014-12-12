@@ -215,7 +215,6 @@ $annotation->clusters_annotation_to_summary( $anno_rp_path,
 					     $blasts, 
 					     $superfams );
 
-#system("rm -rf $config->{output_directory} t/$config->{run_log_file} t/transposome_mgblast* t_rep** $conf_file formatdb.log");
 unlink glob("t/transposome_mgblast*");
 unlink glob("t_rep*");
 remove_tree( $config->{output_directory}, { safe => 1 } );
