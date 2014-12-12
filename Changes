@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+- Fix bug with variables for blast paths not being defined when
+  searching path.
+- Add comments to example configuration, and provide real values for all slots instead
+  of test values that may cause confusion (and lead to issues if not changed).
+
 0.08.1	12/08/14	Vancouver, BC
 
 - Fix a bug with Transposome::Run::Blast class not being
