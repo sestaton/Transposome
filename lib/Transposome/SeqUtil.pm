@@ -166,7 +166,13 @@ method sample_seq {
     my @sample;
     my %seqhash;
 
-    my $seqio_fa = Transposome::SeqIO->new( file => $filename );
+    my $seqio_fa;
+    if ($self->has_fh) {
+        $seqio_fa = Transposome::SeqIO->new( fh => $filename );
+    }
+    else {
+        $seqio_fa = Transposome::SeqIO->new( file => $filename );
+    }
 
     srand($seed);
     while (my $seq = $seqio_fa->next_seq) {

@@ -2,10 +2,11 @@
 
 use strict;
 use warnings;
+use File::Spec;
 use Transposome::SeqIO;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 36;
+use Test::More 'no_plan';# tests => 36;
 
 my $test_proper = TestFixture->new( build_proper => 1, destroy => 0 );
 my $seq_num = 1;
@@ -37,4 +38,15 @@ for my $fq (@$proper_fq_arr) {
     $seq_num++;
 }
 
-done_testing();
+my $file = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
+my $seqio_fa = Transposome::SeqIO->new( file => $file );
+while ( my $seq = $seqio_fa->next_seq ) {
+    ok( $seq->has_id,  "Fasta sequence $seq_num has an ID" );
+    ok( $seq->has_seq, "Fasta sequence $seq_num has a sequence" );
+    ok( !$seq->has_qual,
+	"Fasta sequence $seq_num does not have quality scores" );
+}
+#unlink $fa;
+#$seq_num++;
+
+#done_testing();

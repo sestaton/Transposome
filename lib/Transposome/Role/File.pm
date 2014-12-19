@@ -3,6 +3,8 @@ package Transposome::Role::File;
 use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use IO::File;
 use Method::Signatures;
 
 =head1 NAME
@@ -44,8 +46,34 @@ has 'dir' => (
 has 'fh' => (
     is         => 'ro',
     isa        => 'IO::File',
+    predicate  => 'has_fh',
     lazy_build => 1,
+    builder    => '_build_fh', #sub { return $_->file->openr },
 );
+
+method _build_fh {
+    #my $fh = $self->file->openr;
+    #return $fh;
+    my $file = $self->file;
+    say $file;
+    my $fh = IO::File->new();
+    if ($file =~ /\.gz$/) {
+        #open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
+	$fh = new IO::Uncompress::Gunzip $file->stringify;
+	    #or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
+	#$fh = IO::File->new($file, 
+    }
+    elsif ($file =~ /\.bz2$/) {
+        open $fh, '-|', 'bzcat', $file or die "\nERROR: Could not open file: $file\n";
+    }
+    elsif ($file =~ /^-$|STDIN/) {
+        open $fh, '< -' or die "\nERROR: Could not open STDIN\n";
+    }
+    else {
+        $fh = $self->file->openr;
+    }
+    return $fh;
+}
 
 =head1 METHODS
 
@@ -67,34 +95,22 @@ has 'fh' => (
 =cut
 
 method get_fh {
-    if (-e $self->file) {
-	my $fh = $self->file->openr;
-	return $fh;
+    my $file = $self->file;
+    my $fh;
+    if ($file =~ /\.gz$/) {
+	open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
     }
-}
-
-=head2 _build_fh
-
- Title   : _build_fh
-
- Usage   : This is a private method, do not use it directly.
-          
- Function: Gets a filehandle for the associated
-           file.
-
-                                                   Return_type
- Returns : An open filehandle for reading          Scalar
-
- Args    : None. This is a role that can
-           be consumed.
-
-=cut
-
-method _build_fh {
-    my $fh = $self->file->openr;
+    elsif ($file =~ /\.bz2$/) {
+	open $fh, '-|', 'bzcat', $file or die "\nERROR: Could not open file: $file\n";
+    }
+    elsif ($file =~ /^-$|STDIN/) {
+	open $fh, '< -' or die "\nERROR: Could not open STDIN\n";
+    }
+    else {
+	$fh = $self->file->openr;
+    }
     return $fh;
 }
-
 
 =head1 AUTHOR
 
