@@ -5,6 +5,7 @@ use Moose::Role;
 use MooseX::Types::Path::Class;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use IO::File;
+use Symbol;
 use Method::Signatures;
 
 =head1 NAME
@@ -54,12 +55,13 @@ has 'fh' => (
 method _build_fh {
     #my $fh = $self->file->openr;
     #return $fh;
+    my $class = $self->meta->name;
     my $file = $self->file;
-    say $file;
+    #my $s = Symbol::gensym;
     my $fh = IO::File->new();
     if ($file =~ /\.gz$/) {
-        #open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
-	$fh = new IO::Uncompress::Gunzip $file->stringify;
+        open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
+	#$fh = new IO::Uncompress::Gunzip $file->stringify;
 	    #or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
 	#$fh = IO::File->new($file, 
     }
@@ -72,6 +74,8 @@ method _build_fh {
     else {
         $fh = $self->file->openr;
     }
+    #tie $$s, $class, $self;
+
     return $fh;
 }
 
