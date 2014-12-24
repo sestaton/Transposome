@@ -14,7 +14,7 @@ use Path::Class::File;
 use File::Basename;
 use Parallel::ForkManager;
 use Try::Tiny;
-use Transposome::SeqIO;
+use Transposome::SeqFactory;
 use namespace::autoclean;
 
 with 'MooseX::Log::Log4perl',
@@ -28,11 +28,11 @@ Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -147,6 +147,7 @@ method run_allvall_blast {
     my $t0      = gettimeofday();
     my $dir     = $self->dir->absolute;
     my $file    = $self->file->absolute;
+    my $format  = $self->format;
     my $cpu     = $self->cpus;
     my $thread  = $self->threads;
     my $numseqs = $self->seq_num;
@@ -164,7 +165,7 @@ method run_allvall_blast {
     $self->log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.")
 	if Log::Log4perl::initialized();
 
-    my ($seq_files, $seqct) = $self->_split_reads($numseqs);
+    my ($seq_files, $seqct) = $self->_split_reads($numseqs, $format);
     
     my $database = $self->_make_mgblastdb($formatdb);
     my $files_ct = @$seq_files;
@@ -236,18 +237,17 @@ method _make_mgblastdb ($formatdb) {
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
-    #my $formatdb = $self->get_formatdb_exec;
+
     $fname =~ s/\.f.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
-    my $is_fastq = $self->_is_fastq($file);
 
-    $file = $self->_make_fasta_from_fastq($file, $fname, $dir) if $is_fastq;
-   
+    my $tempdb = $self->_make_tempdb($file);
+
     try {
-        system([0..5],"$formatdb -p F -i $file -t $db -n $db_path 2>&1 > /dev/null");
+        system([0..5],"$formatdb -p F -i $tempdb -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
         $self->log->error("Unable to make mgblast database.")
@@ -256,65 +256,34 @@ method _make_mgblastdb ($formatdb) {
 	    if Log::Log4perl::intialized();
         exit(1);
     };
+    unlink $tempdb;
 
-    unlink $file if $is_fastq;
     return $db_path;
 }
 
-=head2 _is_fastq
+=head2 _make_tempdb
 
- Title : _is_fastq
+ Title : _make_tempdb
  
  Usage   : This is private method, do not use it directly.
            
- Function: Determine if the input is fasta or fastq in order
-           to know how to construct the database.
+ Function: Determine if the input is FASTA or FASTQ, and if the
+           input is compressed. formatdb does not accept FASTQ or compressed
+           data, so we need to construct a temporary database.
 
                                                                    Return_type
- Returns : In order, 1) boolean (1 - is fastq, 0 - is not fastq)   Scalar
+ Returns : In order, 1) The sequence file name                     Scalar
 
- Args    : In order, 1) the sequence file
+ Args    : In order, 1) The temp sequence file                     Scalar
 
 =cut 
 
-method _is_fastq ($file) {
-    require Transposome::SeqIO;
+method _make_tempdb ($file) {
+    my $format = $self->format;
+    my $seqio  = Transposome::SeqFactory->new( file => $file, format => $format )->make_seqio_object;
 
-    my $seqio = Transposome::SeqIO->new( file => $file );
-
-    my $seq = $seqio->next_seq;
-    if (defined $seq->get_qual) {
-	return 1;
-    }
-    else {
-	return 0;
-    }
-}
-
-=head2 _make_fasta_from_fastq
-
- Title : _make_fasta_from_fastq
- 
- Usage   : This is private method, do not use it directly.
-           
- Function: Creates a temporary fasta file for database construction
-           if the input is fastq, otherwise the original file is used.
-
-                                                                   Return_type
- Returns : In order, 1) the fasta file of input sequences          Scalar
-
- Args    : In order, 1) the sequence file, 
-                     2) the sequence name,
-                     3) the directory of the input
-
-=cut 
-
-method _make_fasta_from_fastq ($file, $fname, $dir) {
-    require Transposome::SeqIO;
-
-    my $seqio = Transposome::SeqIO->new( file => $file );
-    my $tmpfasta = $fname."_tmp.fasta";
-    my $fas_path = Path::Class::File->new($dir, $tmpfasta);
+    my $tmpfasta = $self->file->basename."_tmp.fasta";
+    my $fas_path = Path::Class::File->new($self->dir, $tmpfasta);
     my $fasfh = $fas_path->open('w') or die "\n[ERROR]: Could not open file: $fas_path\n";
 
     while (my $seq = $seqio->next_seq) {
@@ -354,7 +323,6 @@ method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
     my $pid          = $self->percent_identity;
     my $desc_num     = $self->desc_num;
     my $aln_num      = $self->aln_num;
-    #my $mgblast      = $self->get_mgblast_exec;
 
     my $exit_value;
     my @blast_cmd = "$mgblast ".           # program
@@ -406,7 +374,7 @@ method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
 
 =cut
 
-method _split_reads (Int $numseqs) {
+method _split_reads (Int $numseqs, Str $format) {
     my ($iname, $ipath, $isuffix) = fileparse($self->file->absolute, qr/\.[^.]*/);
     my $dir = $self->dir->absolute;
 
@@ -425,27 +393,27 @@ method _split_reads (Int $numseqs) {
     open $out, '>', $fname or die "\n[ERROR]: Could not open file: $fname\n";
     
     push @split_files, $fname;
-    if (-e $self->file) {
-        my $filename = $self->file->absolute;
-        my $seqio = Transposome::SeqIO->new( file => $filename );
-        while (my $seq = $seqio->next_seq) {
+    
+    my $filename = $self->file->absolute;
+    my $seqio = Transposome::SeqFactory->new( file => $filename, format => $format )->make_seqio_object;
 
-	    if ($count % $numseqs == 0 && $count > 0) {
-		$fcount++;
-		$tmpiname = $iname."_".$fcount."_XXXX";
-		$fname = File::Temp->new( TEMPLATE => $tmpiname,
-					  DIR      => $dir,
-					  SUFFIX   => ".fasta",
-					  UNLINK   => 0);
-		
-		open $out, '>', $fname or die "\n[ERROR]: Could not open file: $fname\n";
-		
-		push @split_files, $fname;
-	    }
-
-	    say $out join "\n", ">".$seq->get_id, $seq->get_seq;
-	    $count++;
+    while (my $seq = $seqio->next_seq) {
+	
+	if ($count % $numseqs == 0 && $count > 0) {
+	    $fcount++;
+	    $tmpiname = $iname."_".$fcount."_XXXX";
+	    $fname = File::Temp->new( TEMPLATE => $tmpiname,
+				      DIR      => $dir,
+				      SUFFIX   => ".fasta",
+				      UNLINK   => 0);
+	    
+	    open $out, '>', $fname or die "\n[ERROR]: Could not open file: $fname\n";
+	    
+	    push @split_files, $fname;
 	}
+	
+	say $out join "\n", ">".$seq->get_id, $seq->get_seq;
+	$count++;
     }
     close $out;
     return (\@split_files, $count);
