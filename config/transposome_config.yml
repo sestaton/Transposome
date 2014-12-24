@@ -3,6 +3,7 @@
 ## For more information about this file, see https://github.com/sestaton/Transposome/wiki/Specifications-and-example-usage.
 blast_input:
   - sequence_file:      t_reads.fas
+  - sequence_format:    fasta
   - sequence_num:       10000
   - cpu:                1
   - thread:             2
