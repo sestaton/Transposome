@@ -1,4 +1,4 @@
-package Transposome::SeqIO::fasta;
+package Transposome::SeqIO::fastq;
 
 use 5.010;
 use Moose;
@@ -9,7 +9,7 @@ extends 'Transposome::SeqIO';
 
 =head1 NAME
 
-Transposome::SeqIO::fasta - Class for reading FASTA data.
+Transposome::SeqIO::fastq - Class for reading FASTQ data.
 
 =head1 VERSION
 
@@ -21,9 +21,9 @@ our $VERSION = '0.08.3';
 
 =head1 SYNOPSIS
 
-    use Transposome::SeqIO::fasta;
+    use Transposome::SeqIO::fastq;
 
-    my $trans_obj = Transposome::SeqIO::fasta->new( file => $infile );
+    my $trans_obj = Transposome::SeqIO::fastq->new( file => $infile );
 
     while (my $seq = $trans_obj->next_seq) {
          # do something interesting with $seq
@@ -38,7 +38,7 @@ our $VERSION = '0.08.3';
  Title   : next_seq
  Usage   : while (my $seq = $trans_obj->next_seq) { ... };
            
- Function: Reads fasta data from a file or filehanle.
+ Function: Reads fastq data from a file or filehandle.
                                                                             
  Returns : A Transposome::SeqIO object on which you can call methods                  
            representing the sequence, id, or quality scores (in the
@@ -57,23 +57,38 @@ our $VERSION = '0.08.3';
            if ($seq->has_seq)  { ... # is the seq set? }
            if ($seq->has_qual) { ... # is the qual set? This will be no for Fasta. }
 
- Args    : None. This is a class method called on a Transposome::SeqIO::fasta object.
+ Args    : None. This is a class method called on a Transposome::SeqIO:fastq object.
  
-           my $seqio = Transposome::SeqIO::fasta->new( file => $infile );
+           my $seqio = Transposome::SeqIO::fastq->new( file => $infile );
 
 =cut
 
 method next_seq {
-    local $/ = "\n>";
     my $fh   = $self->fh;
-    return unless my $record = $fh->getline;
-    chomp $record;
+    my $line = $fh->getline;
+    return unless defined $line && $line =~ /\S/;
+    chomp $line;
+    
+    if (substr($line, 0, 1) eq '@') {
+        my $name = $self->_set_id_per_encoding($line);
+        $self->set_id($name);
+    }
 
-    my ($id, $seq) = split /\n/, $record, 2;
-    defined $id && $id =~ s/>//g;
-    my $name = $self->_set_id_per_encoding($id);
-    $self->set_id($name);
+    my ($sline, $seq);
+    while ($sline = $fh->getline) {
+	chomp $sline;
+	last if $sline =~ /^\+/;
+	$seq .= $sline;
+    }	
     $self->set_seq($seq);
+    
+    my $qual;
+    while (my $qline = $fh->getline) {
+	chomp $qline;
+	$qual .= $qline;
+	last if length($qual) >= length($seq);
+    }
+    $self->set_qual($qual);
 
     return $self;
 }
@@ -96,11 +111,11 @@ Args    : A sequence header                                    Scalar
 
 =cut
 
-method _set_id_per_encoding ($id) {
-    if ($id =~ /(\S+)\s(\d)\S+/) {
+method _set_id_per_encoding ($line) {
+    if ($line =~ /^.?(\S+)\s(\d)\S+/) {
 	return $1."/".$2;
     }
-    elsif ($id =~ /(\S+)/) {
+    elsif ($line =~ /^.?(\S+)/) {
 	return $1;
     }
     else {
