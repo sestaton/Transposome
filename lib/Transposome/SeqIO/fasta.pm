@@ -73,6 +73,11 @@ method next_seq {
     defined $id && $id =~ s/>//g;
     my $name = $self->_set_id_per_encoding($id);
     $self->set_id($name);
+
+    if (!length($seq)) {
+	warn "No sequence for FASTA record '$name'.";
+	exit(1);
+    }
     $self->set_seq($seq);
 
     return $self;

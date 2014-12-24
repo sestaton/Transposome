@@ -68,9 +68,10 @@ method next_seq {
     my $line = $fh->getline;
     return unless defined $line && $line =~ /\S/;
     chomp $line;
-    
+
+    my $name;
     if (substr($line, 0, 1) eq '@') {
-        my $name = $self->_set_id_per_encoding($line);
+        $name = $self->_set_id_per_encoding($line);
         $self->set_id($name);
     }
 
@@ -80,6 +81,11 @@ method next_seq {
 	last if $sline =~ /^\+/;
 	$seq .= $sline;
     }	
+
+    if (!length($seq)) {
+	warn "No sequence for FASTQ record '$name'.";
+	exit(1);
+    }
     $self->set_seq($seq);
     
     my $qual;
@@ -87,6 +93,16 @@ method next_seq {
 	chomp $qline;
 	$qual .= $qline;
 	last if length($qual) >= length($seq);
+    }
+
+    if (!length($qual)) {
+	warn "No quality scores for '$name'.";
+	exit(1);
+    }
+
+    unless (length($qual) >= length($seq)) {
+	warn "Unequal number of quality and scores and bases for '$name'.";
+	exit(1);
     }
     $self->set_qual($qual);
 
