@@ -71,7 +71,7 @@ Available classes are:
     Transposome::Annotation
     Transposome::Cluster
     Transposome::PairFinder
-    Transposome::SeqIO
+    Transposome::SeqFactory
     Transposome::SeqUtil
     Transposome::Run::Blast
                       

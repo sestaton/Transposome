@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use IPC::System::Simple qw(capture);
 use Transposome::SeqUtil;
-use Transposome::SeqIO;
+use Transposome::SeqFactory;
 
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 8;
@@ -37,7 +37,7 @@ for my $fa ( @$fa_arr ) {
         $memstore2->sample_seq;
     }
 
-    my $seqio2 = Transposome::SeqIO->new( file => $seqfile );
+    my $seqio2 = Transposome::SeqFactory->new( file => $seqfile )->make_seqio_object;
     while ( my $seq2 = $seqio2->next_seq ) {
         $stdoutct++ if $seq2->has_seq;
     }
@@ -74,7 +74,7 @@ for my $fa ( @$fa_arr ) {
 
 for my $fq ( @$fq_arr ) {
     my $memstore =
-	Transposome::SeqUtil->new( file => $fq, sample_size => 2 );
+	Transposome::SeqUtil->new( file => $fq, sample_size => 2, format => 'fastq' );
     ( $seqs, $seqct ) = $memstore->sample_seq;
     is( $seqct, 2,
 	'There correct number of Fastq sequences were sampled' );
@@ -83,17 +83,18 @@ for my $fq ( @$fq_arr ) {
 	'The same number of Fastq sequences were sampled and stored' );
 
     my $memstore2 =
-	Transposome::SeqUtil->new( file => $fq, sample_size => 2, no_store => 1 );
+	Transposome::SeqUtil->new( file => $fq, sample_size => 2, no_store => 1, format => 'fastq' );
     {
         local *STDOUT;
         open STDOUT, '>', $seqfile;
         $memstore2->sample_seq;
     }
     
-    my $seqio2 = Transposome::SeqIO->new( file => $seqfile );
+    my $seqio2 = Transposome::SeqFactory->new( file => $seqfile )->make_seqio_object;
     while ( my $seq2 = $seqio2->next_seq ) {
         $stdoutct++ if $seq2->has_seq;
     }
+
     ok(
        $seqct == $stdoutct,
        'The same number of Fastq sequences sampled and stored as written to STDOUT'
@@ -101,7 +102,7 @@ for my $fq ( @$fq_arr ) {
     unlink $seqfile;
 
     my $memstore3 =
-	Transposome::SeqUtil->new( file => $fq, sample_size => 7, no_store => 1 );
+	Transposome::SeqUtil->new( file => $fq, sample_size => 7, no_store => 1, format => 'fastq' );
     {
         local *STDOUT;
         local *STDERR;

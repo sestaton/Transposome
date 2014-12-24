@@ -13,8 +13,8 @@ use Log::Log4perl;
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 4;
 
-my $fasfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
-my $fqfile   = File::Spec->catfile('t', 'test_data', 't_reads.fq');
+my $fasfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
+my $fqfile   = File::Spec->catfile('t', 'test_data', 't_reads.fq.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 
 mgblast_fasta($fasfile, $repeatdb);
@@ -24,6 +24,7 @@ sub mgblast_fasta {
     my ($fasfile, $repeatdb) = @_;
     my $test = TestFixture->new(
 			      seq_file     => $fasfile,
+			      seq_format   => 'fasta',
 			      repeat_db    => $repeatdb,
 			      destroy      => 0,
 			      build_proper => 1
@@ -54,6 +55,7 @@ sub mgblast_fasta {
     
     my $blast = Transposome::Run::Blast->new(
 					     file          => $config->{sequence_file},
+					     format        => $config->{sequence_format},
 					     dir           => $config->{output_directory},
 					     threads       => 1,
 					     cpus          => 1,
@@ -77,6 +79,7 @@ sub mgblast_fastq {
     my ($fqfile, $repeatdb) = @_;
     my $test = TestFixture->new(
                               seq_file     => $fqfile,
+			      seq_format   => 'fastq',
                               repeat_db    => $repeatdb,
                               destroy      => 0,
                               build_proper => 1
@@ -107,6 +110,7 @@ sub mgblast_fastq {
     
     my $blast = Transposome::Run::Blast->new(
                                              file          => $config->{sequence_file},
+					     format        => $config->{sequence_format},
                                              dir           => $config->{output_directory},
                                              threads       => 1,
                                              cpus          => 1,

@@ -1,4 +1,4 @@
-package Transposome::SeqIO;
+package Transposome::SeqFactory;
 
 use 5.010;
 use Moose;
@@ -10,7 +10,7 @@ with 'Transposome::Role::File';
 
 =head1 NAME
 
-Transposome::SeqIO - Base class for reading Fasta/q data.
+Transposome::SeqIO - Class for reading Fasta/q data.
 
 =head1 VERSION
 
@@ -22,7 +22,6 @@ our $VERSION = '0.08.3';
 
 =head1 SYNOPSIS
 
-    ## Don't use Transposome::SeqIO directly, use as below.
     use Transposome::SeqFactory;
 
     my $trans_obj = Transposome::SeqFactory->new( file => $infile )->make_seqio_object;
@@ -33,33 +32,32 @@ our $VERSION = '0.08.3';
 
 =cut
 
-has 'id' => (
-    is        => 'rw',
-    isa       => 'Str',
-    reader    => 'get_id',
-    writer    => 'set_id',
-    predicate => 'has_id',
-    clearer   => 'clear_id',
-);
+#has 'format' => (
+#    is        => 'ro',
+#    isa       => 'Str',
+#    predicate => 'has_format',
+#    default   => 'fasta'
+#);
 
-has 'seq' => (
-    is        => 'rw',
-    isa       => 'Str',
-    reader    => 'get_seq',
-    writer    => 'set_seq',
-    predicate => 'has_seq',
-    clearer   => 'clear_seq',
-);
-
-has 'qual' => (
-    is        => 'rw',
-    lazy      => 1,
-    default   => undef,
-    reader    => 'get_qual',
-    writer    => 'set_qual',
-    predicate => 'has_qual',
-    clearer   => 'clear_qual',
-);
+method make_seqio_object {
+    if ($self->format =~ /fasta/i) {
+	Class::Load::load_class('Transposome::SeqIO::fasta');
+	  return Transposome::SeqIO::fasta->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
+	  return Transposome::SeqIO::fasta->new( file => $self->file, format => $self->format ) if !defined $self->fh;
+      }
+    elsif ($self->format =~ /fastq/i) {
+	Class::Load::load_class('Transposome::SeqIO::fastq');
+	  return Transposome::SeqIO::fastq->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
+          return Transposome::SeqIO::fastq->new( file => $self->file, format => $self->format ) if !defined $self->fh;
+      }
+    else {
+        my $unrecognized = $self->format;
+        #$self->log->error("Unable to set sequence format. '$unrecognized' is not recognized. Exiting.")
+            #if Log::Log4perl::initialized();
+        say STDERR "Unable to set sequence format. '$unrecognized' is not recognized. Exiting.";
+        exit(1);
+    }
+};
 
 =head1 AUTHOR
 
@@ -76,7 +74,7 @@ reached at the email address listed above to resolve any questions.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Transposome::SeqIO
+    perldoc Transposome::SeqFactory
 
 
 =head1 LICENSE AND COPYRIGHT

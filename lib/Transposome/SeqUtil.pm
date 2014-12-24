@@ -5,12 +5,11 @@ use Moose;
 use Method::Signatures;
 use DBI;
 use Tie::Hash::DBD;
-use Transposome::SeqIO;
+use Transposome::SeqFactory;
 use namespace::autoclean;
 use feature 'say';
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::File',
+with 'Transposome::Role::File',
      'Transposome::Role::Types';
 
 =head1 NAME
@@ -19,11 +18,11 @@ Transposome::SeqUtil - Utilities for handling Fasta/q sequence files.
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -89,13 +88,13 @@ has 'no_store' => (
  Title   : store_seq
  Usage   : my ($seqs, $seq_ct) = $seq_store->store_seq;
           
- Function: Take a Fasta or Fastq file and return a reference
+ Function: Take a FASTA or FASTQ file and return a reference
            to a data structure containing the sequences, along
            with the total sequence count.
 
                                                                Return_type
-Returns : In order, 1) a hash containing the id, sequence      HashRef 
-                        mappings for each Fasta/q record
+ Returns : In order, 1) a hash containing the id, sequence     HashRef 
+                        mappings for each FASTA/Q record
                      2) the sequence count                     Scalar
 
                                                                Arg_type
@@ -125,7 +124,8 @@ method store_seq {
     }
 
     my $filename = $self->file->relative;
-    my $seqio = Transposome::SeqIO->new( file => $filename );
+    my $format   = $self->format;
+    my $seqio    = Transposome::SeqFactory->new( file => $filename, format => $format )->make_seqio_object;
 
     while (my $seq = $seqio->next_seq) {
 	$self->inc_counter if $seq->has_seq;
@@ -160,13 +160,20 @@ method store_seq {
 method sample_seq {
     # get method vars from class attributes
     my $filename = $self->file->relative;   # file to sample
+    my $format   = $self->format;           # sequence format
     my $k        = $self->sample_size;      # sample size
     my $seed     = $self->seed;             # random seed
     my $n        = 0;                       # number of records seen
     my @sample;
     my %seqhash;
 
-    my $seqio_fa = Transposome::SeqIO->new( file => $filename );
+    my $seqio_fa;
+    if ($self->has_fh) {
+        $seqio_fa = Transposome::SeqFactory->new( fh => $filename, format => $format )->make_seqio_object;
+    }
+    else {
+        $seqio_fa = Transposome::SeqFactory->new( file => $filename, format => $format )->make_seqio_object;
+    }
 
     srand($seed);
     while (my $seq = $seqio_fa->next_seq) {
@@ -178,8 +185,6 @@ method sample_seq {
     if ($k > $n) {
 	warn "\n[ERROR]: Sample size $k is larger than the number of sequences ($n).";  
 	warn "Pick a smaller sample size. Exiting.\n";
-	$self->log->error("\n[ERROR]: Sample size $k is larger than the number of sequences ($n). Pick a smaller sample size. Exiting.")
-            if Log::Log4perl::initialized();
     }
     else {
         while (my $seq = $seqio_fa->next_seq) {

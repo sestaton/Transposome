@@ -10,11 +10,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -49,10 +49,11 @@ method parse_configuration ($yaml) {
 
     # blast input section from config
     $config{sequence_file}     = $yaml->[0]->{blast_input}->[0]->{sequence_file};
-    $config{sequence_num}      = $yaml->[0]->{blast_input}->[1]->{sequence_num};
-    $config{cpu}               = $yaml->[0]->{blast_input}->[2]->{cpu};
-    $config{thread}            = $yaml->[0]->{blast_input}->[3]->{thread};
-    $config{output_directory}  = $yaml->[0]->{blast_input}->[4]->{output_directory};
+    $config{sequence_format}   = $yaml->[0]->{blast_input}->[1]->{sequence_format};
+    $config{sequence_num}      = $yaml->[0]->{blast_input}->[2]->{sequence_num};
+    $config{cpu}               = $yaml->[0]->{blast_input}->[3]->{cpu};
+    $config{thread}            = $yaml->[0]->{blast_input}->[4]->{thread};
+    $config{output_directory}  = $yaml->[0]->{blast_input}->[5]->{output_directory};
 
     # clustering options from config
     $config{in_memory}         = $yaml->[0]->{clustering_options}->[0]->{in_memory};
@@ -110,7 +111,7 @@ method _validate_params ($config) {
     for my $file (qw(sequence_file repeat_database)) {
 	if (! -e $config->{$file}) {
 	    die "\n[ERROR]: '$config->{$file}' was provided in the configuration file but it does not exist or cannot be found.\n".
-	        "            Please check your configuration file and try again. Exiting.\n";
+	        "          Please check your configuration file and try again. Exiting.\n";
 	}
     }
     return $config;

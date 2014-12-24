@@ -14,11 +14,11 @@ Transposome::Test::TestFixture::TestConfig - Methods for mocking configuration d
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -35,6 +35,12 @@ has 'seq_file' => (
     isa      => 'Path::Class::File',
     required => 0,
     coerce   => 1
+);
+
+has 'seq_format' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 0,
 );
 
 has 'repeat_db' => (
@@ -76,7 +82,7 @@ method config_constructor {
 
  Title   : _build_config_data
 
- Usage   : This is a private method, don't use it directly.
+ Usage   : This is a private method, do not use it directly.
            
  Function: Create temporary configuration files for testing Transposome.
 
@@ -97,14 +103,16 @@ method _build_config_data {
 
     my $tmpyml_name = $tmpyml->filename;
 
-    my $seq_file  = $self->seq_file;
-    my $repeat_db = $self->repeat_db;
-    my $test      = TestFixture->new( build_proper => 1, destroy => 0 );
-    my $blast     = $test->blast_constructor;
-    my ($blfl)    = @$blast;
+    my $seq_file   = $self->seq_file;
+    my $seq_format = $self->seq_format;
+    my $repeat_db  = $self->repeat_db;
+    my $test       = TestFixture->new( build_proper => 1, destroy => 0 );
+    my $blast      = $test->blast_constructor;
+    my ($blfl)     = @$blast;
 
     say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";
+    say $tmpyml "  - sequence_format:   $seq_format";
     say $tmpyml "  - sequence_num:      10";
     say $tmpyml "  - cpu:               1";
     say $tmpyml "  - thread:            1";

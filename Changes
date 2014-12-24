@@ -1,8 +1,21 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.08.2	12/12/14	Vancouver, BC
+0.08.3	12/24/14	Vancouver, BC
 
+- Rework SeqIO class to follow a factory pattern. Now, sequence I/O is done
+  through the Transposome::SeqFactory class.
+- Add separate FASTA and FASTQ subclasses of the SeqIO class, which are returned
+  from the Transposome::SeqFactory class. The new methods do not involve seeking back
+  on a filehandle, so now it is possible to read from STDIN. Overall, there was a more
+  than 3X speed improvement for both FASTA and FASTQ reading, though this does not
+  account for format validation.
+- Add support for reading sequence data from compressed files, STDIN (a pipe),
+  or from a file handle.
+- Add tests for command line application and increase test coverage of methods. In total,
+  220+ tests have been added to this version, including 3 new test files.
+
+0.08.2	12/08/14	Vancouver, BC
 - Fix bug with variables for blast paths not being defined when
   searching path.
 - Add comments to example configuration, and provide real values for all slots instead

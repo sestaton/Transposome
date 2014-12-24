@@ -13,8 +13,8 @@ BEGIN {
     use_ok('Transposome') || print "[Error]: Could not load Transposome.\n";
     use_ok('Transposome::SeqUtil')
       || print "[Error]: Could not load Transposome::SeqUtil.\n";
-    use_ok('Transposome::SeqIO')
-      || print "[Error]: Could not load Transposome::SeqIO.\n";
+    use_ok('Transposome::SeqFactory')
+      || print "[Error]: Could not load Transposome::SeqFactory.\n";
     use_ok('Transposome::Cluster')
       || print "[Error]: Could not load Transposome::Cluster.\n";
     use_ok('Transposome::Annotation')

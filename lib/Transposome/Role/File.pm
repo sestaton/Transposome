@@ -3,6 +3,9 @@ package Transposome::Role::File;
 use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
+#use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use IO::File;
+use Symbol;
 use Method::Signatures;
 
 =head1 NAME
@@ -11,11 +14,11 @@ Transposome::Role::File - File handling methods for Transposome.
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -30,7 +33,7 @@ $VERSION = eval $VERSION;
 has 'file' => (
       is       => 'ro',
       isa      => 'Path::Class::File',
-      required => 1,
+      required => 0,
       coerce   => 1,
 );
 
@@ -43,9 +46,40 @@ has 'dir' => (
 
 has 'fh' => (
     is         => 'ro',
-    isa        => 'IO::File',
+    #isa        => 'IO::File',
+    predicate  => 'has_fh',
     lazy_build => 1,
+    builder    => '_build_fh',
 );
+
+has 'format' => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => 'has_format',
+    default   => 'fasta'
+);
+
+method _build_fh {
+    my $file = $self->file->absolute;
+    my $fh = IO::File->new();
+
+    if ($file =~ /\.gz$/) {
+        open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
+	#$fh = new IO::Uncompress::Gunzip $file->stringify;
+	    #or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
+    }
+    elsif ($file =~ /\.bz2$/) {
+        open $fh, '-|', 'bzcat', $file or die "\nERROR: Could not open file: $file\n";
+    }
+    elsif ($file =~ /^-$|STDIN/) {
+        open $fh, '< -' or die "\nERROR: Could not open STDIN\n";
+    }
+    else {
+	open $fh, '<', $file or die "\nERROR: Could not open file: $file\n";
+    }
+
+    return $fh;
+}
 
 =head1 METHODS
 
@@ -67,34 +101,22 @@ has 'fh' => (
 =cut
 
 method get_fh {
-    if (-e $self->file) {
-	my $fh = $self->file->openr;
-	return $fh;
+    my $file = $self->file;
+    my $fh;
+    if ($file =~ /\.gz$/) {
+	open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
     }
-}
-
-=head2 _build_fh
-
- Title   : _build_fh
-
- Usage   : This is a private method, do not use it directly.
-          
- Function: Gets a filehandle for the associated
-           file.
-
-                                                   Return_type
- Returns : An open filehandle for reading          Scalar
-
- Args    : None. This is a role that can
-           be consumed.
-
-=cut
-
-method _build_fh {
-    my $fh = $self->file->openr;
+    elsif ($file =~ /\.bz2$/) {
+	open $fh, '-|', 'bzcat', $file or die "\nERROR: Could not open file: $file\n";
+    }
+    elsif ($file =~ /^-$|STDIN/) {
+	open $fh, '< -' or die "\nERROR: Could not open STDIN\n";
+    }
+    else {
+	$fh = $self->file->openr;
+    }
     return $fh;
 }
-
 
 =head1 AUTHOR
 

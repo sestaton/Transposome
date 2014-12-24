@@ -15,11 +15,11 @@ transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -107,6 +107,7 @@ sub init_transposome {
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
     $log->info("Configuration - Log file for monitoring progress and errors: $config->{run_log_file}");
     $log->info("Configuration - Sequence file:                               $config->{sequence_file}");
+    $log->info("Configuration - Sequence format:                      :      $config->{sequence_format}");
     $log->info("Configuration - Sequence number for each BLAST process:      $config->{sequence_num}");
     $log->info("Configuration - Number of CPUs per thread:                   $config->{cpu}");
     $log->info("Configuration - Number of threads:                           $config->{thread}");
@@ -129,6 +130,7 @@ sub run_blast {
     load_classes('Transposome::Run::Blast');
 
     my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
+					      format    => $config->{sequence_format},
 					      dir       => $config->{output_directory},
 					      threads   => $config->{thread},
 					      cpus      => $config->{cpu},
@@ -169,7 +171,10 @@ sub make_clusters {
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
     my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
  
-    my $memstore = Transposome::SeqUtil->new( file => $config->{sequence_file}, in_memory => $config->{in_memory} );
+    my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
+					      in_memory => $config->{in_memory},
+					      format    => $config->{sequence_format} );
+
     my ($seqs, $seqct) = $memstore->store_seq;
 
     my ($cls_dir_path, 
@@ -191,23 +196,11 @@ sub annotate_clusters {
 						   threads   => $config->{thread},
 						   cpus      => $config->{cpu} );
 
-    my ($anno_rp_path, 
-	$anno_sum_rep_path, 
-	$singles_rp_path, 
-	$total_readct, 
-	$rep_frac, 
-	$blasts, 
-	$superfams)
+    my ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams)
 	= $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 
-    $annotation->clusters_annotation_to_summary($anno_rp_path, 
-						$anno_sum_rep_path, 
-						$singles_rp_path, 
-						$total_readct, 
-						$seqct, 
-						$rep_frac, 
-						$blasts, 
-						$superfams);
+    $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, 
+						$total_readct, $seqct, $rep_frac, $blasts, $superfams);
 
 }
 

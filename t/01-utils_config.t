@@ -8,11 +8,12 @@ use Transposome;
 use aliased 'Transposome::Test::TestFixture';
 use Test::Most tests => 4;
 
-my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
  
 my $test = TestFixture->new(
     seq_file     => $seqfile,
+    seq_format   => 'fasta',
     repeat_db    => $repeatdb,
     destroy      => 1,
     build_proper => 1
@@ -22,6 +23,7 @@ ok( $test->config_constructor, 'Can build all configuration data for testing' );
 
 my $test2 = TestFixture->new(
     seq_file     => $seqfile,
+    seq_format   => 'fasta',
     repeat_db    => $repeatdb,
     destroy      => 0,
     build_proper => 1
@@ -34,6 +36,7 @@ ok( defined($test2_conf_file), 'Correctly build configuration data for testing' 
 
 my $test3 = TestFixture->new(
     seq_file     => 'test_seqfile', # does not exist
+    seq_format   => 'fasta',
     repeat_db    => $repeatdb,      
     destroy      => 0,
     build_proper => 1
@@ -48,6 +51,7 @@ dies_ok { $trans_obj3->get_configuration } 'Correctly handled missing sequence f
 
 my $test4 = TestFixture->new(
     seq_file     => $seqfile,
+    seq_format   => 'fasta',
     repeat_db    => 'test_db',      # does not exist
     destroy      => 0,
     build_proper => 1
