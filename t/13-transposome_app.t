@@ -32,13 +32,10 @@ my $trans_obj = Transposome->new( config => $conf_file );
 ok( $trans_obj->get_configuration, 'Configuration data loaded from file correctly' );
 my $config = $trans_obj->get_configuration;
 
-my $cwd      = getcwd();
-my $bin      = File::Spec->catdir($cwd, 'bin');
-#my $mgblast  = File::Spec->catfile($bin, 'mgblast');
-#my $formatdb = File::Spec->catfile($bin, 'formatdb');
+my $cwd = getcwd();
+my $bin = File::Spec->catdir($cwd, 'bin');
 
 local $ENV{PATH} = "$bin:$ENV{PATH}";
-say "PATH: ", $ENV{PATH};
 
 my ($stdout, $stderr, @res) = capture { system([0..5], "perl -Iblib/lib $program --config $conf_file"); };
 
