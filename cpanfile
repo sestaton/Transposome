@@ -15,6 +15,7 @@ requires 'DBD::SQLite',                '1.44';
 requires 'Tie::Hash::DBD',             '0.13';
 requires 'Log::Log4perl',              '1.40';
 requires 'DateTime',                   '1.03';
+requires 'Capture::Tiny';
 requires 'List::MoreUtils'; 
 requires 'Test::Most';
 requires 'Lingua::EN::Inflect';

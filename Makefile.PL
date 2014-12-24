@@ -90,6 +90,7 @@ WriteMakefile(
 	'Parallel::ForkManager'            => 0.7,
 	'Log::Log4perl'                    => 1.40,
 	'DateTime'                         => 1.03,
+	'Capture::Tiny'                    => 0,
 	'List::MoreUtils'                  => 0,
 	'Lingua::EN::Inflect'              => 0,
 	'DBM::Deep'                        => 0,
