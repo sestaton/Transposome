@@ -3,7 +3,7 @@ package Transposome::Role::File;
 use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+#use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use IO::File;
 use Symbol;
 use Method::Signatures;
@@ -14,11 +14,11 @@ Transposome::Role::File - File handling methods for Transposome.
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
+our $VERSION = '0.08.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -33,7 +33,7 @@ $VERSION = eval $VERSION;
 has 'file' => (
       is       => 'ro',
       isa      => 'Path::Class::File',
-      required => 1,
+      required => 0,
       coerce   => 1,
 );
 
@@ -46,24 +46,27 @@ has 'dir' => (
 
 has 'fh' => (
     is         => 'ro',
-    isa        => 'IO::File',
+    #isa        => 'IO::File',
     predicate  => 'has_fh',
     lazy_build => 1,
-    builder    => '_build_fh', #sub { return $_->file->openr },
+    builder    => '_build_fh',
+);
+
+has 'format' => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => 'has_format',
+    default   => 'fasta'
 );
 
 method _build_fh {
-    #my $fh = $self->file->openr;
-    #return $fh;
-    my $class = $self->meta->name;
-    my $file = $self->file;
-    #my $s = Symbol::gensym;
+    my $file = $self->file->absolute;
     my $fh = IO::File->new();
+
     if ($file =~ /\.gz$/) {
         open $fh, '-|', 'zcat', $file or die "\nERROR: Could not open file: $file\n";
 	#$fh = new IO::Uncompress::Gunzip $file->stringify;
 	    #or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
-	#$fh = IO::File->new($file, 
     }
     elsif ($file =~ /\.bz2$/) {
         open $fh, '-|', 'bzcat', $file or die "\nERROR: Could not open file: $file\n";
@@ -72,9 +75,8 @@ method _build_fh {
         open $fh, '< -' or die "\nERROR: Could not open STDIN\n";
     }
     else {
-        $fh = $self->file->openr;
+	open $fh, '<', $file or die "\nERROR: Could not open file: $file\n";
     }
-    #tie $$s, $class, $self;
 
     return $fh;
 }
