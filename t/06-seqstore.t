@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use Transposome::SeqUtil;
-use Transposome::SeqIO;
+use Transposome::SeqFactory;
 
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 48;
@@ -15,7 +15,7 @@ my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;
 
 for my $fa ( @$fa_arr ) {
-    my $seqio = Transposome::SeqIO->new( file => $fa );
+    my $seqio = Transposome::SeqFactory->new( file => $fa )->make_seqio_object;
     while ( my $seq = $seqio->next_seq ) {
         if ( $seq->has_id && $seq->has_seq && !$seq->has_qual ) {
             my $memstore =
@@ -48,11 +48,11 @@ for my $fa ( @$fa_arr ) {
 }
 
 for my $fq ( @$fq_arr ) {
-    my $seqio = Transposome::SeqIO->new( file => $fq );
+    my $seqio = Transposome::SeqFactory->new( file => $fq, format => 'fastq' )->make_seqio_object;
     while ( my $seq = $seqio->next_seq ) {
         if ( $seq->has_id && $seq->has_seq && $seq->has_qual ) {
             my $memstore =
-              Transposome::SeqUtil->new( file => $fq, in_memory => 1 );
+              Transposome::SeqUtil->new( file => $fq, in_memory => 1, format => 'fastq' );
             {
                 my ( $seqs, $seqct ) = $memstore->store_seq;
                 is( $seqct, 6,
@@ -64,7 +64,7 @@ for my $fq ( @$fq_arr ) {
                 );
             }
             my $diskstore =
-              Transposome::SeqUtil->new( file => $fq, in_memory => 0 );
+              Transposome::SeqUtil->new( file => $fq, in_memory => 0, format => 'fastq' );
             {
                 my ( $seqs, $seqct ) = $diskstore->store_seq;
                 is( $seqct, 6,

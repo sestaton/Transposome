@@ -16,13 +16,14 @@ use Transposome::Annotation;
 use Transposome::Run::Blast;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 33;
+use Test::More tests => 34;
 
-my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas');
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 
 my $test = TestFixture->new(
     seq_file     => $seqfile,
+    seq_format   => 'fasta',
     repeat_db    => $repeatdb,
     destroy      => 0,
     build_proper => 1
@@ -38,6 +39,10 @@ my $config = $trans_obj->get_configuration;
 ok(
     defined( $config->{sequence_file} ),
     'Can set sequence data for configuration'
+);
+ok(
+   defined( $config->{sequence_format} ),
+    'Can set sequence format for configuration'
 );
 ok(
     defined( $config->{output_directory} ),
@@ -112,6 +117,7 @@ my $formatdb = File::Spec->catfile($bin, 'formatdb');
 
 my $blast = Transposome::Run::Blast->new(
     file          => $config->{sequence_file},
+    format        => $config->{sequence_format},
     dir           => $config->{output_directory},
     threads       => 1,
     cpus          => 1,
@@ -217,7 +223,7 @@ $annotation->clusters_annotation_to_summary( $anno_rp_path,
 
 unlink glob("t/transposome_mgblast*");
 unlink glob("t_rep*");
-remove_tree( $config->{output_directory}, { safe => 1 } );
+#remove_tree( $config->{output_directory}, { safe => 1 } );
 unlink "t/$config->{run_log_file}";
 unlink $conf_file;
 unlink "formatdb.log";
