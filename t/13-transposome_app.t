@@ -47,3 +47,4 @@ for my $line (split /^/, $stderr) {
 remove_tree( $outdir, { safe => 1 } );
 unlink $conf_file;
 unlink glob "t/transposome_mgblast*";
+unlink "formatdb.log";
