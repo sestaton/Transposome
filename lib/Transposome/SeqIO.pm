@@ -4,28 +4,28 @@ use 5.010;
 use Moose;
 use Method::Signatures;
 use namespace::autoclean;
+use Class::Load;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::File';
+with 'Transposome::Role::File';
 
 =head1 NAME
 
-Transposome::SeqIO - Class for reading Fasta/q data.
+Transposome::SeqIO - Base class for reading Fasta/q data.
 
 =head1 VERSION
 
-Version 0.08.2
+Version 0.08.3
 
 =cut
 
-our $VERSION = '0.08.2';
-$VERSION = eval $VERSION;
+our $VERSION = '0.08.3';
 
 =head1 SYNOPSIS
 
-    use Transposome::SeqIO;
+    ## Don't use Transposome::SeqIO directly, use as below.
+    use Transposome::SeqFactory;
 
-    my $trans_obj = Transposome::SeqIO->new( file => $infile );
+    my $trans_obj = Transposome::SeqFactory->new( file => $infile )->make_seqio_object;
 
     while (my $seq = $trans_obj->next_seq) {
          # do something interesting with $seq
@@ -39,6 +39,7 @@ has 'id' => (
     reader    => 'get_id',
     writer    => 'set_id',
     predicate => 'has_id',
+    clearer   => 'clear_id',
 );
 
 has 'seq' => (
@@ -47,6 +48,7 @@ has 'seq' => (
     reader    => 'get_seq',
     writer    => 'set_seq',
     predicate => 'has_seq',
+    clearer   => 'clear_seq',
 );
 
 has 'qual' => (
@@ -56,155 +58,8 @@ has 'qual' => (
     reader    => 'get_qual',
     writer    => 'set_qual',
     predicate => 'has_qual',
+    clearer   => 'clear_qual',
 );
-
-=head1 METHODS
-
-=head2 next_seq
-
- Title   : next_seq
- Usage   : while (my $seq = $trans_obj->next_seq) { ... };
-           
- Function: Reads fasta/fastq files seamlessly without needing to 
-           specify the format.
-                                                                            
- Returns : A Transposome::SeqIO object on which you can call methods                  
-           representing the sequence, id, or quality scores (in the
-           case of fastq). E.g.,
-           
-           while (my $seq = $trans_obj->next_seq) { 
-               $seq->get_id;   # gets the sequence id
-               $seq->get_seq;  # gets the sequence
-               $seq->get_qual; # gets the quality scores
-           }
-
-           Each of the above methods an easy way of checking to see
-           if that slot is set. E.g.,
-           
-           if ($seq->has_id)   { ... # is the id set? }
-           if ($seq->has_seq)  { ... # is the seq set? }
-           if ($seq->has_qual) { ... # is the qual set? This will be no for Fasta. }
-
- Args    : Takes a file handle. You can get the file handle                 
-           by calling the method 'get_fh' on a Transposome::SeqIO object. E.g.,
- 
-           my $trans_obj = Transposome::SeqIO->new( file => $infile );
-
-=cut
-
-method next_seq {
-    my $fh   = $self->fh;
-    my $line = $fh->getline;
-    return unless defined $line && $line =~ /\S/;
-    chomp $line;
-
-    if (substr($line, 0, 1) eq '>') {
-	# this method checks if the Casava format is 1.4 or 1.8+
-        my $name = $self->_set_id_per_encoding($line);
-        $self->set_id($name);
-        
-        my ($sline, $seq);
-        while ($sline = <$fh>) {
-            chomp $sline;
-            last if $sline =~ />/;
-            $seq .= $sline;
-        }
-	if ($sline) {
-	    seek $fh, -length($sline)-1, 1 if length $sline;
-	}
-
-        if (!length($seq)) {
-            $self->log->error("No sequence for Fasta record '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
-        $self->set_seq($seq);
-        return $self;
-    }
-    elsif (substr($line, 0, 1) eq '@') {
-        my $name = $self->_set_id_per_encoding($line);
-        $self->set_id($name);
-
-        my ($sline, $seq);
-        while ($sline = <$fh>) {
-            chomp $sline;
-            last if $sline =~ /^\+/;
-            $seq .= $sline;
-        }
-        seek $fh, -length($sline)-1, 1 if length $sline;
-
-        if (!length($seq)) {
-	    $self->log->error("No sequence for Fastq record '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
-        $self->set_seq($seq);
-        
-        my $cline = <$fh>;
-        chomp $cline;
-        unless (substr($cline, 0, 1) =~ /^\+/) {
-	    $self->log->error("No comment line for Fastq record '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
-        my $qual;
-        while (my $qline = <$fh>) {
-            chomp $qline;
-            $qual .= $qline;
-            last if length($qual) >= length($seq);
-        }
-   
-        if (!length($qual)) {
-            $self->log->error("No quality scores for '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
-
-        unless (length($qual) >= length($seq)) {
-	    $self->log->error("Unequal number of quality and scores and bases for '$name'.")
-		if Log::Log4perl::initialized();
-	    exit(1);
-        }
-        $self->set_qual($qual);
-
-        return $self;
-    }
-    else {
-	$self->log->error("'$line' does not look like Fasta or Fastq.")
-	    if Log::Log4perl::initialized();
-	exit(1);
-    }
-}
-
-
-=head2 _set_id_per_encoding
-
-Title   : _set_id_per_encoding
-
-Usage   : This is a private method, do not use it directly.
-          
-Function: Try to determine format of sequence files
-          and preserve paired-end information.
-                                                               Return_type
-Returns : A corrected sequence header if Illumina              Scalar
-          Illumina 1.8+ is detected                           
-        
-                                                               Arg_type
-Args    : A sequence header                                    Scalar
-
-=cut
-
-method _set_id_per_encoding ($hline) {
-    if ($hline =~ /^.?(\S+)\s(\d)\S+/) {
-	return $1."/".$2;
-    }
-    elsif ($hline =~ /^.?(\S+)/) {
-	return $1;
-    }
-    else {
-	return '';
-    }
-}
 
 =head1 AUTHOR
 
@@ -226,10 +81,32 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2014 S. Evan Staton
+Copyright 2013 S. Evan Staton.
 
-This program is distributed under the MIT (X11) License, which should be distributed with the package. 
-If not, it can be found here: L<http://www.opensource.org/licenses/mit-license.php>
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
 
 =cut
 
