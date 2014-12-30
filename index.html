@@ -40,32 +40,45 @@
 
 <p><strong>DEPENDENCIES</strong></p>
 
-<p>To use this package, you will need Perl version 5.12 (or greater) installed and a few external programs. See the <a href="https://github.com/sestaton/Transposome/wiki/Installing-dependencies">Installing dependencies</a> page for a walk through of how to install the dependencies. </p>
+<p>To use Transposome, you will need Perl installed (version 5.10 or greater) and it is very simple to install Perl with a tool called perlbrew. A <a href="https://github.com/sestaton/Transposome/wiki/Installing-dependencies#installing-perl">step-by-step set of instructions</a> is provided for installing a recent version of Perl. That wiki page also explains the commands below. </p>
 
 <p><strong>INSTALLATION</strong></p>
 
-<p>The recommened method to satisfy the Perl dependencies is to install <a href="http://search.cpan.org/%7Emiyagawa/App-cpanminus-1.6935/lib/App/cpanminus.pm">cpanminus</a>, and run the following command:</p>
+<p>Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
 
-<pre><code>cpanm git://github.com/sestaton/Transposome.git
+For Ubuntu/Debian as the OS:</p>
+
+<pre><code>apt-get install -y build-essential lib32z1 git ncbi-blast+
+    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 </code></pre>
 
-<p>If you run into any installation issues, it may be necessary to download the code and install manually (see the <a href="https://github.com/sestaton/Transposome/wiki/Troubleshooting">Troubleshooting</a> page for more information):</p>
+<p>For RHEL/Fedora:</p>
 
-<pre><code>git clone https://github.com/sestaton/Transposome.git
-cd Transposome
-cpanm --installdeps .
-perl Makefile.PL
-make
-make test
-make install
+<pre><code>yum groupinstall "Development Tools"
+    yum install -y glibc.i686 gcc-c++ git ncbi-blast+
+    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 </code></pre>
 
-<p>Updating your installation can be achieved by simply running the same commands.</p>
+<p>If you run into issues, it may be easier to download the latest <a href="https://github.com/sestaton/Transposome/releases">release</a> and install manually (see the <a href="https://github.com/sestaton/Transposome/wiki/Troubleshooting">troubleshooting</a> page for more information) with the following commands.</p>
+
+<pre><code>tar xzf Transposome.tar.gz
+    cd Transposome
+    perl Makefile.PL
+    make
+    make test
+    make install
+</code></pre>
+
+<p>Updating your installation can be achieved by simply running the same commands. Please report any issues.</p>
 
 <p><strong>BASIC USAGE</strong></p>
 
-<p>Following installation, fill out the sample configuration file in the 'config' directory
-in the Transposome distribution, specifying the location of data files and parameters for analysis.</p>
+<p>Following installation, get the Transposome configuration file:</p>
+
+<pre><code>curl -L tr.im/transposomeconfig > transposome_config.yml
+</code></pre>
+
+<p>Next, edit the configuration file by specifying the location of data files and parameters for analysis. Note that if you downloaded manually, a configuration file can be found in the 'config' directory, or the configuration file on the <a href="https://github.com/sestaton/Transposome/wiki/Quick-Start">Quick Start></a> page can be copied into a text editor and saved locally. It makes no difference which way you create the configuration file, though the <code>curl</code> method is faster.</p>
 
 <p>Then, simply run the <code>transposome</code> program, specifying your configuration file:</p>
 
@@ -90,7 +103,7 @@ using. For example,</p>
 <pre><code>Transposome::Annotation
 Transposome::Cluster
 Transposome::PairFinder
-Transposome::SeqIO
+Transposome::SeqFactory
 Transposome::SeqUtil
 Transposome::Run::Blast
 </code></pre>
@@ -118,6 +131,14 @@ Transposome::Run::Blast
 
 Transposome issue tracker
     https://github.com/sestaton/Transposome/issues
+</code></pre>
+
+<p><strong>CITATION</strong></p>
+
+<p>A manuscript is in review, but for now please use the following citation: <a href="http://dx.doi.org/10.5281/zenodo.11303"><img src="https://zenodo.org/badge/5565/sestaton/Transposome.png" alt="Zenodo Badge"></a></p>
+
+<pre><code>Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families
+         from unassembled sequence reads. doi:10.5281/zenodo.11303
 </code></pre>
 
 <p><strong>LICENSE AND COPYRIGHT</strong></p>
