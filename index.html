@@ -44,9 +44,9 @@
 
 <p><strong>INSTALLATION</strong></p>
 
-<p>Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
+<p>Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:</p>
 
-For Ubuntu/Debian as the OS:</p>
+<p>For Ubuntu/Debian as the OS:</p>
 
 <pre><code>apt-get install -y build-essential lib32z1 git ncbi-blast+
 curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
@@ -78,7 +78,7 @@ make install
 <pre><code>curl -L tr.im/transposomeconfig > transposome_config.yml
 </code></pre>
 
-<p>Next, edit the configuration file by specifying the location of data files and parameters for analysis. Note that if you downloaded manually, a configuration file can be found in the 'config' directory, or the configuration file on the <a href="https://github.com/sestaton/Transposome/wiki/Quick-Start">Quick Start></a> page can be copied into a text editor and saved locally. It makes no difference which way you create the configuration file, though the <code>curl</code> method is faster.</p>
+<p>Next, edit the configuration file by specifying the location of data files and parameters for analysis. Note that if you downloaded manually, a configuration file can be found in the 'config' directory, or the configuration file on the <a href="https://github.com/sestaton/Transposome/wiki/Quick-Start">Quick Start</a> page can be copied into a text editor and saved locally. It makes no difference which way you create the configuration file, though the <code>curl</code> method is faster.</p>
 
 <p>Then, simply run the <code>transposome</code> program, specifying your configuration file:</p>
 
