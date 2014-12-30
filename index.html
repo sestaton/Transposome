@@ -49,24 +49,24 @@
 For Ubuntu/Debian as the OS:</p>
 
 <pre><code>apt-get install -y build-essential lib32z1 git ncbi-blast+
-    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
+curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 </code></pre>
 
 <p>For RHEL/Fedora:</p>
 
 <pre><code>yum groupinstall "Development Tools"
-    yum install -y glibc.i686 gcc-c++ git ncbi-blast+
-    curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
+yum install -y glibc.i686 gcc-c++ git ncbi-blast+
+curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 </code></pre>
 
 <p>If you run into issues, it may be easier to download the latest <a href="https://github.com/sestaton/Transposome/releases">release</a> and install manually (see the <a href="https://github.com/sestaton/Transposome/wiki/Troubleshooting">troubleshooting</a> page for more information) with the following commands.</p>
 
 <pre><code>tar xzf Transposome.tar.gz
-    cd Transposome
-    perl Makefile.PL
-    make
-    make test
-    make install
+cd Transposome
+perl Makefile.PL
+make
+make test
+make install
 </code></pre>
 
 <p>Updating your installation can be achieved by simply running the same commands. Please report any issues.</p>
@@ -138,7 +138,7 @@ Transposome issue tracker
 <p>A manuscript is in review, but for now please use the following citation: <a href="http://dx.doi.org/10.5281/zenodo.11303"><img src="https://zenodo.org/badge/5565/sestaton/Transposome.png" alt="Zenodo Badge"></a></p>
 
 <pre><code>Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families
-         from unassembled sequence reads. doi:10.5281/zenodo.11303
+     from unassembled sequence reads. doi:10.5281/zenodo.11303
 </code></pre>
 
 <p><strong>LICENSE AND COPYRIGHT</strong></p>
