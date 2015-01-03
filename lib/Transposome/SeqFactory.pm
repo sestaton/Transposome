@@ -10,7 +10,7 @@ with 'Transposome::Role::File';
 
 =head1 NAME
 
-Transposome::SeqIO - Class for reading Fasta/q data.
+Transposome::SeqFactory - Class for constructing a Transposome::SeqIO object for reading FASTA/Q data.
 
 =head1 VERSION
 
@@ -29,6 +29,37 @@ our $VERSION = '0.08.3';
     while (my $seq = $trans_obj->next_seq) {
          # do something interesting with $seq
     }
+
+=cut
+
+=head2 make_seqio_objectq
+
+ Title   : make_seqio_object
+ Usage   : my $seqio = $seqfactory_object->make_seqio_object;
+           
+ Function: Evaluate the arguments to the SeqFactory constructur and return
+           a SeqIO object for reading sequence data.
+                                                                            
+ Returns : A Transposome::SeqIO object on which you can call methods                  
+           representing the sequence, id, or quality scores (in the
+           case of FASTQ). E.g.,
+           
+           while (my $seq = $trans_obj->next_seq) { 
+               $seq->get_id;   # gets the sequence id
+               $seq->get_seq;  # gets the sequence
+               $seq->get_qual; # gets the quality scores
+           }
+
+           Each of the above methods an easy way of checking to see
+           if that slot is set. E.g.,
+           
+           if ($seq->has_id)   { ... # is the id set? }
+           if ($seq->has_seq)  { ... # is the seq set? }
+           if ($seq->has_qual) { ... # is the qual set? This will be no for FASTA. }
+
+ Args    : None. This is a class method called on a Transposome::SeqFactory object.
+ 
+           my $seqio = Transposome::SeqFactory->new( file => $infile )->make_seqio_object;
 
 =cut
 
