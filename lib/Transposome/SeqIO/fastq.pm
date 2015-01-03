@@ -38,7 +38,7 @@ our $VERSION = '0.08.3';
  Title   : next_seq
  Usage   : while (my $seq = $trans_obj->next_seq) { ... };
            
- Function: Reads fastq data from a file or filehandle.
+ Function: Reads FASTQ data from a file or filehandle.
                                                                             
  Returns : A Transposome::SeqIO object on which you can call methods                  
            representing the sequence, id, or quality scores (in the
@@ -55,7 +55,7 @@ our $VERSION = '0.08.3';
            
            if ($seq->has_id)   { ... # is the id set? }
            if ($seq->has_seq)  { ... # is the seq set? }
-           if ($seq->has_qual) { ... # is the qual set? This will be no for Fasta. }
+           if ($seq->has_qual) { ... # is the qual set? }
 
  Args    : None. This is a class method called on a Transposome::SeqIO:fastq object.
  

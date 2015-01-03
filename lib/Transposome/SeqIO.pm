@@ -10,7 +10,7 @@ with 'Transposome::Role::File';
 
 =head1 NAME
 
-Transposome::SeqIO - Base class for reading Fasta/q data.
+Transposome::SeqIO - Base class for reading FASTA/Q data.
 
 =head1 VERSION
 
