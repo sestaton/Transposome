@@ -102,7 +102,7 @@ A manuscript is in review, but for now please use the following citation:
 
 **LICENSE AND COPYRIGHT**
 
-Copyright (C) 2013-2014 S. Evan Staton
+Copyright (C) 2013-2015 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: http://www.opensource.org/licenses/mit-license.php

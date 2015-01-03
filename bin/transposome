@@ -307,7 +307,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2014 S. Evan Staton.
+Copyright 2013-2015 S. Evan Staton.
 
 This program is distributed under the MIT (X11) License:
 L<http://www.opensource.org/licenses/mit-license.php>
