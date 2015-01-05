@@ -223,22 +223,10 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my %all_cluster_annotations; # container for annotations; used for creating summary
 
     ## annotate singletons, then add total to results
-    my ($singleton_hits, 
-	$singleton_rep_frac, 
-	$singles_rp_path,
-	$blasts, 
-	$superfams, 
-	$cluster_annotations, 
-	$top_hit_superfam, 
-	$cluster_annot) = $self->_annotate_singletons(\%repeats,
-						      $singletons_file_path, 
-						      $rpname, 
-						      $single_tot, 
- 						      $evalue, 
-						      $thread_range, 
-						      $db_path, 
-						      $out_dir, 
-						      $blastn);
+    my ($singleton_hits, $singleton_rep_frac, $singles_rp_path,
+	$blasts, $superfams, $cluster_annotations, $top_hit_superfam, $cluster_annot) = 
+    $self->_annotate_singletons(\%repeats, $singletons_file_path, $rpname, $single_tot, 
+				$evalue, $thread_range, $db_path, $out_dir, $blastn);
 
     my $true_singleton_rep_frac = $single_frac * $singleton_rep_frac;
     my $total_rep_frac = $true_singleton_rep_frac + $rep_frac;
@@ -401,7 +389,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
         }
     }
     close $outsum;
-    $self->log->info("Total repeat fraction from annotations: $total_gcov")
+    $self->log->info("Results - Total repeat fraction from annotations: $total_gcov")
         if Log::Log4perl::initialized();
 
     # log results
