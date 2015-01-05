@@ -98,7 +98,7 @@ method _validate_params ($config) {
     for my $k (keys %$config) {
 	my $v = $config->{$k};
         if (not defined $v) {
-            die "\n[ERROR]: '$k' is not defined after parsing configuration file.\n".
+            die "[ERROR]: '$k' is not defined after parsing configuration file.\n".
 	        "         This indicates there may be a blank line in your configuration file.\n".
 	        "         Please check your configuration file and try again. Exiting.\n";
         }
@@ -110,7 +110,7 @@ method _validate_params ($config) {
     
     for my $file (qw(sequence_file repeat_database)) {
 	if (! -e $config->{$file}) {
-	    die "\n[ERROR]: '$config->{$file}' was provided in the configuration file but it does not exist or cannot be found.\n".
+	    die "[ERROR]: '$config->{$file}' was provided in the configuration file but it does not exist or cannot be found.\n".
 	        "          Please check your configuration file and try again. Exiting.\n";
 	}
     }
