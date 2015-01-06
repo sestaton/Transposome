@@ -46,24 +46,12 @@ $VERSION = eval $VERSION;
                                                    dir       => 'outdir',
                                                    file      => 'report.txt' );
 
-    my ( $anno_rp_path, 
-         $anno_sum_rep_path, 
-         $singles_rp_path, 
-         $total_readct,  
-         $rep_frac, 
-         $blasts, 
-         $superfams )
-         = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+    my ( $anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct,  $rep_frac, $blasts, $superfams ) = 
+    $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
     
  
-    $annotation->clusters_annotation_to_summary( $anno_rp_path, 
-                                                 $anno_sum_rep_path, 
-                                                 $singles_rp_path, 
-                                                 $total_readct, 
-                                                 $seqct, 
-                                                 $rep_frac, 
-                                                 $blasts, 
-                                                 $superfams );
+    $annotation->clusters_annotation_to_summary( $anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, 
+                                                 $seqct, $rep_frac, $blasts, $superfams );
 
 
 =cut
@@ -223,8 +211,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my %all_cluster_annotations; # container for annotations; used for creating summary
 
     ## annotate singletons, then add total to results
-    my ($singleton_hits, $singleton_rep_frac, $singles_rp_path,
-	$blasts, $superfams, $cluster_annotations, $top_hit_superfam, $cluster_annot) = 
+    my ($singleton_hits, $singleton_rep_frac, $singles_rp_path, $blasts, $superfams, 
+	$cluster_annotations, $top_hit_superfam, $cluster_annot) = 
     $self->_annotate_singletons(\%repeats, $singletons_file_path, $rpname, $single_tot, 
 				$evalue, $thread_range, $db_path, $out_dir, $blastn);
 
