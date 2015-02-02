@@ -94,11 +94,12 @@ You can also look for information at:
 
 **CITATION**
 
-A manuscript is in review, but for now please use the following citation: 
-[![DOI](https://zenodo.org/badge/5565/sestaton/Transposome.png)](http://dx.doi.org/10.5281/zenodo.11303)
+Transposome is published in the journal Bioinformatics, and if you use this software in your work please use the following citation:
 
-    Staton SE, and Burke JM. 2014. Transposome: Annotation of transposable element families
-         from unassembled sequence reads. doi:10.5281/zenodo.11303
+    Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
+    S. Evan Staton; John M. Burke
+    Bioinformatics 2015;
+    doi: 10.1093/bioinformatics/btv059
 
 **LICENSE AND COPYRIGHT**
 
