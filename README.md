@@ -94,7 +94,7 @@ You can also look for information at:
 
 **CITATION**
 
-Transposome is published in the journal Bioinformatics, and if you use this software in your work please use the following citation:
+Transposome is published in the journal *Bioinformatics*, and if you use this software in your work please use the following citation:
 
     Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
         Bioinformatics, doi: 10.1093/bioinformatics/btv059
