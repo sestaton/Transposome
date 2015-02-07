@@ -13,11 +13,11 @@ Transposome::SeqIO::fasta - Class for reading FASTA data.
 
 =head1 VERSION
 
-Version 0.08.3
+Version 0.08.4
 
 =cut
 
-our $VERSION = '0.08.3';
+our $VERSION = '0.08.4';
 
 =head1 SYNOPSIS
 
