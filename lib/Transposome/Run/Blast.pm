@@ -238,6 +238,7 @@ method _make_mgblastdb ($formatdb) {
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
 
+    my $log = "formatdb.log";
     $fname =~ s/\.f.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
@@ -257,6 +258,7 @@ method _make_mgblastdb ($formatdb) {
         exit(1);
     };
     unlink $tempdb;
+    unlink $log if -e $log;
 
     return $db_path;
 }
