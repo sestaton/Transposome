@@ -4,6 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use Cwd;
+use File::Find;
 use File::Spec;
 use File::Path          qw(remove_tree);
 use Capture::Tiny       qw(capture);
@@ -11,7 +12,7 @@ use IPC::System::Simple qw(system);
 use Transposome;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 my $program  = File::Spec->catfile('bin', 'transposome');
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
@@ -49,6 +50,10 @@ for my $line (split /^/, $stderr) {
 	      'Transposome CLI application completed successfully' );
     }
 }
+
+my @results;
+find( sub { push @results, $File::Find::name if -f and /\.tgz$/ }, $outdir );
+is( scalar(@results), 2, 'Output directories compressed successfully' );
 
 remove_tree( $outdir, { safe => 1 } );
 unlink $conf_file;
