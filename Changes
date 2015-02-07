@@ -1,6 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.08.4	02/07/15	Vancouver, BC
+
+- Remove intermediate files from the CL application but not from method calls.
+  This reduces the output by removing the clustering and BLAST files.
+- Compress cluster and annotation directories.
+
 0.08.3	12/24/14	Vancouver, BC
 
 - Rework SeqIO class to follow a factory pattern. Now, sequence I/O is done
