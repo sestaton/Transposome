@@ -252,7 +252,6 @@ method parse_blast {
     untie %match_pairs unless $self->in_memory;
     unlink $dbi if -e $dbi;
     unlink $dbm if -e $dbm;
-    unlink $self->file;
     
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
