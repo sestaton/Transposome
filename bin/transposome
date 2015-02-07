@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use Transposome;
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Basename;
 use Getopt::Long;
 use Pod::Usage;
@@ -154,6 +154,7 @@ sub find_pairs {
     
     my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
+    unlink $blastdb;
     return ($idx_file, $int_file, $hs_file);
 }
 
@@ -177,18 +178,18 @@ sub make_clusters {
 
     my ($seqs, $seqct) = $memstore->store_seq;
 
-    my ($cls_dir_path, 
-	$cls_with_merges_path, 
-	$singletons_file_path, 
-	$cls_tot) = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
+    my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
+        = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
+
+    unlink $idx_file, $int_file, $hs_file;
     return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 }
 
 sub annotate_clusters {
     my ($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = @_;
     
-    load_classes('Transposome::Annotation');
+    load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
 
     my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 						   dir       => $config->{output_directory},
@@ -202,6 +203,28 @@ sub annotate_clusters {
     $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, 
 						$total_readct, $seqct, $rep_frac, $blasts, $superfams);
 
+    my $anno_dir_path = $cls_dir_path."_annotations";
+    my $outdir        = dirname($cls_dir_path);
+    my $cls_tar_file  = basename($cls_dir_path);
+    my $anno_tar_file = basename($anno_dir_path);
+    my $cls_tar_path  = File::Spec->catfile($outdir, $cls_tar_file.".tgz");
+    my $anno_tar_path = File::Spec->catfile($outdir, $anno_tar_file.".tgz");
+
+    say join q{ }, "DEBUG: ", $cls_tar_path, $anno_tar_path;
+    my (@clusters, @annotations);
+    find( sub { push @clusters,    $File::Find::name }, $cls_dir_path );
+    find( sub { push @annotations, $File::Find::name }, $anno_dir_path );
+
+    my $ctar = Archive::Tar->new;
+    $ctar->add_files(@clusters);
+    $ctar->write($cls_tar_path, &COMPRESS_GZIP);
+
+    my $atar = Archive::Tar->new;
+    $atar->add_files(@annotations);
+    $atar->write($anno_tar_path, &COMPRESS_GZIP);
+
+    remove_tree( $cls_dir_path,  { safe => 1 } );
+    remove_tree( $anno_dir_path, { safe => 1 } );
 }
 
 sub log_interval {
