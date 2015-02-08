@@ -107,7 +107,7 @@ sub init_transposome {
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
     $log->info("Configuration - Log file for monitoring progress and errors: $config->{run_log_file}");
     $log->info("Configuration - Sequence file:                               $config->{sequence_file}");
-    $log->info("Configuration - Sequence format:                      :      $config->{sequence_format}");
+    $log->info("Configuration - Sequence format:                             $config->{sequence_format}");
     $log->info("Configuration - Sequence number for each BLAST process:      $config->{sequence_num}");
     $log->info("Configuration - Number of CPUs per thread:                   $config->{cpu}");
     $log->info("Configuration - Number of threads:                           $config->{thread}");
