@@ -1,9 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.08.5 (FUTURE RELEASE)
+0.08.5	02/09/15	Vancouver, BC
 
 - Minor fix in log format (remove extra colons in displaying configuration details).
+- Index files for calculating matches on disk are written to the results directory
+  instead of working directory.
 
 0.08.4	02/07/15	Vancouver, BC
 
