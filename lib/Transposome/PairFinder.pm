@@ -129,8 +129,8 @@ method parse_blast {
     
     my %match_pairs;
     my %match_index;
-    my $dbm = "mgblast_matchpairs.dbm";
-    my $dbi = "mgblast_matchindex.dbm";
+    my $dbm = File::Spec->catfile($self->dir, "mgblast_matchpairs.dbm");
+    my $dbi = File::Spec->catfile($self->dir, "mgblast_matchindex.dbm");
     
     unless ($self->in_memory) {
 	unlink $dbm if -e $dbm;
