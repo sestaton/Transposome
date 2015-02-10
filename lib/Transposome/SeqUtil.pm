@@ -4,6 +4,7 @@ use 5.010;
 use Moose;
 use Method::Signatures;
 use DBI;
+use Cwd;
 use Tie::Hash::DBD;
 use Transposome::SeqFactory;
 use namespace::autoclean;
@@ -96,7 +97,8 @@ has 'no_store' => (
  Returns : In order, 1) a hash containing the id, sequence     HashRef 
                         mappings for each FASTA/Q record
                      2) the sequence count                     Scalar
-
+                     3) the DBM file if the indexing is        Scalar
+                        not done in memory
                                                                Arg_type
  Args    : A sequence file                                     Scalar
 
@@ -106,9 +108,13 @@ has 'no_store' => (
 method store_seq {
     my %seqhash;
     my $dbh;
+    my $seq_dbm;
+   
+    my $cwd = getcwd();
+    my $dir = $self->dir || $cwd; 
 
     unless ($self->in_memory) {
-        my $seq_dbm = "transposome_seqstore.dbm";
+	$seq_dbm = File::Spec->catfile($dir, "transposome_seqstore.dbm");
         unlink $seq_dbm if -e $seq_dbm;
 
 	my $dsn  = "dbi:SQLite:dbname=$seq_dbm";
@@ -132,7 +138,12 @@ method store_seq {
 	$seqhash{$seq->get_id} = $seq->get_seq;
     }
 
-    return (\%seqhash, $self->counter);
+    if ($self->in_memory) {
+	return (\%seqhash, $self->counter);
+    }
+    else {
+	return (\%seqhash, $self->counter, $seq_dbm);
+    }
 }
 
 =head2 sample_seq
