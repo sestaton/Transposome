@@ -32,7 +32,7 @@ for my $fa ( @$fa_arr ) {
             my $diskstore =
               Transposome::SeqUtil->new( file => $fa, in_memory => 0 );
             {
-                my ( $seqs, $seqct ) = $diskstore->store_seq;
+                my ( $seqs, $seqct, $seq_dbm ) = $diskstore->store_seq;
                 is( $seqct, 6,
                     'There are exactly six Fasta sequences being stored on file'
                 );
@@ -40,6 +40,8 @@ for my $fa ( @$fa_arr ) {
                 is( $seqct, $idct,
                     'The same number of Fasta sequences were read and stored on file'
                 );
+		untie %$seqs;
+		unlink $seq_dbm;
             }
         }
     }
@@ -65,7 +67,7 @@ for my $fq ( @$fq_arr ) {
             my $diskstore =
               Transposome::SeqUtil->new( file => $fq, in_memory => 0, format => 'fastq' );
             {
-                my ( $seqs, $seqct ) = $diskstore->store_seq;
+                my ( $seqs, $seqct, $seq_dbm ) = $diskstore->store_seq;
                 is( $seqct, 6,
                     'There are exactly six Fastq sequences being stored on file'
                 );
@@ -73,6 +75,8 @@ for my $fq ( @$fq_arr ) {
                 is( $seqct, $idct,
                     'The same number of Fastq sequences were read and stored on file'
                 );
+		untie %$seqs;
+		unlink $seq_dbm;
             }
         }
     }
