@@ -182,8 +182,8 @@ sub make_clusters {
     my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
         = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
-
     unlink $idx_file, $int_file, $hs_file;
+    untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if -e $seq_dbm;
     return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 }
