@@ -1,6 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.08.6	FUTURE RELEASE
+
+- Remove sequence index file when analysis is not done in memory.
+- Write index file in the results directory unless the method is called from a script
+  or the CLI, in which case the index file is written to the working directory.
+
 0.08.5	02/09/15	Vancouver, BC
 
 - Minor fix in log format (remove extra colons in displaying configuration details).
