@@ -174,15 +174,17 @@ sub make_clusters {
  
     my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
 					      in_memory => $config->{in_memory},
-					      format    => $config->{sequence_format} );
+					      format    => $config->{sequence_format},
+                                              dir       => $config->{output_directory} );
 
-    my ($seqs, $seqct) = $memstore->store_seq;
+    my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
 
     my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
         = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
 
     unlink $idx_file, $int_file, $hs_file;
+    unlink $seq_dbm if -e $seq_dbm;
     return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 }
 
