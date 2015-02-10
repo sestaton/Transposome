@@ -10,7 +10,6 @@ use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 48;
 
 my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
-my $dbmf   = "transposome_seqstore.dbm";
 my $fa_arr = $test->fasta_constructor;
 my $fq_arr = $test->fastq_constructor;
 
@@ -79,7 +78,5 @@ for my $fq ( @$fq_arr ) {
     }
     unlink $fq;
 }
-
-unlink $dbmf;
 
 done_testing();
