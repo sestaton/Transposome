@@ -212,7 +212,6 @@ sub annotate_clusters {
     my $cls_tar_path  = File::Spec->catfile($outdir, $cls_tar_file.".tgz");
     my $anno_tar_path = File::Spec->catfile($outdir, $anno_tar_file.".tgz");
 
-    say join q{ }, "DEBUG: ", $cls_tar_path, $anno_tar_path;
     my (@clusters, @annotations);
     find( sub { push @clusters,    $File::Find::name }, $cls_dir_path );
     find( sub { push @annotations, $File::Find::name }, $anno_dir_path );
