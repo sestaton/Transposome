@@ -196,7 +196,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     closedir $dir;
 
     if (@clus_fas_files < 1) {
-        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. Exiting.")
+        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. This can result from using too few sequences. Please report this error if the problem persists. Exiting.")
             if Log::Log4perl::initialized();
         exit(1);
     }
