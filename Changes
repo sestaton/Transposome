@@ -1,11 +1,14 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.08.6	FUTURE RELEASE
+0.08.6	02/12/15	Vancouver, BC
 
 - Remove sequence index file when analysis is not done in memory.
 - Write index file in the results directory unless the method is called from a script
   or the CLI, in which case the index file is written to the working directory.
+- Add more information to the error message when no clusters were found. Specifically,
+  it now states that the issue results from using too few sequences.
+- Minor bug fix in annotation class to not return by next.
 
 0.08.5	02/09/15	Vancouver, BC
 
