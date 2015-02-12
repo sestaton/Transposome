@@ -184,7 +184,7 @@ sub make_clusters {
 
     unlink $idx_file, $int_file, $hs_file;
     untie %$seqs unless $config->{in_memory};
-    unlink $seq_dbm if -e $seq_dbm;
+    unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
     return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
 }
 
