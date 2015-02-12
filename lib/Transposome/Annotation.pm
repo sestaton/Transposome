@@ -471,7 +471,7 @@ method _annotate_singletons ($repeats,
 
     ## mapping singleton blast hits to repeat types
     my ($hit_ct, $top_hit, $top_hit_perc, $blhits) = $self->_parse_blast_to_top_hit(\@blct_out, $singles_rp_sum_path);
-    next unless defined $top_hit && defined $hit_ct;
+    return unless defined $top_hit && defined $hit_ct;
 
     ($top_hit_superfam, $top_hit_cluster_annot) = $self->_blast_to_annotation($repeats, 'singletons', $singleton_hits, $top_hit, $top_hit_perc);
 
