@@ -34,6 +34,7 @@ It is **highly** recommended that you use these methods to install and update Tr
 
     tar xzf Transposome.tar.gz
     cd Transposome
+    curl -L cpanmin.us | perl - --installdeps .
     perl Makefile.PL
     make
     make test
