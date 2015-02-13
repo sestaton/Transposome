@@ -17,7 +17,7 @@ To use Transposome, you will need Perl installed (version 5.10 or greater) and i
 
 **INSTALLATION**
 
-Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies:
+Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies. The installation can be done with the following commands (note that this requires [git](http://git-scm.com/)):
 
 For Ubuntu/Debian as the OS:
 
@@ -30,7 +30,7 @@ For RHEL/Fedora:
     yum install -y glibc.i686 gcc-c++ git ncbi-blast+
     curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
-If you run into issues, it may be easier to download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
+It is **highly** recommended that you use these methods to install and update Transposome and not try to install manually. However, if you run into issues, it is possible to download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
     tar xzf Transposome.tar.gz
     cd Transposome
@@ -39,7 +39,7 @@ If you run into issues, it may be easier to download the latest [release](https:
     make test
     make install 
 
-Updating your installation can be achieved by simply running the same commands. Please report any issues.
+These steps will give a clear indication of any issues. Updating your installation can be achieved by simply running the same commands. Please report any issues.
 
 **BASIC USAGE**
 
