@@ -17,7 +17,7 @@ To use Transposome, you will need Perl installed (version 5.10 or greater) and i
 
 **INSTALLATION**
 
-Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies. The installation can be done with the following commands (note that this requires [git](http://git-scm.com/)):
+Note that the following commands assume a fresh cloud instance with no compilers or libraries installed. There are only a couple of steps, but please be advised that it can take a little while (perhaps 20 minutes) to compile the dependencies.
 
 For Ubuntu/Debian as the OS:
 
