@@ -350,8 +350,9 @@ method make_clusters ($graph_comm, $idx_file) {
     }
     close $in;
 
-    my $cls_ct = 1;
+    my $cls_ct = 0;
     for my $cls (reverse sort { @{$clus{$a}} <=> @{$clus{$b}} } keys %clus) {
+	$cls_ct++;
         my $clus_size = @{$clus{$cls}};
         say $cls_out ">CL$cls_ct $clus_size";
         my @clus_members;
@@ -362,7 +363,6 @@ method make_clusters ($graph_comm, $idx_file) {
             }
         }
         say $cls_out join q{ }, @clus_members;
-        $cls_ct++;
     }
     close $cls_out;
     close $mem;
@@ -370,6 +370,13 @@ method make_clusters ($graph_comm, $idx_file) {
     for (@$graph_comm) {
 	my $graph_file = File::Spec->catfile($out_dir, $_);
 	unlink $graph_file;
+    }
+
+    if ($cls_ct == 0 ) {
+	$self->log->error("No clusters found. This likely results from analyzing too few sequences. 
+                           Report this issue if it persists. Exiting.") 
+	    if Log::Log4perl::initialized();
+	exit(1);
     }
 
     # log results
