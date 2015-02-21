@@ -14,11 +14,11 @@ Transposome::SeqFactory - Class for constructing a Transposome::SeqIO object for
 
 =head1 VERSION
 
-Version 0.08.6
+Version 0.08.7
 
 =cut
 
-our $VERSION = '0.08.6';
+our $VERSION = '0.08.7';
 
 =head1 SYNOPSIS
 
