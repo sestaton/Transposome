@@ -109,8 +109,12 @@ method BUILD (@_) {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-        $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.") 
-	    if Log::Log4perl::initialized(); 
+	if (Log::Log4perl::initialized()) {
+	    $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.");
+	}
+	else {
+	    say STDERR "Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.";
+	}
 	exit(1);
     };
 
@@ -118,8 +122,12 @@ method BUILD (@_) {
         die unless $self->has_blastn_exec;
     }
     catch {
-        $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.")
-	    if Log::Log4perl::initialized(); 
+	if (Log::Log4perl::initialized()) {
+	    $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.");
+	}
+	else {
+	    say STDERR "Unable to find blastn. Check you PATH to see that it is installed. Exiting.";
+	}
 	exit(1);
     };
 }
@@ -182,9 +190,12 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     my $single_frac  = 1 - $rep_frac;
    
     # log results
+    my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     if (Log::Log4perl::initialized()) {
-        my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
         $self->log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
+    }
+    else {
+	say STDERR "Transposome::Annotation::annotate_clusters started at:   $st." if $self->verbose;
     }
 
     my $repeat_typemap = $self->map_repeat_types($database);
@@ -196,8 +207,16 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     closedir $dir;
 
     if (@clus_fas_files < 1) {
-        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. This can result from using too few sequences. Please report this error if the problem persists. Exiting.")
-            if Log::Log4perl::initialized();
+	if (Log::Log4perl::initialized()) {
+        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. ".
+			  "This can result from using too few sequences. ".
+			  "Please report this error if the problem persists. Exiting.");
+	}
+	else {
+	    say STDERR "Could not find any fasta files in $cls_with_merges_dir. ".
+		"This can result from using too few sequences. ".
+		"Please report this error if the problem persists. Exiting.";
+	}
         exit(1);
     }
 
@@ -242,8 +261,12 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 	    @blast_out = capture(EXIT_ANY, @blastcmd);
 	}
 	catch {
-	    $self->log->error("blastn failed. Caught error: $_.")
-		if Log::Log4perl::initialized();
+	    if (Log::Log4perl::initialized()) {
+		$self->log->error("blastn failed. Caught error: $_.");
+	    }
+	    else {
+		say STDERR "blastn failed. Caught error: $_.";
+	    }
 	    exit(1);
 	};
 
@@ -270,8 +293,8 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     unlink glob("$db_path*");
 
     # log results
+    my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     if (Log::Log4perl::initialized()) {
-	my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
 	$self->log->info("Results - Total sequences:                        $seqct");
 	$self->log->info("Results - Total sequences clustered:              $cls_tot");
@@ -279,6 +302,17 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 	$self->log->info("Results - Repeat fraction from clusters:          $rep_frac");
 	$self->log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
 	$self->log->info("Results - Total repeat fraction:                  $total_rep_frac");
+    }
+    else {
+	if ($self->verbose) {
+	    say STDERR "Transposome::Annotation::annotate_clusters completed at: $ft.";
+	    say STDERR "Results - Total sequences:                        $seqct";
+	    say STDERR "Results - Total sequences clustered:              $cls_tot";
+	    say STDERR "Results - Total sequences unclustered:            $single_tot";
+	    say STDERR "Results - Repeat fraction from clusters:          $rep_frac";
+	    say STDERR "Results - Singleton repeat fraction:              $singleton_rep_frac";
+	    say STDERR "Results - Total repeat fraction:                  $total_rep_frac";
+	}
     }
 
     return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
@@ -377,15 +411,25 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
         }
     }
     close $outsum;
-    $self->log->info("Results - Total repeat fraction from annotations: $total_gcov")
-        if Log::Log4perl::initialized();
+    if (Log::Log4perl::initialized()) {
+	$self->log->info("Results - Total repeat fraction from annotations: $total_gcov");
+    }
+    else {
+	say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
+    }
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.")
-	if Log::Log4perl::initialized();
-    $self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.")
-        if Log::Log4perl::initialized();
+    if (Log::Log4perl::initialized()) {
+	$self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
+	$self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
+    }
+    else {
+	if ($self->verbose) {
+	    say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
+	    say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
+	}
+    }
 }
 
 =head2 _annotate_singletons
@@ -520,12 +564,16 @@ method _make_blastdb (Path::Class::File $db_fas) {
 	my @makedbout = capture([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-	$self->log->error("Unable to make blast database. Here is the exception: $_.")
-	    if Log::Log4perl::initialized();
-	$self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.")
-	    if Log::Log4perl::initialized();
-        $self->log->error("These cause problems with BLAST+. Exiting.")
-            if Log::Log4perl::initialized();
+	if (Log::Log4perl::initialized()) {
+	    $self->log->error("Unable to make blast database. Here is the exception: $_.");
+	    $self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.");
+	    $self->log->error("These cause problems with BLAST+. Exiting.");
+	}
+	else {
+	    say STDERR "Unable to make blast database. Here is the exception: $_.";
+	    say STDERR "Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.";
+	    say STDERR "These cause problems with BLAST+. Exiting.";
+	}
 	exit(1);
     };
 
