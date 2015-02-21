@@ -4,6 +4,8 @@ Version	Date	Location
 0.08.7 FUTURE RELEASE
 
 - Add check if any clusters were produced before doing the annotation step.
+- Add separate command line options for each stage of the analysis. The analysis options
+  are: all, blast, findpairs, cluster, and annotation.
 
 0.08.6	02/12/15	Vancouver, BC
 
