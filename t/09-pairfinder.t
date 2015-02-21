@@ -33,7 +33,8 @@ dies_ok { Transposome::Pairfinder->new( file              => $tmpbln,
 					dir               => $outdir, 
 					in_memory         => 1, 
 					percent_identity  => 90, 
-					fraction_coverage => 0.55 ); } 
+					fraction_coverage => 0.55,
+	                                verbose           => 0 ); } 
 'Transpsome::Pairfinder dies as expected when given empty input file';
 
 unlink $tmpbln;
@@ -44,7 +45,8 @@ my $mem_test = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
-    fraction_coverage => 0.55
+    fraction_coverage => 0.55,
+    verbose           => 0,
 );
 
 ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
@@ -118,7 +120,8 @@ my $file_test = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 0,
     percent_identity  => 90.0,
-    fraction_coverage => 0.55
+    fraction_coverage => 0.55,
+    verbose           => 0,
 );
 
 ok( $file_test->parse_blast, 'Can build database on file and parse blast' );
