@@ -32,7 +32,7 @@ t/09-pairfinder.t
 t/10-cluster.t
 t/11-annotation.t
 t/12-allmethods.t
-t/13-transposome_app.t
+t/13-analysis_steps.t
 xt/00-pod.t
 xt/01-pod-coverage.t
 src/Makefile
