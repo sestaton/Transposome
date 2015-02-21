@@ -43,6 +43,13 @@ has 'threads' => (
     default   => 1,
 );
 
+has 'verbose' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    lazy       => 1,
+    default    => 1,
+);
+
 =head1 METHODS
 
 =head2 mk_key
