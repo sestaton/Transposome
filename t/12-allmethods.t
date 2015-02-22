@@ -226,4 +226,3 @@ unlink glob("t_rep*");
 #remove_tree( $config->{output_directory}, { safe => 1 } );
 unlink "t/$config->{run_log_file}";
 unlink $conf_file;
-unlink "formatdb.log";
