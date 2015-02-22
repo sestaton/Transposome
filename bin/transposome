@@ -11,7 +11,7 @@ use Pod::Usage;
 
 =head1 NAME
 
-transposome - Investigate the repeat strucuture of a genome through unassembled sequence reads.
+transposome - A toolkit for annotation of transposable element families from unassembled sequence reads 
 
 =head1 VERSION
 
