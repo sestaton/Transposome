@@ -40,8 +40,8 @@ GetOptions(\%opts,
 	   'bdb|blastdb=s'       => \$opts{blastdb},
 	   'edges|edgefile=s'    => \$opts{edge_file},
 	   'clsdir|clusterdir=s' => \$opts{cls_dir},
-	   #'sc|seqct=i'          => \$opts{seqct},
-	   #'clsct|clusteredct=i' => \$opts{cls_tot},
+	   'seqct|sequencect=i'  => \$opts{seqct},
+	   'clsct|clusteredct=i' => \$opts{cls_tot},
 	   'h|help'              => \$opts{help},
 	   'm|man'               => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
@@ -115,7 +115,7 @@ sub full_analysis {
     my ( $cls_dir_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $edge_file );
 
     # Annotate clusters and generate whole-genome summary of results
-    annotate_clusters( $config, $cls_dir_path );
+    annotate_clusters( $config, $cls_dir_path, $seqct, $cls_tot );
 
     # Log summary of results
     log_interval( $t0, $log );
@@ -226,7 +226,6 @@ sub make_clusters {
     my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
         = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
-    #say STDERR "DEBUG1: $seqct $cls_tot";
     unlink $idx_file, $int_file, $hs_file;
     untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
@@ -234,25 +233,14 @@ sub make_clusters {
 }
 
 sub annotate_clusters {
-    my ($config, $cls_dir_path) = @_;
+    my ($config, $cls_dir_path, $seqct, $cls_tot) = @_;
 
     load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
 
-    my (@clsfastas, $singtot, $cls_tot);
+    my @clsfastas;
     find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
 
     my ($singletons_file_path) = grep { /singletons/ } @clsfastas;
-
-    for my $fas (@clsfastas) {
-        if ($fas =~ /singletons_(\d+)\.fas$/) {
-            $singtot = $1;
-            $singletons_file_path = $fas;
-        }
-        elsif ($fas =~ /(\d+)\.fas$/) {
-            $cls_tot += $1;
-        }
-    }
-    my $seqct = $singtot + $cls_tot;
 
     my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 						   dir       => $config->{output_directory},
@@ -351,6 +339,10 @@ Options:
     -bdb|blastdb        :    The all-vs-all BLAST file (only required for the 'findpairs' analysis).
     -clsdir|clusterdir  :    The directory of FASTA files for each cluster 
                              (only required for the 'annotation' analysis).
+    -seqct|sequencect   :    The total number of sequences used in the analysis.
+                             (only required for the 'annotation' analysis).
+    -clsct|clusteredct  :    The total number of clustered sequences.
+                             (only required for the 'annotation' analysis).
     -v|version          :    Print the program version and exit.
     -h|help             :    Print a usage statement.
     -m|man              :    Print the full documentation.
@@ -408,7 +400,7 @@ Examples:
 
 5) Run the 'annotation' analysis step. 
 
-    transposome --analysis annotation --config transposome_config.yml -clsdir seqs_clustered_fasta_files 
+    transposome --analysis annotation --config transposome_config.yml -clsdir seqs_clustered_fasta_files -seqct 100000 -clsct 73400
 
 =item -int, --intfile
 
@@ -429,6 +421,14 @@ The all-vs-all BLAST report generated from the unassembled sequenc reads. This f
 =item -clsdir, --clusterdir
 
 A directory containing the FASTA files for each cluster. The PATH to this directory is returned from the merge_clusters method in the Transposome::Cluster class.
+
+=item -seqct, --sequencect
+
+The total number of sequences used in the analysis. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
+
+=item -clsct, --clusteredct
+
+The total number of clustered sequences. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
 
 =item -v, --version
 
