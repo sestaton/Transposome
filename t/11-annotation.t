@@ -31,7 +31,8 @@ my $blast_res = Transposome::PairFinder->new(
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
-    fraction_coverage => 0.55
+    fraction_coverage => 0.55,
+    verbose           => 0,
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -47,7 +48,8 @@ my $cluster = Transposome::Cluster->new(
     dir             => $outdir,
     merge_threshold => 2,
     cluster_size    => 1,
-    bin_dir         => $realbin
+    bin_dir         => $realbin,
+    verbose         => 0,
 );
 
 ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
@@ -79,7 +81,8 @@ my $annotation = Transposome::Annotation->new(
     dir      => $outdir,
     file     => $report,
     threads  => 1,
-    cpus     => 1
+    cpus     => 1,
+    verbose  => 0,
 );
 
 ok( defined($annotation), 'new() returned something correctly' );

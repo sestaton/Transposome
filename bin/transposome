@@ -11,15 +11,15 @@ use Pod::Usage;
 
 =head1 NAME
 
-transposome - Investigate the repeat strucuture of a genome through unassembled sequence reads.
+transposome - A toolkit for annotation of transposable element families from unassembled sequence reads 
 
 =head1 VERSION
 
-Version 0.08.6
+Version 0.08.7
 
 =cut
 
-our $VERSION = '0.08.6';
+our $VERSION = '0.08.7';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -29,12 +29,21 @@ our $VERSION = '0.08.6';
 =cut 
 
 my %opts;
+my $script = basename($0, ());
 
 GetOptions(\%opts,
-	   'c|config=s' => \$opts{config},
-	   'v|version'  => \$opts{version},
-	   'h|help'     => \$opts{help},
-	   'm|man'      => \$opts{man},
+	   'c|config=s'          => \$opts{config},
+	   'v|version'           => \$opts{version},
+	   'a|analysis=s'        => \$opts{analysis},
+	   'int|intfile=s'       => \$opts{int_file},
+	   'idx|idxfile=s'       => \$opts{idx_file},
+	   'bdb|blastdb=s'       => \$opts{blastdb},
+	   'edges|edgefile=s'    => \$opts{edge_file},
+	   'clsdir|clusterdir=s' => \$opts{cls_dir},
+	   'seqct|sequencect=i'  => \$opts{seqct},
+	   'clsct|clusteredct=i' => \$opts{cls_tot},
+	   'h|help'              => \$opts{help},
+	   'm|man'               => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
 
 # Get configuration using Transposome class
@@ -48,38 +57,70 @@ if ( !$opts{config} ) {
     exit(1);
 }
 
+$opts{analysis} //= 'all';
 my $trans_obj = Transposome->new( config => $opts{config} );
 
 # Parse configuration
 my $config = $trans_obj->get_configuration;
-
 unless ( -d $config->{output_directory} ) {
     make_path( $config->{output_directory}, {verbose => 0, mode => 0771,} );
 }
 
-# Initialize log and timers
-my ( $t0, $log ) = init_transposome( $config );
+if ($opts{analysis} eq 'all') {
+    if ( !$opts{config} ) {
+	say "\nERROR: No arguments were given.\n";
+	usage();
+	exit(1);
+    }
+    else {
+	full_analysis($config);
+    }
+}
+elsif ($opts{analysis} eq 'blast') {
+    my $blastdb = run_blast( $config );
+    die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
+        unless -s $blastdb;
+}
+elsif ($opts{analysis} eq 'findpairs') {
+    my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $opts{blastdb} );
+}
+elsif ($opts{analysis} eq 'cluster') {
+    my ( $cls_dir_path, $seqct, $cls_tot ) 
+	= make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
+}
+elsif ($opts{analysis} eq 'annotation') {
+    annotate_clusters( $config, $opts{cls_dir}, $opts{seqct}, $opts{cls_tot} );
+}
+else {
+    say "\nERROR: '$opts{analysis}' is not recognized. See the manual by typing '$script -m',".
+	" or see https://github.com/sestaton/Transposome.\n";
+    exit(1);
+}
 
-# Perform the all vs. all blast
-my $blastdb = run_blast( $config );
-die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
-    unless -s $blastdb;
+sub full_analysis {
+    my ($config) = @_;
 
-# parse mglblast results to find best scoring pairwise matches
-my ( $idx_file, $int_file, $hs_file ) = find_pairs( $config, $blastdb );
+    # Initialize log and timers
+    my ( $t0, $log ) = init_transposome( $config );
 
-# Cluster sequences and analyze groupings
-my ( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $hs_file );
+    # Perform the all vs. all blast
+    my $blastdb = run_blast( $config );
+    die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
+	unless -s $blastdb;
 
-# Annotate clusters and generate whole-genome summary of results
-annotate_clusters( $config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+    # parse mglblast results to find best scoring pairwise matches
+    my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $blastdb );
 
-# Log summary of results
-log_interval( $t0, $log );
+    # Cluster sequences and analyze groupings
+    my ( $cls_dir_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $edge_file );
 
-#
-# Methods
-# 
+    # Annotate clusters and generate whole-genome summary of results
+    annotate_clusters( $config, $cls_dir_path, $seqct, $cls_tot );
+
+    # Log summary of results
+    log_interval( $t0, $log );
+}
+
 sub init_transposome {
     my ($config) = @_;
 
@@ -134,7 +175,8 @@ sub run_blast {
 					      dir       => $config->{output_directory},
 					      threads   => $config->{thread},
 					      cpus      => $config->{cpu},
-					      seq_num   => $config->{sequence_num} );
+					      seq_num   => $config->{sequence_num},
+                                              verbose   => 1 );
     
     my $blastdb = $blast->run_allvall_blast;
 
@@ -150,7 +192,8 @@ sub find_pairs {
 						  dir               => $config->{output_directory},
 						  in_memory         => $config->{in_memory},
 						  percent_identity  => $config->{percent_identity},
-						  alignment_length  => $config->{alignment_length} );
+						  alignment_length  => $config->{alignment_length},
+                                                  verbose           => 1 );
     
     my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
 
@@ -166,7 +209,8 @@ sub make_clusters {
     my $cluster = Transposome::Cluster->new( file            => $int_file,
 					     dir             => $config->{output_directory},
 					     merge_threshold => $config->{merge_threshold},
-					     cluster_size    => $config->{cluster_size} );
+					     cluster_size    => $config->{cluster_size},
+	                                     verbose         => 1 );
     
     my $comm = $cluster->louvain_method;
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
@@ -185,19 +229,25 @@ sub make_clusters {
     unlink $idx_file, $int_file, $hs_file;
     untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
-    return ($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+    return ($cls_dir_path, $seqct, $cls_tot);
 }
 
 sub annotate_clusters {
-    my ($config, $cls_dir_path, $singletons_file_path, $seqct, $cls_tot) = @_;
-    
+    my ($config, $cls_dir_path, $seqct, $cls_tot) = @_;
+
     load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
+
+    my @clsfastas;
+    find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
+
+    my ($singletons_file_path) = grep { /singletons/ } @clsfastas;
 
     my $annotation = Transposome::Annotation->new( database  => $config->{repeat_database},
 						   dir       => $config->{output_directory},
 						   file      => $config->{cluster_log_file},
 						   threads   => $config->{thread},
-						   cpus      => $config->{cpu} );
+						   cpus      => $config->{cpu},
+                                                   verbose   => 1 );
 
     my ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams)
 	= $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
@@ -274,16 +324,35 @@ sub load_classes {
 sub usage {
     my $prog = basename($0);
     print STDERR <<END
-USAGE: $prog [-c] [-v] [-h] [-m]
+Transposome version: $VERSION
+
+USAGE: $prog [-c] [-a] [-int] [-idx] [-edges] [-bdb] [-clsdir] [-v] [-h] [-m]
 
 Required:
-    -c|config  :    The Transposome configuration file.
+    -c|config           :    The Transposome configuration file. This is all that is required to run
+                             the full analysis. The options below are for individual analysis steps.
 
 Options:
-    -v|version :    Print the program version and exit.
-    -h|help    :    Print a usage statement.
-    -m|man     :    Print the full documentation.
+    -a|analysis         :    The type of analysis to perform (Default: all).
+    -int|intfile        :    The file containing an index of each sequence 
+                             (only required for the 'cluster' analysis).
+    -idx|idxfile        :    The file containing an index mapping the sequence ID and the
+                             ID used for clustering (only required for the 'cluster' analysis).
+    -edges|edgefile     :    The file containing the best pairwise matches and
+                             the score (only required for the 'cluster' analysis).
+    -bdb|blastdb        :    The all-vs-all BLAST file (only required for the 'findpairs' analysis).
+    -clsdir|clusterdir  :    The directory of FASTA files for each cluster 
+                             (only required for the 'annotation' analysis).
+    -seqct|sequencect   :    The total number of sequences used in the analysis.
+                             (only required for the 'annotation' analysis).
+    -clsct|clusteredct  :    The total number of clustered sequences.
+                             (only required for the 'annotation' analysis).
+    -v|version          :    Print the program version and exit.
+    -h|help             :    Print a usage statement.
+    -m|man              :    Print the full documentation.
 
+Reference: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
+           families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
 END
 }
 
@@ -300,6 +369,70 @@ The Transposome configuration file.
 =head1 OPTIONS
 
 =over 2
+
+=item -a, --analysis
+
+The type of analysis to perform. Options are 'all', 'blast', 'findpairs', 'cluster', and 'annotation'. Default: all.
+
+Analysis type         Description
+
+all                   Run the full analysis from beginning to end, logging progress of each step
+blast                 Run only the all-vs-all BLAST comparison.
+findpairs             Parse the all-vs-all BLAST report and find best scoring pairwise matches (to be used in graph construction)
+cluster               Perform the clustering step with the pairwise matches
+annotation            Run the annotation procedures on a directory cluster FASTA files
+
+The BLAST step can be greatly accelerated by running on a machine with a large number of processors, but the 'findpairs' and 'cluster' steps often require a large amount of computer memory. For this reason, it is best to separate the steps so you can run the BLAST on a large cluster, then send the 'findpairs' and 'cluster' steps to a high memory machine.
+
+Examples:
+
+1) Run the full analysis. In this case, only the configuration file is required.
+
+    transposome --config transposome_config.yml
+
+2) Run just the BLAST step. Only the configuration file is required for this step.
+
+    transposome --analysis blast --config transposome_config.yml
+
+3) Run the 'findpairs' analysis step. For this analysis, the configuration file and an all-vs-all BLAST file is required.
+
+    transposome --analysis findpairs --config transposome_config.yml --blastdb seqs_allvall_blastdb.bln
+
+4) Run the 'cluster' analysis step. In addition to the configuration file, the three files generated by the 'findpairs' step are required. These files are explained in more detail below.
+
+    transposome --analysis cluster --config transposome_config.yml -int seqs_matches.int -idx seqs_matches.idx -edges seqs_matches.edges
+
+5) Run the 'annotation' analysis step. 
+
+    transposome --analysis annotation --config transposome_config.yml -clsdir seqs_clustered_fasta_files -seqct 100000 -clsct 73400
+
+=item -int, --intfile
+
+The file containing the index of each sequence and match score. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -idx, --idxfile
+
+The file containing an index mapping the sequence ID and the sequence index used for clustering. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -edges, --edgefile
+
+The file containg the pairwise information for each best scoring match. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -bdb, --blastdb
+
+The all-vs-all BLAST report generated from the unassembled sequenc reads. This file is returned from the run_allvall_blast method in the Transposome::Run::Blast class.
+
+=item -clsdir, --clusterdir
+
+A directory containing the FASTA files for each cluster. The PATH to this directory is returned from the merge_clusters method in the Transposome::Cluster class.
+
+=item -seqct, --sequencect
+
+The total number of sequences used in the analysis. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
+
+=item -clsct, --clusteredct
+
+The total number of clustered sequences. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
 
 =item -v, --version
 

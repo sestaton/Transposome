@@ -11,11 +11,11 @@ Transposome::Role::Util - Numerous utility routines for Transposome.
 
 =head1 VERSION
 
-Version 0.08.6
+Version 0.08.7
 
 =cut
 
-our $VERSION = '0.08.6';
+our $VERSION = '0.08.7';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -41,6 +41,13 @@ has 'threads' => (
     predicate => 'has_threads',
     lazy      => 1,
     default   => 1,
+);
+
+has 'verbose' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    lazy       => 1,
+    default    => 1,
 );
 
 =head1 METHODS

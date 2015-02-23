@@ -24,11 +24,11 @@ Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
 
 =head1 VERSION
 
-Version 0.08.6
+Version 0.08.7
 
 =cut
 
-our $VERSION = '0.08.6';
+our $VERSION = '0.08.7';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -72,8 +72,12 @@ method BUILD (@_) {
 	die unless -s $self->file;
     }
     catch {
-        $self->log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.")
-	    if Log::Log4perl::initialized();
+	if (Log::Log4perl::initialized()) {
+	    $self->log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
+	}
+	else {
+	    say STDERR "There seems to be no content in the input file. Check the blast results and try again. Exiting.";
+	}
 	exit(1);
     };
 }
@@ -83,7 +87,7 @@ method BUILD (@_) {
 =head2 parse_blast
 
  Title   : parse_blast
- Usage   : my ($idx_file, $int_file, $hs_file) = $pairfinder_obj->parse_blast;
+ Usage   : my ($idx_file, $int_file, $edge_file) = $pairfinder_obj->parse_blast;
 
  Function: Find the best scoring matches for each pair of sequences. 
 
@@ -105,15 +109,15 @@ method parse_blast {
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
     }
-    my $int_file = $iname;
-    my $idx_file = $iname;
-    my $hs_file  = $iname;
-    $int_file    .= "_louvain.int";
-    $idx_file    .= "_louvain.idx";
-    $hs_file     .= "_louvain.hs";
-    my $int_path = File::Spec->catfile($self->dir, $int_file);
-    my $idx_path = File::Spec->catfile($self->dir, $idx_file);
-    my $hs_path  = File::Spec->catfile($self->dir, $hs_file);
+    my $int_file  = $iname;
+    my $idx_file  = $iname;
+    my $edge_file = $iname;
+    $int_file     .= "_louvain.int";
+    $idx_file     .= "_louvain.idx";
+    $edge_file    .= "_louvain.edges";
+    my $int_path  = File::Spec->catfile($self->dir, $int_file);
+    my $idx_path  = File::Spec->catfile($self->dir, $idx_file);
+    my $edge_path = File::Spec->catfile($self->dir, $edge_file);
     
     # counters
     my $total_hits  = 0;
@@ -124,8 +128,12 @@ method parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::PairFinder::parse_blast started at:   $st.")
-        if Log::Log4perl::initialized();
+    if (Log::Log4perl::initialized()) {
+	$self->log->info("Transposome::PairFinder::parse_blast started at:   $st.");
+    }
+    else {
+	say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
+    }
     
     my %match_pairs;
     my %match_index;
@@ -219,7 +227,7 @@ method parse_blast {
     close $idx;
 
     open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
-    open my $hs,  '>', $hs_path  or die "\n[ERROR]: Could not open file: $hs_path\n";
+    open my $edge,  '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
 
     while (my ($match, $scores) = each %match_pairs) {
 	my $match_score = max(@$scores);
@@ -229,7 +237,7 @@ method parse_blast {
 	    my $rev_match_score = max(@{$match_pairs{$revmatch}});
 	    if ($rev_match_score > $match_score) {
 		if (exists $match_index{$sbj} && exists $match_index{$qry}) {
-		    say $hs join "\t", $sbj, $qry, $rev_match_score;
+		    say $edge join "\t", $sbj, $qry, $rev_match_score;
 		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
 		    delete $match_pairs{$match};
 		}
@@ -240,13 +248,13 @@ method parse_blast {
 	}
 	else {
 	    if (exists $match_index{$qry} && exists $match_index{$sbj}) {
-		say $hs join "\t", $qry, $sbj, $match_score;
+		say $edge join "\t", $qry, $sbj, $match_score;
 		say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
 	    }
 	}
     }
     close $int;
-    close $hs;
+    close $edge;
     
     untie %match_index unless $self->in_memory;
     untie %match_pairs unless $self->in_memory;
@@ -255,12 +263,18 @@ method parse_blast {
     
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    $self->log->info("Transposome::PairFinder::parse_blast completed at: $ft.")
-	if Log::Log4perl::initialized();
-    $self->log->info("Final output files are:\n$int_file,\n$idx_file,\n$hs_file.")
-	if Log::Log4perl::initialized();
+    if (Log::Log4perl::initialized()) {
+	$self->log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
+	$self->log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
+    }
+    else {
+	if ($self->verbose) {
+	    say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
+	    say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
+	}
+    }
     
-    return ($idx_path, $int_path, $hs_path);
+    return ($idx_path, $int_path, $edge_path);
 }
 
 =head2 _validate_format
