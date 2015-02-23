@@ -1,7 +1,7 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.08.7 FUTURE RELEASE
+0.08.7	02/23/15	Vancouver, BC
 
 - Add check if any clusters were produced before doing the annotation step.
 - Add separate command line options for each stage of the analysis. The analysis options
