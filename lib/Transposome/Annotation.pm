@@ -282,7 +282,7 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
     @all_cluster_annotations{keys %$_} = values %$_ for @$cluster_annotations;
 
     open my $out, '>', $anno_rp_path or die "\n[ERROR]: Could not open file: $anno_rp_path\n";
-    say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfamily", "Family","Top_hit","Top_hit_perc";
+    say $out join "\t", "Cluster", "Read_count", "Type", "Class", "Superfamily", "Family","Top_hit","Top_hit_frac";
 
     for my $readct (reverse sort { $a <=> $b } keys %all_cluster_annotations) {
 	my @annots  = $self->mk_vec($all_cluster_annotations{$readct});
@@ -398,7 +398,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
     }
     my $total_gcov = 0;
 
-    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", "HitPerc", "GenomePerc";
+    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", "HitPerc", "GenomeFrac";
     for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
         if (exists $top_hit_superfam{$k}) {
 	    my $hit_perc   = sprintf("%.12f",$fams{$k}/$total_ct);
