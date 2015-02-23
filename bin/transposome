@@ -40,6 +40,8 @@ GetOptions(\%opts,
 	   'bdb|blastdb=s'       => \$opts{blastdb},
 	   'edges|edgefile=s'    => \$opts{edge_file},
 	   'clsdir|clusterdir=s' => \$opts{cls_dir},
+	   #'sc|seqct=i'          => \$opts{seqct},
+	   #'clsct|clusteredct=i' => \$opts{cls_tot},
 	   'h|help'              => \$opts{help},
 	   'm|man'               => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
@@ -83,11 +85,11 @@ elsif ($opts{analysis} eq 'findpairs') {
     my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $opts{blastdb} );
 }
 elsif ($opts{analysis} eq 'cluster') {
-    my ( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot ) 
+    my ( $cls_dir_path, $seqct, $cls_tot ) 
 	= make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
 }
 elsif ($opts{analysis} eq 'annotation') {
-    annotate_clusters( $config, $opts{cls_dir} );
+    annotate_clusters( $config, $opts{cls_dir}, $opts{seqct}, $opts{cls_tot} );
 }
 else {
     say "\nERROR: '$opts{analysis}' is not recognized. See the manual by typing '$script -m',".
@@ -110,7 +112,7 @@ sub full_analysis {
     my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $blastdb );
 
     # Cluster sequences and analyze groupings
-    my $cls_dir_path = make_clusters( $config, $idx_file, $int_file, $edge_file );
+    my ( $cls_dir_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $edge_file );
 
     # Annotate clusters and generate whole-genome summary of results
     annotate_clusters( $config, $cls_dir_path );
@@ -224,19 +226,22 @@ sub make_clusters {
     my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
         = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
 
+    #say STDERR "DEBUG1: $seqct $cls_tot";
     unlink $idx_file, $int_file, $hs_file;
     untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
-    return $cls_dir_path;
+    return ($cls_dir_path, $seqct, $cls_tot);
 }
 
 sub annotate_clusters {
     my ($config, $cls_dir_path) = @_;
-    
+
     load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
 
-    my ($singletons_file_path, $singtot, $cls_tot, @clsfastas);
+    my (@clsfastas, $singtot, $cls_tot);
     find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
+
+    my ($singletons_file_path) = grep { /singletons/ } @clsfastas;
 
     for my $fas (@clsfastas) {
         if ($fas =~ /singletons_(\d+)\.fas$/) {

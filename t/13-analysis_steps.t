@@ -43,8 +43,8 @@ local $ENV{PATH} = "$bin:$ENV{PATH}";
 my $allok = full_analysis($script, $conf_file);
 my $blastdb = blast_analysis($script, $conf_file, $outdir);
 my ($int_file, $idx_file, $edge_file) = findpairs_analysis($script, $conf_file, $outdir, $blastdb);
-my $clsdir = cluster_analysis($script, $conf_file, $outdir, $int_file, $idx_file, $edge_file);
-my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir);
+my ($clsdir, $seqtot, $clstot) = cluster_analysis($script, $conf_file, $outdir, $int_file, $idx_file, $edge_file);
+my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir, $seqtot, $clstot);
 
 # clean up
 remove_tree( $outdir, { safe => 1 } );
@@ -75,7 +75,6 @@ sub full_analysis {
     
     remove_tree( $outdir, { safe => 1 } );
     unlink glob "t/transposome_mgblast*";
-    unlink "formatdb.log";
     return $stderr;
 }
 
@@ -123,7 +122,7 @@ sub cluster_analysis {
     $script .= " --analysis cluster --config $conf_file";
     $script .= " -int $int_file -idx $idx_file -edges $edge_file";
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
-
+    
     my (@files, @dirs, @fastas);
     find( sub { push @dirs, $File::Find::name if -d and /cls_fasta_files/ }, $outdir );
     my $clsdir = shift @dirs;
@@ -150,15 +149,16 @@ sub cluster_analysis {
     is( @files,    4, 'Correct number of log files generated' );
     is( @fastas,  19, 'Correct number of clusters produced' );
 
-    return $clsdir;
+    return ($clsdir, $seqtot, $clstot);
 }
 
 sub annotation_analysis {
-    my ($script, $conf_file, $outdir, $clsdir) = @_;
+    my ($script, $conf_file, $outdir, $clsdir, $seqct, $cls_tot) = @_;
 
-    $script .= " --analysis annotation --config $conf_file --clsdir $clsdir";
+    $script .= " --analysis annotation --config $conf_file --clsdir $clsdir"; # --seqct $seqct --clusteredct $cls_tot";
 
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    #say $stderr;
 
     my @files;
     find( sub { push @files, $File::Find::name if -f and /\.tgz$/ }, $outdir );
