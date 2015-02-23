@@ -155,7 +155,7 @@ sub cluster_analysis {
 sub annotation_analysis {
     my ($script, $conf_file, $outdir, $clsdir, $seqct, $cls_tot) = @_;
 
-    $script .= " --analysis annotation --config $conf_file --clsdir $clsdir"; # --seqct $seqct --clusteredct $cls_tot";
+    $script .= " --analysis annotation --config $conf_file --clsdir $clsdir -seqct $seqct -clsct $cls_tot";
 
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
     #say $stderr;
