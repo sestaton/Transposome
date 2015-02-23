@@ -211,11 +211,14 @@ sub annotate_clusters {
     my $anno_tar_file = basename($anno_dir_path);
     my $cls_tar_path  = File::Spec->catfile($outdir, $cls_tar_file.".tgz");
     my $anno_tar_path = File::Spec->catfile($outdir, $anno_tar_file.".tgz");
+    #$cls_tar_file .= ".tgz";
+    #$anno_tar_file .= ".tgz";
 
     my (@clusters, @annotations);
     find( sub { push @clusters,    $File::Find::name }, $cls_dir_path );
     find( sub { push @annotations, $File::Find::name }, $anno_dir_path );
 
+    #chdir $outdir;
     my $ctar = Archive::Tar->new;
     $ctar->add_files(@clusters);
     $ctar->write($cls_tar_path, &COMPRESS_GZIP);
@@ -223,6 +226,7 @@ sub annotate_clusters {
     my $atar = Archive::Tar->new;
     $atar->add_files(@annotations);
     $atar->write($anno_tar_path, &COMPRESS_GZIP);
+    #chdir "..";
 
     remove_tree( $cls_dir_path,  { safe => 1 } );
     remove_tree( $anno_dir_path, { safe => 1 } );
