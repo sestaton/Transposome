@@ -54,7 +54,7 @@ Then, simply run the `transposome` program, specifying your configuration file:
 
     transposome --config transposome_config.yml
 
-The name of the configuration file does not matter, this is just an example. Though, the format is important. It is also possible to run individual steps of the analysis from the command line. See the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) wiki page for more details.
+The name of the configuration file does not matter, this is just an example. Though, the format is important. It is also possible to [run individual steps of the analysis](https://github.com/sestaton/Transposome/wiki/Running-some-or-all-of-the-analysis-steps) from the command line. See the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) wiki page for more details.
 
 **ADVANCED USAGE**
 
