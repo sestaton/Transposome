@@ -6,6 +6,9 @@ Version	Date	Location
 - Add check if any clusters were produced before doing the annotation step.
 - Add separate command line options for each stage of the analysis. The analysis options
   are: all, blast, findpairs, cluster, and annotation.
+- Change the name of the most important field in the annotation summary file (the sixth column) 
+  from "GenomePerc" to "GenomeFrac" to reflect that this is a fraction, not a percent. 
+  This is correctly reported in the log but the column name in the summary file header is misleading.
 
 0.08.6	02/12/15	Vancouver, BC
 
