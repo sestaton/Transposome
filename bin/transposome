@@ -351,8 +351,8 @@ Options:
     -h|help             :    Print a usage statement.
     -m|man              :    Print the full documentation.
 
-Reference: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
-           families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
+Citation: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
+          families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
 END
 }
 
@@ -374,13 +374,13 @@ The Transposome configuration file.
 
 The type of analysis to perform. Options are 'all', 'blast', 'findpairs', 'cluster', and 'annotation'. Default: all.
 
-Analysis type         Description
+    Analysis type         Description
 
-all                   Run the full analysis from beginning to end, logging progress of each step
-blast                 Run only the all-vs-all BLAST comparison.
-findpairs             Parse the all-vs-all BLAST report and find best scoring pairwise matches (to be used in graph construction)
-cluster               Perform the clustering step with the pairwise matches
-annotation            Run the annotation procedures on a directory cluster FASTA files
+    all                   Run the full analysis from beginning to end, logging progress of each step.
+    blast                 Run only the all-vs-all BLAST comparison.
+    findpairs             Parse the all-vs-all BLAST report and find best scoring pairwise matches (to be used in graph construction).
+    cluster               Perform the clustering step with the pairwise matches.
+    annotation            Run the annotation procedures on a directory cluster FASTA files.
 
 The BLAST step can be greatly accelerated by running on a machine with a large number of processors, but the 'findpairs' and 'cluster' steps often require a large amount of computer memory. For this reason, it is best to separate the steps so you can run the BLAST on a large cluster, then send the 'findpairs' and 'cluster' steps to a high memory machine.
 
@@ -465,6 +465,10 @@ You can find documentation for this module with the perldoc command.
 
     perldoc transposome
 
+=head1 CITATION
+
+ Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
+           families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
 
 =head1 LICENSE AND COPYRIGHT
 
