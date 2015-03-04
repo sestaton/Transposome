@@ -1,6 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.0	03/04/15	Vancouver, BC
+
+- Modify annotation and cluster methods to take and return a hash of arguments
+  instead of long lists of arguments. This change breaks the API, indicated by
+  the version change (minor version change).
+
 0.08.7	02/23/15	Vancouver, BC
 
 - Add check if any clusters were produced before doing the annotation step.
