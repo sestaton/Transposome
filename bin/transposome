@@ -85,8 +85,8 @@ elsif ($opts{analysis} eq 'findpairs') {
     my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $opts{blastdb} );
 }
 elsif ($opts{analysis} eq 'cluster') {
-    my ( $cls_dir_path, $seqct, $cls_tot ) 
-	= make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
+    my $cluster_data =
+	make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
 }
 elsif ($opts{analysis} eq 'annotation') {
     annotate_clusters( $config, $opts{cls_dir}, $opts{seqct}, $opts{cls_tot} );
@@ -112,10 +112,13 @@ sub full_analysis {
     my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $blastdb );
 
     # Cluster sequences and analyze groupings
-    my ( $cls_dir_path, $seqct, $cls_tot ) = make_clusters( $config, $idx_file, $int_file, $edge_file );
+    my $cluster_data = make_clusters( $config, $idx_file, $int_file, $edge_file );
 
     # Annotate clusters and generate whole-genome summary of results
-    annotate_clusters( $config, $cls_dir_path, $seqct, $cls_tot );
+    annotate_clusters( $config, 
+		       $cluster_data->{cluster_directory}, 
+		       $cluster_data->{total_sequence_num}, 
+		       $cluster_data->{total_cluster_num} );
 
     # Log summary of results
     log_interval( $t0, $log );
@@ -223,13 +226,19 @@ sub make_clusters {
 
     my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
 
-    my ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot) 
-        = $cluster->merge_clusters($vertex, $seqs, $read_pairs, $config->{cluster_log_file}, $uf);
+    my $cluster_data
+       = $cluster->merge_clusters({ graph_vertices         => $vertex,
+                                    sequence_hash          => $seqs,
+                                    read_pairs             => $read_pairs,
+                                    cluster_log_file       => $config->{cluster_log_file},
+                                    graph_unionfind_object => $uf });
 
+    $cluster_data->{total_sequence_num} = $seqct;
     unlink $idx_file, $int_file, $hs_file;
     untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
-    return ($cls_dir_path, $seqct, $cls_tot);
+
+    return $cluster_data;
 }
 
 sub annotate_clusters {
@@ -249,11 +258,13 @@ sub annotate_clusters {
 						   cpus      => $config->{cpu},
                                                    verbose   => 1 );
 
-    my ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams)
-	= $annotation->annotate_clusters($cls_dir_path, $singletons_file_path, $seqct, $cls_tot);
+    my $annotation_results = $annotation->annotate_clusters({
+	    cluster_directory  => $cls_dir_path, 
+	    singletons_file    => $singletons_file_path, 
+	    total_sequence_num => $seqct, 
+	    total_cluster_num  => $cls_tot });
 
-    $annotation->clusters_annotation_to_summary($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, 
-						$total_readct, $seqct, $rep_frac, $blasts, $superfams);
+    $annotation->clusters_annotation_to_summary( $annotation_results );
 
     my $anno_dir_path = $cls_dir_path."_annotations";
     my $outdir        = dirname($cls_dir_path);
