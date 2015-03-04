@@ -12,7 +12,7 @@ use Transposome::Cluster;
 use Transposome::SeqUtil;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 51;
+use Test::More 'no_plan';
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'cluster_t');
@@ -86,14 +86,18 @@ ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
 my ( $seqs, $seqct ) = $memstore->store_seq;
 
-#diag("Trying to merge clusters...");
-my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
-  $cluster->merge_clusters( $vertex, $seqs, $read_pairs, $report, $uf );
+my $cluster_data =
+   $cluster->merge_clusters({ graph_vertices         => $vertex,
+			      sequence_hash          => $seqs,
+			      read_pairs             => $read_pairs,
+			      cluster_log_file       => $report,
+			      graph_unionfind_object => $uf });
+
 
 {
     local $/ = '>';
 
-    open my $in, '<', $cls_with_merges_path;
+    open my $in, '<', $cluster_data->{merged_cluster_file};
     while ( my $line = <$in> ) {
         $line =~ s/>//g;
         next if !length($line);
@@ -106,10 +110,12 @@ my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
     close $in;
 }
 
-ok( defined($cls_dir_path),
-    'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 46, 'The expected number of reads went into clusters' );
+ok( defined($cluster_data), 'Returned data from cluster merging process' );
+ok( ref($cluster_data) eq 'HASH', 'Returned the correct data type from cluster merging' );
 
+ok( defined($cluster_data->{cluster_directory}),
+    'Can successfully merge communities based on paired-end information' );
+is( $cluster_data->{total_cluster_num}, 46, 'The expected number of reads went into clusters' );
 my $repfile = File::Spec->catfile($outdir, $report);
 open my $rep, '<', $repfile;
 
@@ -147,7 +153,10 @@ while (<$rep>) {
 close $rep;
 
 my $single_ct = 0;
-my ($singles_file) = glob("$cls_dir_path/singletons*.fas");
+my $cluster_dir = $cluster_data->{cluster_directory};
+
+my ($singles_file) = glob("$cluster_dir/singletons*.fas");
+ok( defined($singles_file), 'Produced a file of singleton reads' );
 open my $singfh, '<', $singles_file;
 
 while (<$singfh>) {
@@ -156,7 +165,8 @@ while (<$singfh>) {
 close $singfh;
 
 is( $single_ct, 24, 'Expected number of reads went into singletons file' );
-is( $cls_tot + $single_ct, 70, 'Expected number of reads went into clusters and singletons file' );
+is( $cluster_data->{total_cluster_num} + $single_ct, 70, 
+    'Expected number of reads went into clusters and singletons file' );
 
 END {
     remove_tree( $outdir, { safe => 1 } );

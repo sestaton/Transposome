@@ -176,16 +176,17 @@ my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
-  $cluster->merge_clusters( $vertex, 
-			    $seqs,
-			    $read_pairs, 
-			    $config->{cluster_log_file}, 
-			    $uf ); 
+my $cluster_data =
+  $cluster->merge_clusters({ graph_vertices         => $vertex,
+                             sequence_hash          => $seqs,
+                             read_pairs             => $read_pairs,
+                             cluster_log_file       => $config->{cluster_log_file},
+                             graph_unionfind_object => $uf });
 
-ok( defined($cls_dir_path),
+$cluster_data->{total_sequence_num} = $seqct;
+ok( defined($cluster_data->{cluster_directory}),
     'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 48, 'The expected number of reads went into clusters' );
+is( $cluster_data->{total_cluster_num}, 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new(
     database => $config->{repeat_database},
@@ -195,34 +196,21 @@ my $annotation = Transposome::Annotation->new(
     cpus     => 1
 );
 
-my ( $anno_rp_path, 
-     $anno_sum_rep_path, 
-     $singles_rp_path, 
-     $total_readct, 
-     $rep_frac, 
-     $blasts, 
-     $superfams )
-     = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+my $annotation_results = $annotation->annotate_clusters( $cluster_data );
 
-is( $total_readct, 48,       'Correct number of reads annotated' );
-is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
+is( $annotation_results->{total_sequence_num}, 48,       'Correct number of reads annotated' );
+is( $annotation_results->{total_sequence_num}, $cluster_data->{total_cluster_num}, 
+'Same number of reads clustered and annotated' );
 
-ok( ref($blasts) eq 'ARRAY',
+ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
-ok( ref($superfams) eq 'ARRAY',
+ok( ref($annotation_results->{cluster_superfamilies}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (2)' );
 
-$annotation->clusters_annotation_to_summary( $anno_rp_path, 
-					     $anno_sum_rep_path, 
-					     $singles_rp_path, 
-					     $total_readct, 
-					     $seqct, 
-					     $rep_frac, 
-					     $blasts, 
-					     $superfams );
+$annotation->clusters_annotation_to_summary( $annotation_results );
 
 unlink glob("t/transposome_mgblast*");
 unlink glob("t_rep*");
-#remove_tree( $config->{output_directory}, { safe => 1 } );
+remove_tree( $config->{output_directory}, { safe => 1 } );
 unlink "t/$config->{run_log_file}";
 unlink $conf_file;

@@ -69,12 +69,16 @@ my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-my ( $cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot ) =
-  $cluster->merge_clusters( $vertex, $seqs, $read_pairs, $report, $uf );
+my $cluster_data =
+    $cluster->merge_clusters({ graph_vertices         => $vertex,
+			       sequence_hash          => $seqs,
+			       read_pairs             => $read_pairs,
+			       cluster_log_file       => $report,
+			       graph_unionfind_object => $uf });
 
-ok( defined($cls_dir_path),
+ok( defined($cluster_data->{cluster_directory}),
     'Can successfully merge communities based on paired-end information' );
-is( $cls_tot, 46, 'The expected number of reads went into clusters' );
+is( $cluster_data->{total_cluster_num}, 46, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new(
     database => $db_fas,
@@ -109,32 +113,24 @@ ok(
 );
 ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
 
-my ( $anno_rp_path, 
-     $anno_sum_rep_path, 
-     $singles_rp_path, 
-     $total_readct,  
-     $rep_frac, 
-     $blasts, 
-     $superfams )
-    = $annotation->annotate_clusters( $cls_dir_path, $singletons_file_path, $seqct, $cls_tot );
+my $annotation_results
+    = $annotation->annotate_clusters({
+            cluster_directory  => $cluster_data->{cluster_directory}, 
+            singletons_file    => $cluster_data->{singletons_file}, 
+            total_sequence_num => $seqct, 
+            total_cluster_num  => $cluster_data->{total_cluster_num} });
 
-like( $total_readct, qr/\d+/,
+like( $annotation_results->{total_sequence_num}, qr/\d+/,
     'Returned the expected type for the total number of reads clustered' );
-is( $total_readct, 46,       'Correct number of reads annotated' );
-is( $total_readct, $cls_tot, 'Same number of reads clustered and annotated' );
-ok( ref($blasts) eq 'ARRAY',
+is( $annotation_results->{total_sequence_num}, 46, 'Correct number of reads annotated' );
+is( $annotation_results->{total_sequence_num}, $cluster_data->{total_cluster_num}, 
+    'Same number of reads clustered and annotated' );
+ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
-ok( ref($superfams) eq 'ARRAY',
+ok( ref($annotation_results->{cluster_superfamilies}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (2)' );
 
-$annotation->clusters_annotation_to_summary( $anno_rp_path, 
-                                             $anno_sum_rep_path, 
-                                             $singles_rp_path, 
-                                             $total_readct, 
-                                             $seqct, 
-                                             $rep_frac, 
-                                             $blasts, 
-                                             $superfams );
+$annotation->clusters_annotation_to_summary( $annotation_results );
 
 END {
     remove_tree( $outdir, { safe => 1 } );
