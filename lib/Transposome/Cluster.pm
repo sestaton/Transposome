@@ -454,7 +454,7 @@ method make_clusters ($graph_comm, $idx_file) {
                read1 read2 read3 
                                                                                  Arg_type
  Args    : In order, 1) a hash of the vertices and their counts                  HashRef
-                     2) the mapping of Fasta/q IDs and their sequence            HashRef
+                     2) the mapping of FASTA/Q IDs and their sequence            HashRef
                         returned from store_seq() from Transposome::SeqStore
                      3) a data structure containing the read IDs in each         HashRef
                         cluster
@@ -465,7 +465,13 @@ method make_clusters ($graph_comm, $idx_file) {
 
 =cut
 
-method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls_log_file, $uf) {
+method merge_clusters (HashRef $cluster_data) {
+    my $vertex = $cluster_data->{graph_vertices};
+    my $seqs   = $cluster_data->{sequence_hash};
+    my $uf     = $cluster_data->{graph_unionfind_object};
+    my $read_pairs   = $cluster_data->{read_pairs};
+    my $cls_log_file = $cluster_data->{cluster_log_file};
+
     my $infile = $self->file->relative;
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
     my $out_dir = $self->dir->relative;
@@ -522,7 +528,7 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
     
 	for my $clus (@$group) {
 	    if (exists $read_pairs->{$clus}) {
-		print $clsnew join " ",@{$read_pairs->{$clus}};
+		print $clsnew join q{ },@{$read_pairs->{$clus}};
 		for my $read (@{$read_pairs->{$clus}}) {
 		    if (exists $seqs->{$read}) {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
@@ -594,7 +600,11 @@ method merge_clusters (HashRef $vertex, HashRef $seqs, HashRef $read_pairs, $cls
 	say STDERR "Transposome::Cluster::merge_clusters completed at:       $ft." if $self->verbose;
     }
 
-    return ($cls_dir_path, $cls_with_merges_path, $singletons_file_path, $cls_tot);
+    return ({ cluster_directory    => $cls_dir_path,
+              singletons_file      => $singletons_file_path,
+              merged_clusters_file => $cls_with_merges_path,
+	      total_cluster_num    => $cls_tot });
+
 }
 
 =head2 _find_community_exes

@@ -163,7 +163,12 @@ method BUILD (@_) {
 
 =cut
 
-method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, Int $seqct, Int $cls_tot) {
+method annotate_clusters (HashRef $cluster_data) {
+    my $cls_with_merges_dir  = $cluster_data->{cluster_directory};
+    my $singletons_file_path = $cluster_data->{singletons_file};
+    my $seqct   = $cluster_data->{total_sequence_num};
+    my $cls_tot = $cluster_data->{total_cluster_num};
+
     # set paths for annotate_clusters() method
     my $database = $self->database->absolute;
     my $db_path  = $self->_make_blastdb($database);
@@ -315,7 +320,15 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 	}
     }
 
-    return ($anno_rp_path, $anno_sum_rep_path, $singles_rp_path, $total_readct, $rep_frac, $blasts, $superfams);
+    return ({
+	annotation_report     => $anno_rp_path, 
+	annotation_summary    => $anno_sum_rep_path, 
+	singletons_report     => $singles_rp_path, 
+	total_sequence_num    => $total_readct, 
+	repeat_fraction       => $rep_frac, 
+	cluster_blast_reports => $blasts, 
+	cluster_superfamilies => $superfams });
+
 }
 
 =head2 clusters_annotation_to_summary
@@ -344,14 +357,14 @@ method annotate_clusters (Str $cls_with_merges_dir, Str $singletons_file_path, I
 
 =cut 
 
-method clusters_annotation_to_summary (Path::Class::File $anno_rp_path, 
-				       Path::Class::File $anno_sum_rep_path, 
-                                       $singles_rp_path, 
-				       Int $total_readct, 
-				       Int $seqct,
-				       Num $rep_frac, 
-				       ArrayRef $blasts, 
-				       ArrayRef $superfams) {
+method clusters_annotation_to_summary (HashRef $annotation_results) {
+    my $anno_rp_path      = $annotation_results->{annotation_report};
+    my $anno_sum_rep_path = $annotation_results->{annotation_summary};
+    my $singles_rp_path   = $annotation_results->{singletons_report};
+    my $total_readct      = $annotation_results->{total_sequence_num};
+    my $rep_frac          = $annotation_results->{repeat_fraction};
+    my $blasts            = $annotation_results->{cluster_blast_reports};
+    my $superfams         = $annotation_results->{cluster_superfamilies};
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
@@ -407,7 +420,7 @@ method clusters_annotation_to_summary (Path::Class::File $anno_rp_path,
 	    my $fam = $k;
 	    $fam =~ s/_I// if $fam =~ /_I_|_I$/;
 	    $fam =~ s/_LTR// if $fam =~ /_LTR_|_LTR$/;
-            say $outsum join "\t", $seqct, $top_hit_superfam{$k}, $fam, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
+            say $outsum join "\t", $total_readct, $top_hit_superfam{$k}, $fam, $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
         }
     }
     close $outsum;
