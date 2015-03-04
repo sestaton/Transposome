@@ -55,7 +55,7 @@ my @results;
 find( sub { push @results, $File::Find::name if -f and /\.tgz$/ }, $outdir );
 is( scalar(@results), 2, 'Output directories compressed successfully' );
 
-#remove_tree( $outdir, { safe => 1 } );
+remove_tree( $outdir, { safe => 1 } );
 unlink $conf_file;
 unlink glob "t/transposome_mgblast*";
 unlink "formatdb.log";
