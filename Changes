@@ -5,7 +5,7 @@ Version	Date	Location
 
 - Modify annotation and cluster methods to take and return a hash of arguments
   instead of long lists of arguments. This change breaks the API, indicated by
-  the version change (minor version change).
+  the major version change (instead of minor version change).
 
 0.08.7	02/23/15	Vancouver, BC
 
