@@ -1,11 +1,8 @@
-## These example settings are appropriate for 100,000 reads, which is a good level to start an analysis.
-## Note that 2 threads are used, so 2 threads X 1 CPU per thread means 2 total CPUs will be used.
-## For more information about this file, see https://github.com/sestaton/Transposome/wiki/Specifications-and-example-usage.
+## For more information about this file, see: 
+## https://github.com/sestaton/Transposome/wiki/Specifications-and-example-usage.
 blast_input:
   - sequence_file:      t_reads.fas
   - sequence_format:    fasta
-  - sequence_num:       10000
-  - cpu:                1
   - thread:             2
   - output_directory:   transposome_results_out
 clustering_options:
@@ -17,7 +14,6 @@ annotation_input:
   - repeat_database:    repeats.fas
 annotation_options:
   - cluster_size:       100
-  - blast_evalue:       10
 output:
   - run_log_file:       t_log.txt
   - cluster_log_file:   t_cluster_report.txt
