@@ -47,12 +47,11 @@ $VERSION = eval $VERSION;
                                                    file      => 'report.txt' );
 
     my $annotation_results = 
-       $annotation->annotate_clusters({ cluster_directory  => $cls_dir_path,
-                                        singletons_file    => $singletons_file_path,
-                                        total_sequence_num => $seqct,
-                                        total_cluster_num  => $cls_tot });
-    
- 
+        $annotation->annotate_clusters({ cluster_directory  => $cls_dir_path,
+                                         singletons_file    => $singletons_file_path,
+                                         total_sequence_num => $seqct,
+                                         total_cluster_num  => $cls_tot });
+     
     $annotation->clusters_annotation_to_summary( $annotation_results );
 
 =cut
