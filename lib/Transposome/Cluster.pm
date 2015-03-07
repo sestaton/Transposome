@@ -436,14 +436,26 @@ method make_clusters ($graph_comm, $idx_file) {
            
  Function: Join clusters based on threshold of split paired reads.  
 
-                                                                                 Return_type
- Returns : In order, 1) path to the results directory                            Scalar
-                     2) filename (path to) the cluster file with                 Scalar
-                        unions above threshold (see below)
-                     3) filename (path to) the singletons file                   Scalar
-                     4) the total number of reads clustered                      Scalar
+                                                                                 
+ Returns : A Perl hash containing the clustering results.
 
-           The cluster file is in a format similar to Fasta, where the           
+           The following is an example data structure returned by 
+           the merge_clusters method:
+
+           { cluster_directory    => $cls_dir_path,
+             singletons_file      => $singletons_file_path,
+             merged_clusters_file => $cls_with_merges_path,
+             total_cluster_num    => $cls_tot }
+
+           A description of the hash values returned:                            Return_type
+
+           cluster_directory -  path to the results directory                    Scalar
+           merged_clusters_file - filename (path to) the cluster file with       Scalar
+                                  unions above threshold (see below)
+           singletons_file - filename (path to) the singletons file              Scalar
+           total_cluster_num - the total number of reads clustered               Scalar
+
+           The cluster file is in a format similar to FASTA, where the           
            identifier specifies the cluster ID followed by the size. The
            second line of each record contains each read ID separated by 
            a space. The 'G' indicates a group created by joining clusters.
@@ -453,15 +465,29 @@ method make_clusters ($graph_comm, $idx_file) {
                >G1 3
                read1 read2 read3 
                                                                                  Arg_type
- Args    : In order, 1) a hash of the vertices and their counts                  HashRef
-                     2) the mapping of FASTA/Q IDs and their sequence            HashRef
-                        returned from store_seq() from Transposome::SeqStore
-                     3) a data structure containing the read IDs in each         HashRef
+ Args    : A Perl hash containing the clustering results.                        HashRef
+           
+           The following is an example data structure taken by the 
+           merge_clusters method.
+
+           { graph_vertices         => $vertex,
+             sequence_hash          => $seqs,
+             read_pairs             => $read_pairs,
+             cluster_log_file       => $cluster_log_file,
+             graph_unionfind_object => $uf });
+
+           A description of the hash values returned:
+
+           graph_vertices - a hash of the vertices and their counts              HashRef
+           sequence_hash - the mapping of FASTA/Q IDs and their sequence         HashRef
+                           returned from store_seq() from 
+                           Transposome::SeqStore
+           read_pairs - a data structure containing the read IDs in each         HashRef
                         cluster
-                     4) the filename of the report for logging progress          Scalar 
-                        and results
-                     5) a Graph::UnionFind object, containg data for finding
-                        union in the graph   
+           cluster_log_file - the filename of the report for logging progress    Scalar 
+                              and results
+           graph_unionfind_object - a Graph::UnionFind object, containg data     Object
+                                    for finding union in the graph   
 
 =cut
 
