@@ -30,6 +30,12 @@ $VERSION = eval $VERSION;
 
 =cut
 
+has 'exclude' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 0
+);
+
 has 'seq_file' => (
     is       => 'ro',
     isa      => 'Path::Class::File',
@@ -68,13 +74,14 @@ has 'repeat_db' => (
 
 method config_constructor {
     if ( $self->build_proper ) {
-        my $proper_yml = $self->_build_config_data;
-        if ( $self->destroy ) {
-            unlink $proper_yml;
-        }
-        else {
-            return [$proper_yml];
-        }
+	my $exclude = $self->exclude || undef;
+	my $proper_yml = $self->_build_config_data($exclude);
+	if ( $self->destroy ) {
+	    unlink $proper_yml;
+	}
+	else {
+	    return [$proper_yml];
+	}
     }
 }
 
@@ -93,7 +100,7 @@ method config_constructor {
 
 =cut
 
-method _build_config_data {
+method _build_config_data ($exclude?) {
     my $tmpyml = File::Temp->new(
         TEMPLATE => "transposome_config_XXXX",
         DIR      => 't',
@@ -113,8 +120,8 @@ method _build_config_data {
     say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";
     say $tmpyml "  - sequence_format:   $seq_format";
-    say $tmpyml "  - sequence_num:      10";
-    say $tmpyml "  - cpu:               1";
+    say $tmpyml "  - sequence_num:      10" unless defined $exclude && $exclude eq 'sequence_num';
+    say $tmpyml "  - cpu:               1" unless defined $exclude && $exclude eq 'cpu';
     say $tmpyml "  - thread:            1";
     say $tmpyml "  - output_directory:  t/test_transposome_cli_out";
     say $tmpyml "clustering_options:";
@@ -126,7 +133,7 @@ method _build_config_data {
     say $tmpyml "  - repeat_database:  $repeat_db";
     say $tmpyml "annotation_options:";
     say $tmpyml "  - cluster_size:     1";
-    say $tmpyml "  - blast_evalue:     10";
+    say $tmpyml "  - blast_evalue:     10" unless defined $exclude && $exclude eq 'blast_evalue';
     say $tmpyml "output:";
     say $tmpyml "  - run_log_file:       t_log.txt";
     say $tmpyml "  - cluster_log_file:   t_cluster_report.txt";
