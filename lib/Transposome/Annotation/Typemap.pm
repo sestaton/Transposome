@@ -12,11 +12,11 @@ Transposome::Annotation::Typemap - Create a map of repeats to the family level.
 
 =head1 VERSION
 
-Version 0.09.0
+Version 0.09.1
 
 =cut
 
-our $VERSION = '0.09.0';
+our $VERSION = '0.09.1';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
