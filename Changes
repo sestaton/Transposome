@@ -1,10 +1,17 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.1	03/06/15	Vancouver, BC
+
+- Remove 'sequence_num', 'cpu' and 'blast_evalue' options from the configuration
+  file to simplify usage (this addresses #18). Many tests were added (~30) to ensure
+  backwards compatibility with previous configuration files, so nothing should break
+  with these changes.
+.
 0.09.0	03/04/15	Vancouver, BC
 
 - Modify annotation and cluster methods to take and return a hash of arguments
-  instead of long lists of arguments. This change breaks the API, indicated by
+  instead of long lists of arguments (#15). This change breaks the API, indicated by
   the major version change (instead of minor version change).
 
 0.08.7	02/23/15	Vancouver, BC
