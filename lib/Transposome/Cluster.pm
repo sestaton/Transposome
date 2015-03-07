@@ -476,7 +476,7 @@ method make_clusters ($graph_comm, $idx_file) {
              cluster_log_file       => $cluster_log_file,
              graph_unionfind_object => $uf });
 
-           A description of the hash values returned:
+           A description of the hash values taken:
 
            graph_vertices - a hash of the vertices and their counts              HashRef
            sequence_hash - the mapping of FASTA/Q IDs and their sequence         HashRef
