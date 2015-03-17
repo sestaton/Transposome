@@ -14,6 +14,8 @@ use File::Spec;
 use Try::Tiny;
 use namespace::autoclean;
 
+use Data::Dump;
+
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Methods', 
      'Transposome::Role::File', 
@@ -318,7 +320,10 @@ method annotate_clusters (HashRef $cluster_data) {
 					    readct       => $readct,
 					    repeat_type  => $type_map->{$$top_hit},
 					    repeat_map   => \%repeats });
-	
+
+	dd $top_hit_superfam;
+	dd $cluster_annot;
+
         push @$superfams, $top_hit_superfam 
 	    unless not defined $top_hit_superfam or !%$top_hit_superfam;
 	push @$cluster_annotations, $cluster_annot 
