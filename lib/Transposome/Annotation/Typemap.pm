@@ -68,71 +68,111 @@ $VERSION = eval $VERSION;
 =cut
 
 method map_repeat_types ($infile) {
-    open my $in, '<', $infile or die "\n[ERROR]: Could not open file: $infile\n";
+    open my $in, '<', $infile 
+	or die "\n[ERROR]: Could not open file: $infile\n";
 
     my $matches = $self->_build_repeat_map();
+    my $repeats = $self->_map_repeat_taxonomy($matches);
 
-    my %family_map;
+    my (%family_map, %type_map, %seen);
 
     while (my $line = <$in>) {
-	chomp $line;
-	if ($line =~ /^>/) {
-	    $line =~ s/>//;
-	    my ($f, $sf, $source)  = split /\t/, $line;
-	    next unless defined $sf && defined $f; 
-	    if ($sf =~ /(\s+)/) {
-		$sf =~ s/$1/\_/;
-	    }
-	    $f =~ s/\s/\_/;
-	    if (exists $family_map{$sf}) {
-		push @{$family_map{$sf}}, $f;
-	    }
-	    else {
-		$family_map{$sf} = [];
-	    }
-	}
+        chomp $line;
+        if ($line =~ /^>/) {
+            $line =~ s/>//;
+            my ($f, $sf, $source)  = split /\t/, $line;
+            next unless defined $sf && defined $f;
+            if ($sf =~ /(\s+)/) {
+                $sf =~ s/$1/\_/;
+            }
+            $f =~ s/\s/\_/;
+            push @{$family_map{$sf}}, $f;
+        }
     }
     close $in;
 
-    for my $type (keys %$matches) {
-	unless ($type eq 'pseudogene' || $type eq 'integrated_virus') {
-	    for my $class (keys %{$matches->{$type}}) {
-		for my $superfam (@{$matches->{$type}{$class}}) {
-		    my $superfam_index = first_index { $_ eq $superfam } @{$matches->{$type}{$class}};
-		    for my $superfam_h (keys %$superfam) {
-			my $superfam_cp = lc($superfam_h);
-			for my $mapped_fam (keys %family_map) {
-			    my $mapped_fam_cp = lc($mapped_fam);
-			    if (length($superfam_cp) > 1 && length($mapped_fam_cp) > 1) {
-				if ($mapped_fam_cp =~ /sine/i && $superfam_cp =~ /sine/i) {
-				    for my $sine_fam_h (@{$superfam->{$superfam_h}}) {
-					my $sine_fam_index = first_index { $_ eq $sine_fam_h } @{$superfam->{$superfam_h}};
-					for my $sine_fam_mem (keys %$sine_fam_h) {
-					    if ($sine_fam_mem =~ /$mapped_fam_cp/i && $mapped_fam_cp =~ /^(?!sine$)/) {
-						push @{$matches->{$type}{$class}[$superfam_index]{$superfam_h}[$sine_fam_index]{$sine_fam_mem}}, 
-						$family_map{$mapped_fam};
-					    }
-					}
-				    }
-				} 
-				elsif ($mapped_fam_cp =~ /$superfam_cp/) {
-				    push @{$matches->{$type}{$class}[$superfam_index]{$superfam_h}}, $family_map{$mapped_fam};
-				}
-				elsif (length($mapped_fam_cp) == 1 && length($superfam_cp) == 1) {
-				    if ($mapped_fam_cp =~ /$superfam_cp/) {
-					push @{$matches->{$type}{$class}[$superfam_index]{$superfam_h}}, $family_map{$mapped_fam};
-				    }
-				}
-			    }
-			}
-		    }
-		} 
-	    } 
-	}
+    for my $mapped_sfam (keys %family_map) {
+        my $mapped_sfam_cp = lc($mapped_sfam);
+        for my $mapped_fam (@{$family_map{$mapped_sfam}}) {
+            for my $class (keys %$repeats) {
+                for my $sfamh (@{$repeats->{$class}}) {
+                    my $sfam_index = first_index { $_ eq $sfamh } @{$repeats->{$class}};
+                    for my $sfamname (keys %$sfamh) {
+                        if (lc($sfamname) eq $mapped_sfam_cp) {
+                            push @{$repeats->{$class}[$sfam_index]{$sfamname}}, $mapped_fam;
+                            $type_map{$mapped_fam} = $class;
+                        }
+                        elsif ($class eq $mapped_sfam_cp) {
+                            my $unk_idx = first_index { $_ eq 'unclassified' } @{$repeats->{$class}};
+                            push @{$repeats->{$class}[$unk_idx]{'unclassified'}}, $mapped_fam
+                                unless exists $seen{$mapped_fam};
+                            $seen{$mapped_fam} = 1;
+                            $type_map{$mapped_fam} = $class;
+                        }
+                    }
+                }
+            }
+        }
     }
-    
-    my $matches_ser = freeze $matches;   
-    return $matches_ser;
+
+    my $repeats_ser = freeze $repeats;
+    return ($repeats_ser, \%type_map);
+}
+
+=head2 _map_repeat_taxonomy
+
+ Title   : _map_repeat_taxomy
+
+ Usage   : This is a private method, do not use it directly.
+           
+ Function: Retrieve the repeat taxonomy for each TE order. This avoids
+           walking the entire structure for every single match look up.
+
+                                                                            Return_type
+ Returns : A complex data structure of the repeat taxonomy from order       HashRef
+           to the individual element.
+            
+                                                                            Arg_type
+ Args    : The repeat taxonomy map (hash) from the type down to the         HashRef
+           individual TE element.
+
+=cut
+
+method _map_repeat_taxonomy ($matches) {
+    my %repeats;
+
+    for my $type (keys %$matches) { 
+        if ($type eq 'transposable_element') { 
+            for my $tes (keys %{$matches->{$type}}) {
+                if ($tes eq 'dna_transposon') {
+                    $repeats{'dna_transposon'} = $matches->{$type}{$tes};
+                }
+                elsif ($tes eq 'ltr_retrotransposon') {
+                    $repeats{'ltr_retrotransposon'} = $matches->{$type}{$tes};
+                }
+                elsif ($tes eq 'non-ltr_retrotransposon') {
+                    $repeats{'non-ltr_retrotransposon'} = $matches->{$type}{$tes};
+                }
+                elsif ($tes eq 'endogenous_retrovirus') {
+                    $repeats{'endogenous_retrovirus'} = $matches->{$type}{$tes};
+                }
+            }
+        }        
+	elsif ($type eq 'simple_repeat') { 
+            for my $subtype (keys %{$matches->{$type}}) {
+                if ($subtype eq 'Satellite') {
+                    $repeats{'satellite'} = $matches->{$type}{$subtype};
+                }
+            }
+        }
+        elsif ($type eq 'pseudogene') { 
+            $repeats{'pseudogene'} = $matches->{$type};
+        }
+        elsif ($type eq 'integrated_virus') { 
+            $repeats{'integrated_virus'} = $matches->{$type};
+        }
+    }
+    return \%repeats; 
 }
 
 =head2 _build_repeat_map
@@ -155,55 +195,58 @@ method map_repeat_types ($infile) {
 method _build_repeat_map {
     my $matches = {};
     
-    $matches->{'transposable_element'}{'dna_transposon'}          
-        = [{'Mariner/Tc1' => []}, {'hAT'       => []}, 
-	   {'MuDR'        => []}, {'EnSpm'     => []}, 
-	   {'piggyBac'    => []}, {'P'         => []}, 
-	   {'Merlin'      => []}, {'Harbinger' => []}, 
-	   {'Transib'     => []}, {'Novosib'   => []}, 
-	   {'Helitron'    => []}, {'Polinton'  => []}, 
-	   {'Kolobok'     => []}, {'ISL2EU'    => []}, 
-	   {'Crypton'     => []}, {'Sola'      => []}, 
-	   {'Zator'       => []}, {'Ginger/1'  => []}, 
-	   {'Ginger2/TDD' => []}, {'Academ'    => []}, 
-	   {'Zisupton'    => []}, {'IS3EU'     => []}];
+    $matches->{'transposable_element'}{'dna_transposon'} 
+        = [{'Tc1/Mariner' => []}, {'hAT' => []}, 
+	   {'MuDR' => []}, {'EnSpm' => []}, 
+	   {'piggyBac' => []}, {'P' => []}, 
+	   {'Merlin' => []}, {'Harbinger' => []},
+	   {'Transib' => []}, {'Novosib' => []}, 
+	   {'Helitron' => []}, {'Polinton' => []}, 
+	   {'Kolobok' => []}, {'ISL2EU' => []}, 
+	   {'Crypton' => []}, {'Sola' => []}, 
+	   {'Zator' => []}, {'Ginger/1' => []}, 
+	   {'Ginger2/TDD' => []}, {'Academ' => []}, 
+	   {'Zisupton' => []}, {'IS3EU' => []}, 
+	   {'CACTA' => []}, {'Mutator' => []}, 
+	   {'PIF/Harbinger' => []}, {'unclassified' => []}];
     
-    $matches->{'transposable_element'}{'ltr_retrotransposon'}     
+    $matches->{'transposable_element'}{'ltr_retrotransposon'} 
         = [{'Gypsy' => []}, {'Copia' => []}, 
-	   {'BEL'   => []}, {'DIRS'  => []}];
-    
-    $matches->{'transposable_element'}{'endogenous_retrovirus'}   
-        = [{'ERV1' => []}, {'ERV2'       => []}, 
+	   {'BEL' => []}, {'DIRS' => []}, {'Unknown_LTR' => []},
+	   {'unclassified' => []}];
+
+    $matches->{'transposable_element'}{'endogenous_retrovirus'} 
+        = [{'ERV1' => []}, {'ERV2' => []}, 
 	   {'ERV3' => []}, {'Lentivirus' => []}, 
-	   {'ERV4' => []}];
+	   {'ERV4' => []}, {'unclassified' => []}];
     
     $matches->{'transposable_element'}{'non-ltr_retrotransposon'} 
-        = [{'SINE'    => [{'SINE1/7SL' => []}, {'SINE2/tRNA' => []},
-			  {'SINE3/5S'  => []}, {'SINE4'      => []}]},
-	   {'CRE'     => []}, {'NeSL'     => []}, 
-	   {'R4'      => []}, {'R2'       => []}, 
-	   {'L1'      => []}, {'RTE'      => []}, 
-	   {'I'       => []}, {'Jockey'   => []}, 
-	   {'CR1'     => []}, {'Rex1'     => []}, 
-	   {'RandI'   => []}, {'Penelope' => []}, 
-	   {'Tx1'     => []}, {'RTEX'     => []}, 
-	   {'Crack'   => []}, {'Nimb'     => []}, 
-	   {'Proto1'  => []}, {'Proto2'   => []}, 
-	   {'RTETP'   => []}, {'Hero'     => []}, 
-	   {'L2'      => []}, {'Tad1'     => []}, 
-	   {'Loa'     => []}, {'Ingi'     => []}, 
-	   {'Outcast' => []}, {'R1'       => []}, 
-	   {'Daphne'  => []}, {'L2A'      => []}, 
-	   {'L2B'     => []}, {'Ambal'    => []}, 
-	   {'Vingi'   => []}, {'Kiri'     => []}];
-    
-    $matches->{'simple_repeat'}{'Satellite'}                      
+        = [{'SINE1/7SL' => []}, {'SINE2/tRNA' => []},
+	   {'SINE3/5S' => []},{'SINE4' => []},
+	   {'CRE' => []}, {'NeSL' => []}, 
+	   {'R4' => []}, {'R2' => []}, 
+	   {'L1' => []}, {'RTE' => []}, 
+	   {'I' => []}, {'Jockey' => []}, 
+	   {'CR1' => []}, {'Rex1' => []}, 
+	   {'RandI' => []}, {'Penelope' => []}, 
+	   {'Tx1' => []}, {'RTEX' => []}, 
+	   {'Crack' => []}, {'Nimb' => []}, 
+	   {'Proto1' => []}, {'Proto2' => []}, 
+	   {'RTETP' => []}, {'Hero' => []}, 
+	   {'L2' => []}, {'Tad1' => []}, 
+	   {'Loa' => []}, {'Ingi' => []}, 
+	   {'Outcast' => []}, {'R1' => []}, 
+	   {'Daphne' => []}, {'L2A' => []}, 
+	   {'L2B' => []}, {'Ambal' => []}, 
+	   {'Vingi' => []}, {'Kiri' => []}, {'unclassified' => []}];
+
+    $matches->{'simple_repeat'}{'Satellite'} 
         = [{'SAT' => []}, {'MSAT' => []}];
-    
-    $matches->{'pseudogene'}                                      
+
+    $matches->{'pseudogene'} 
         = [{'rRNA' => []}, {'tRNA' => []}, {'snRNA' => []}];
-    
-    $matches->{'integrated_virus'}                                
+
+    $matches->{'integrated_virus'} 
         = [{'DNA_Virus' => []}, {'Caulimoviridae' => []}];
     
     return $matches;
