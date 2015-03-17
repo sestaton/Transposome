@@ -11,12 +11,12 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y build-essential lib32z1 git ncbi-blast+
 
-script: perl Makefile.PL && make test
+script: ./build/ci/run_tests.sh
 
 after_failure: cat /home/travis/.cpanm/build.log
 #after_failure: ls -l /home/travis/build/sestaton/Transposome/t/annotation_t
 
 branches:
   only:
-    - topic/add_annotation_methods
-    #- master
+    #- topic/add_annotation_methods
+    - master
