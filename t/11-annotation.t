@@ -33,7 +33,7 @@ my ($blfl2) = @$blast2;
 test_annotation( $blfl );
 # remove results and test annotation without specifying evalue in configuration
 #system("ls -l $outdir");
-#remove_tree( $outdir, { safe => 1} );
+remove_tree( $outdir, { safe => 1} );
 test_annotation( $blfl2 );
 
 #
@@ -163,8 +163,8 @@ sub test_annotation {
     close $annosum;
 
     ## this is a test introduced in v0.09.2 to ensure all the annotations are logged
-    #ok( $annoct > 2, 'All annotations written to report file' );
-    #ok( $anno_sumct > 2, 'Summary annotations written to file' );
+    ok( $annoct > 2, 'All annotations written to report file' );
+    ok( $anno_sumct > 2, 'Summary annotations written to file' );
 }
     
 END {
