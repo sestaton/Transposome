@@ -18,4 +18,5 @@ after_failure: cat /home/travis/.cpanm/build.log
 
 branches:
   only:
-    - master
+    - topic/add_annotation_methods
+    #- master
