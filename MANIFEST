@@ -1,4 +1,7 @@
 bin/transposome
+build/ci/bin/formatdb
+build/ci/bin/mgblast
+build/ci/run_tests.sh
 Changes
 README.md
 lib/Transposome.pm
