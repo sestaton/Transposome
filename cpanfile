@@ -25,6 +25,7 @@ requires 'File::Path';
 requires 'Graph';
 requires 'aliased';
 requires 'autodie';
+requires 'Data::Dump';
 
 on 'test' => sub {
    requires 'Test::More', '0.96';
