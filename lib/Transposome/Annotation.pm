@@ -537,6 +537,7 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
         chomp $hit;
         my ($ct, $hittype) = split /\t/, $hit;
         next unless defined $ct;
+	say STDERR join q{ }, $ct, $hittype;
         $blhits{$hittype} = $ct;
         $hit_ct++;
     }
@@ -553,6 +554,8 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
             say $out join "\t", $hits, $blhits{$hits}, $hit_perc;
         }
         close $out;
+
+	say $top_hit;
         return (\$hit_ct, \$top_hit, \$top_hit_perc, \%blhits);
     }
     else { ## if (!%blhits) {
