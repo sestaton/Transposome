@@ -31,6 +31,7 @@ my $blast2  = $test2->blast_constructor;
 my ($blfl2) = @$blast2;
 
 test_annotation( $blfl );
+# remove results and test annotation without specifying evalue in configuration
 remove_tree( $outdir, { safe => 1} );
 test_annotation( $blfl2 );
 
