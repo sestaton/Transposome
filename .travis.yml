@@ -1,17 +1,17 @@
 language: perl
 perl:
   - "5.20"
-#  - "5.18"
-#  - "5.16"
-#  - "5.14"
-#  - "5.12"
-#  - "5.10"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
 
 before_install: 
   - sudo apt-get update -qq
   - sudo apt-get install -y build-essential lib32z1 git ncbi-blast+
 
-script: ./build/ci/run_tests.sh
+script: perl Makefile.PL && make test
 
 after_failure: cat /home/travis/.cpanm/build.log
 #after_failure: ls -l /home/travis/build/sestaton/Transposome/t/annotation_t
