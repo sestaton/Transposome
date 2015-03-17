@@ -3,6 +3,11 @@ Changes
 README.md
 lib/Transposome.pm
 lib/Transposome/Annotation.pm
+lib/Transposome/Annotation/Mapping.pm
+lib/Transposome/Annotation/Methods.pm
+lib/Transposome/Annotation/Search.pm
+lib/Transposome/Annotation/Summary.pm
+lib/Transposome/Annotation/Typemap.pm
 lib/Transposome/Cluster.pm
 lib/Transposome/PairFinder.pm
 lib/Transposome/SeqFactory.pm
