@@ -32,8 +32,8 @@ my ($blfl2) = @$blast2;
 
 test_annotation( $blfl );
 # remove results and test annotation without specifying evalue in configuration
-system("ls -l $outdir");
-remove_tree( $outdir, { safe => 1} );
+#system("ls -l $outdir");
+#remove_tree( $outdir, { safe => 1} );
 test_annotation( $blfl2 );
 
 #
@@ -167,12 +167,12 @@ sub test_annotation {
     ok( $anno_sumct > 2, 'Summary annotations written to file' );
 }
     
-END {
-    remove_tree( $outdir, { safe => 1 } );
-    unlink glob("t/cluster_test_rep*");
-    unlink $blfl;
-    unlink $blfl2;
-    unlink $db;
-}
+#END {
+#    remove_tree( $outdir, { safe => 1 } );
+#    unlink glob("t/cluster_test_rep*");
+#    unlink $blfl;
+#    unlink $blfl2;
+#    unlink $db;
+#}
 
 done_testing();
