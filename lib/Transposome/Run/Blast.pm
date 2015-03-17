@@ -259,7 +259,7 @@ method _make_mgblastdb ($formatdb) {
         system([0..5],"$formatdb -p F -i $tempdb -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-	if (Log::Log4perl::intialized()) {
+	if (Log::Log4perl::initialized()) {
 	    $self->log->error("Unable to make mgblast database. Here is the exception: $_\nExiting.");
 	}
 	else {
