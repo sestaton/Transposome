@@ -32,6 +32,7 @@ my ($blfl2) = @$blast2;
 
 test_annotation( $blfl );
 # remove results and test annotation without specifying evalue in configuration
+system("ls -l $outdir");
 remove_tree( $outdir, { safe => 1} );
 test_annotation( $blfl2 );
 
