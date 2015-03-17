@@ -14,7 +14,7 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 40;
+use Test::More tests => 48;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'annotation_t');
@@ -146,21 +146,21 @@ sub test_annotation {
 	'Correct data structure returned for creating annotation summary (2)' );
 
     ## test if annotation reports are generated correctly
-    #my ($annoct, $anno_sumct) = (0, 0);
-    #$annotation->clusters_annotation_to_summary( $annotation_results );
+    my ($annoct, $anno_sumct) = (0, 0);
+    $annotation->clusters_annotation_to_summary( $annotation_results );
     
-    #my $anno_rp_path = $annotation_results->{annotation_report};
-    #my $anno_sum_rep_path = $annotation_results->{annotation_summary};
+    my $anno_rp_path = $annotation_results->{annotation_report};
+    my $anno_sum_rep_path = $annotation_results->{annotation_summary};
     
-    #ok( -s $anno_rp_path, 'Annotation report created' );
-    #ok( -s $anno_sum_rep_path, 'Annotation summary report created' );
+    ok( -s $anno_rp_path, 'Annotation report created' );
+    ok( -s $anno_sum_rep_path, 'Annotation summary report created' );
     
-    #open my $annorep, '<', $anno_rp_path;
-    #open my $annosum, '<', $anno_sum_rep_path;
-    #$annoct++ while (<$annorep>);
-    #close $annorep;
-    #$anno_sumct++ while (<$annosum>);
-    #close $annosum;
+    open my $annorep, '<', $anno_rp_path;
+    open my $annosum, '<', $anno_sum_rep_path;
+    $annoct++ while (<$annorep>);
+    close $annorep;
+    $anno_sumct++ while (<$annosum>);
+    close $annosum;
 
     ## this is a test introduced in v0.09.2 to ensure all the annotations are logged
     #ok( $annoct > 2, 'All annotations written to report file' );
