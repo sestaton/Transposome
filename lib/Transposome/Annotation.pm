@@ -14,7 +14,7 @@ use File::Spec;
 use Try::Tiny;
 use namespace::autoclean;
 
-use Data::Dump;
+#use Data::Dump;
 
 with 'MooseX::Log::Log4perl',
      'Transposome::Annotation::Methods', 
@@ -234,8 +234,7 @@ method annotate_clusters (HashRef $cluster_data) {
 
     my ($repeatmap, $type_map) = $self->map_repeat_types($database);
     my %repeats = %{ thaw($repeatmap) };
-
-    dd $type_map;
+    #dd $type_map;
 
     ## get input files
     opendir my $dir, $cls_with_merges_dir 
@@ -309,16 +308,14 @@ method annotate_clusters (HashRef $cluster_data) {
 						 blastdb      => $db_path,
 						 thread_range => $thread_range });
 
-	#dd $blast_out;
-
 	my ($hit_ct, $top_hit, $top_hit_frac, $blhits) 
 	    = $self->_parse_blast_to_top_hit($blast_out, $blast_file_path);
         next unless defined $top_hit && defined $hit_ct;
        
         push @$blasts, $blhits unless !%$blhits;
 
-	#dd $blasts;
-	say STDERR join q{ }, $$hit_ct, $$top_hit, $$top_hit_frac;
+	#dd $blasts; # for debugging blast issues
+	#say STDERR join q{ }, $$hit_ct, $$top_hit, $$top_hit_frac;
 
         ($top_hit_superfam, $cluster_annot) 
 	    = $self->_blast_to_annotation({ filebase     => $filebase,
@@ -540,7 +537,7 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
 	if ($hittype =~ /\#\w+\#?/) {
 	    $hittype =~ s/\#.*//;
 	}
-	say STDERR join q{ }, $ct, $hittype;
+	#say STDERR join q{ }, $ct, $hittype;
         $blhits{$hittype} = $ct;
         $hit_ct++;
     }
