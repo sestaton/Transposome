@@ -537,6 +537,9 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
         chomp $hit;
         my ($ct, $hittype) = split /\t/, $hit;
         next unless defined $ct;
+	if ($hittype =~ /\#\w+\#?/) {
+	    $hittype =~ s/\#.*//;
+	}
 	say STDERR join q{ }, $ct, $hittype;
         $blhits{$hittype} = $ct;
         $hit_ct++;
