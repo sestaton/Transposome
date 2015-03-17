@@ -13,7 +13,8 @@ before_install:
 
 script: ./build/ci/run_tests.sh
 
-after_failure: cat /home/travis/.cpanm/build.log
+#after_failure: cat /home/travis/.cpanm/build.log
+after_failure: ls -l /home/travis/build/sestaton/Transposome/t/annotation_t
 
 branches:
   only:
