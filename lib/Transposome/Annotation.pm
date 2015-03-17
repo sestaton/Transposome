@@ -555,7 +555,7 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
         }
         close $out;
 
-	say $top_hit;
+	#say $top_hit;
         return (\$hit_ct, \$top_hit, \$top_hit_perc, \%blhits);
     }
     else { ## if (!%blhits) {
