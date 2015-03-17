@@ -307,7 +307,7 @@ method annotate_clusters (HashRef $cluster_data) {
 						 blastdb      => $db_path,
 						 thread_range => $thread_range });
 
-	dd $blast_out;
+	#dd $blast_out;
 
 	my ($hit_ct, $top_hit, $top_hit_frac, $blhits) 
 	    = $self->_parse_blast_to_top_hit($blast_out, $blast_file_path);
@@ -315,8 +315,9 @@ method annotate_clusters (HashRef $cluster_data) {
        
         push @$blasts, $blhits unless !%$blhits;
 
-	#dd $blasts;
-	
+	dd $blasts;
+	say STDERR join q{ }, $hit_ct, $$top_hit, $$top_hit_frac, $type_map->{$$top_hit};
+
         ($top_hit_superfam, $cluster_annot) 
 	    = $self->_blast_to_annotation({ filebase     => $filebase,
 					    top_hit      => $$top_hit,
