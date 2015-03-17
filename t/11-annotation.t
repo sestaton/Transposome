@@ -14,7 +14,7 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 40;
+use Test::More tests => 48;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'annotation_t');
@@ -30,8 +30,9 @@ my $test2   = TestFixture->new( build_proper => 1, destroy => 0, exclude => 'bla
 my $blast2  = $test2->blast_constructor;
 my ($blfl2) = @$blast2;
 
-test_annotation($blfl);
-test_annotation($blfl2);
+test_annotation( $blfl );
+remove_tree( $outdir, { safe => 1} );
+test_annotation( $blfl2 );
 
 #
 # methods
@@ -126,11 +127,11 @@ sub test_annotation {
     ok( $annotation->has_blastn_exec, 'Can perform blastn for annotation' );
     
     my $annotation_results
-    = $annotation->annotate_clusters({
-	cluster_directory  => $cluster_data->{cluster_directory}, 
-	singletons_file    => $cluster_data->{singletons_file}, 
-	total_sequence_num => $seqct, 
-	total_cluster_num  => $cluster_data->{total_cluster_num} });
+	= $annotation->annotate_clusters({
+	    cluster_directory  => $cluster_data->{cluster_directory}, 
+	    singletons_file    => $cluster_data->{singletons_file}, 
+	    total_sequence_num => $seqct, 
+	    total_cluster_num  => $cluster_data->{total_cluster_num} });
     
     like( $annotation_results->{total_sequence_num}, qr/\d+/,
 	  'Returned the expected type for the total number of reads clustered' );
@@ -141,9 +142,27 @@ sub test_annotation {
 	'Correct data structure returned for creating annotation summary (1)' );
     ok( ref($annotation_results->{cluster_superfamilies}) eq 'ARRAY',
 	'Correct data structure returned for creating annotation summary (2)' );
+
+    ## test if annotation reports are generated correctly
+    my ($annoct, $anno_sumct) = (0, 0);
+    $annotation->clusters_annotation_to_summary( $annotation_results );
     
-    #ok ( $annotation->clusters_annotation_to_summary( $annotation_results ) == 1,
-	# 'Can run annotation summary methods' );
+    my $anno_rp_path = $annotation_results->{annotation_report};
+    my $anno_sum_rep_path = $annotation_results->{annotation_summary};
+    
+    ok( -s $anno_rp_path, 'Annotation report created' );
+    ok( -s $anno_sum_rep_path, 'Annotation summary report created' );
+    
+    open my $annorep, '<', $anno_rp_path;
+    open my $annosum, '<', $anno_sum_rep_path;
+    $annoct++ while (<$annorep>);
+    close $annorep;
+    $anno_sumct++ while (<$annosum>);
+    close $annosum;
+
+    ## this is a test introduced in v0.09.2 to ensure all the annotations are logged
+    ok( $annoct > 2, 'All annotations written to report file' );
+    ok( $anno_sumct > 2, 'Summary annotations written to file' );
 }
     
 END {
