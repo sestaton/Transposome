@@ -1,13 +1,15 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.09.2	03/16/15	Vancouver, BC
+0.09.2	03/17/15	Vancouver, BC
 
 - Rework annotation methods to not walk the entire repeat taxonomy. The methods
   are now in four separate roles and are consumed in one interface role.
 - The summary and annotation to family mapping methods are more accurate now by 
-  considering all TE families and more efficient (3X faster) by not applying
+  considering all TE families, and are more efficient (3X faster) by not applying
   redundant methods to the summary calculations.
+- Bug fix for some versions of BLAST joining sequence identifiers, which causes
+  the annotation mapping step to not work properly.
 
 0.09.1	03/06/15	Vancouver, BC
 
