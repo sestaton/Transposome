@@ -235,6 +235,8 @@ method annotate_clusters (HashRef $cluster_data) {
     my ($repeatmap, $type_map) = $self->map_repeat_types($database);
     my %repeats = %{ thaw($repeatmap) };
 
+    dd $type_map;
+
     ## get input files
     opendir my $dir, $cls_with_merges_dir 
 	or die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
@@ -315,8 +317,8 @@ method annotate_clusters (HashRef $cluster_data) {
        
         push @$blasts, $blhits unless !%$blhits;
 
-	dd $blasts;
-	say STDERR join q{ }, $hit_ct, $$top_hit, $$top_hit_frac, $type_map->{$$top_hit};
+	#dd $blasts;
+	say STDERR join q{ }, $$hit_ct, $$top_hit, $$top_hit_frac;
 
         ($top_hit_superfam, $cluster_annot) 
 	    = $self->_blast_to_annotation({ filebase     => $filebase,
