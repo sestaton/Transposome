@@ -115,7 +115,7 @@ method search_clusters (HashRef $blast_data) {
 	else {
 	     say STDERR "blastn failed. Caught error: $_.";
 	} 
-	ex it(1);
+	exit(1);
     }; 
 
     return \@blast_out;
