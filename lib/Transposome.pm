@@ -2,12 +2,12 @@ package Transposome;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
+#use Method::Signatures;
 use YAML::Tiny;
+use Log::Any qw($log);
 use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::Config';
+with 'Transposome::Role::Config';
 
 =head1 NAME
 
@@ -35,7 +35,8 @@ has 'config' => (
     documentation => qq{The Transposome configuration file},
 );
 
-method get_configuration {
+sub get_configuration {
+    my $self = shift;
     my $configfile   = YAML::Tiny->read( $self->config );
     my $valid_config = $self->parse_configuration( $configfile );
     return $valid_config;

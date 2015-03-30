@@ -2,7 +2,7 @@ package Transposome::Annotation::Mapping;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
+#use Method::Signatures;
 
 requires 'mk_key', 'map_family_name';
 
@@ -78,7 +78,9 @@ $VERSION = eval $VERSION;
            class - the TE class of the top BLAST hit                        Scalar
 =cut
 
-method map_hit_family ($arr_ref, $anno_data) {
+sub map_hit_family {
+    my $self = shift;
+    my ($arr_ref, $anno_data) = @_;
     my (%top_hit_superfam, %cluster_annot);
     my ($filebase, $top_hit, $top_hit_frac, $readct, $class) 
         = @{$anno_data}{qw(filebase top_hit top_hit_frac readct class)};
@@ -138,7 +140,9 @@ method map_hit_family ($arr_ref, $anno_data) {
 
 =cut
 
-method map_family_name ($family) {
+sub map_family_name {
+    my $self = shift;
+    my ($family) = @_;
     my $family_name;
 
     if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?[_-]?[a-zA-Z-]+?\d*?)/) {
@@ -178,7 +182,9 @@ method map_family_name ($family) {
 
 =cut
 
-method _map_repeat_type ($type) {
+sub _map_repeat_type {
+    my $self = shift;
+    my ($type) = @_;
     my %map = (
                'ltr_retrotransposon'     => 'transposable_element',
                'dna_transposon'          => 'transposable_element',

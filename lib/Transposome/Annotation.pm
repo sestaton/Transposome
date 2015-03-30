@@ -2,22 +2,22 @@ package Transposome::Annotation;
 
 use 5.010;
 use Moose;
-use MooseX::Types::Moose qw(ArrayRef HashRef Int Num Str ScalarRef); 
-use List::Util           qw(sum max);
-use File::Path           qw(make_path);
-use Storable             qw(thaw);
-use POSIX                qw(strftime);
-use Method::Signatures;
+#use Types::Standard -types; #qw(ArrayRef HashRef Int Num Str ScalarRef); 
+use List::Util      qw(sum max);
+use File::Path      qw(make_path);
+use Storable        qw(thaw);
+use POSIX           qw(strftime);
+#use Method::Signatures;
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
 use Try::Tiny;
 use namespace::autoclean;
 
+use Log::Any qw($log);
 #use Data::Dump;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Annotation::Methods', 
+with 'Transposome::Annotation::Methods', 
      'Transposome::Role::File', 
      'Transposome::Role::Util';
 
@@ -92,7 +92,8 @@ has 'makeblastdb_exec' => (
     predicate => 'has_makeblastdb_exec',
 );
 
-method BUILD (@_) {
+sub BUILD {
+    my $self = shift;
     my @path = split /:|;/, $ENV{PATH};
 
     for my $p (@path) {
@@ -192,7 +193,9 @@ method BUILD (@_) {
 
 =cut
 
-method annotate_clusters (HashRef $cluster_data) {
+sub annotate_clusters { #(HashRef $cluster_data) {
+    my $self = shift;
+    my ($cluster_data) = @_;
     my $cls_with_merges_dir  = $cluster_data->{cluster_directory};
     my $singletons_file_path = $cluster_data->{singletons_file};
     my $seqct   = $cluster_data->{total_sequence_num};
@@ -225,12 +228,12 @@ method annotate_clusters (HashRef $cluster_data) {
    
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-        $self->log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
-    }
-    else {
-	say STDERR "Transposome::Annotation::annotate_clusters started at:   $st." if $self->verbose;
-    }
+    #if (Log::Log4perl::initialized()) {
+        $log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
+    #}
+    #else {
+	#say STDERR "Transposome::Annotation::annotate_clusters started at:   $st." if $self->verbose;
+    #}
 
     my ($repeatmap, $type_map) = $self->map_repeat_types($database);
     my %repeats = %{ thaw($repeatmap) };
@@ -244,16 +247,16 @@ method annotate_clusters (HashRef $cluster_data) {
     closedir $dir;
 
     if (@clus_fas_files < 1) {
-	if (Log::Log4perl::initialized()) {
-        $self->log->error("Could not find any fasta files in $cls_with_merges_dir. ".
+	#if (Log::Log4perl::initialized()) {
+        $log->error("Could not find any fasta files in $cls_with_merges_dir. ".
 			  "This can result from using too few sequences. ".
 			  "Please report this error if the problem persists. Exiting.");
-	}
-	else {
-	    say STDERR "Could not find any fasta files in $cls_with_merges_dir. ".
-		"This can result from using too few sequences. ".
-		"Please report this error if the problem persists. Exiting.";
-	}
+	#}
+	#else {
+	 #   say STDERR "Could not find any fasta files in $cls_with_merges_dir. ".
+		#"This can result from using too few sequences. ".
+		#"Please report this error if the problem persists. Exiting.";
+	#}
         exit(1);
     }
 
@@ -351,26 +354,26 @@ method annotate_clusters (HashRef $cluster_data) {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-	$self->log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
-	$self->log->info("Results - Total sequences:                        $seqct");
-	$self->log->info("Results - Total sequences clustered:              $cls_tot");
-	$self->log->info("Results - Total sequences unclustered:            $single_tot");
-	$self->log->info("Results - Repeat fraction from clusters:          $rep_frac");
-	$self->log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
-	$self->log->info("Results - Total repeat fraction:                  $total_rep_frac");
-    }
-    else {
-	if ($self->verbose) {
-	    say STDERR "Transposome::Annotation::annotate_clusters completed at: $ft.";
-	    say STDERR "Results - Total sequences:                        $seqct";
-	    say STDERR "Results - Total sequences clustered:              $cls_tot";
-	    say STDERR "Results - Total sequences unclustered:            $single_tot";
-	    say STDERR "Results - Repeat fraction from clusters:          $rep_frac";
-	    say STDERR "Results - Singleton repeat fraction:              $singleton_rep_frac";
-	    say STDERR "Results - Total repeat fraction:                  $total_rep_frac";
-	}
-    }
+    #if (Log::Log4perl::initialized()) {
+	$log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
+	$log->info("Results - Total sequences:                        $seqct");
+	$log->info("Results - Total sequences clustered:              $cls_tot");
+	$log->info("Results - Total sequences unclustered:            $single_tot");
+	$log->info("Results - Repeat fraction from clusters:          $rep_frac");
+	$log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
+	$log->info("Results - Total repeat fraction:                  $total_rep_frac");
+    #}
+    #else {
+	#if ($self->verbose) {
+	 #   say STDERR "Transposome::Annotation::annotate_clusters completed at: $ft.";
+	 #   say STDERR "Results - Total sequences:                        $seqct";
+	 #   say STDERR "Results - Total sequences clustered:              $cls_tot";
+	 #   say STDERR "Results - Total sequences unclustered:            $single_tot";
+	 #   say STDERR "Results - Repeat fraction from clusters:          $rep_frac";
+	 #   say STDERR "Results - Singleton repeat fraction:              $singleton_rep_frac";
+	 #   say STDERR "Results - Total repeat fraction:                  $total_rep_frac";
+	#}
+    #}
 
     return ({
 	annotation_report     => $anno_rp_path, 
@@ -402,7 +405,9 @@ method annotate_clusters (HashRef $cluster_data) {
 
 =cut
 
-method _annotate_singletons (HashRef $annotation_data) {
+sub _annotate_singletons { #(HashRef $annotation_data) {
+    my $self = shift;
+    my ($annotation_data) = @_;
     my $repeats      = $annotation_data->{repeat_map};
     my $singletons_file_path = $annotation_data->{singletons_file};
     my $rpname       = $annotation_data->{annotation_report}; 
@@ -526,7 +531,9 @@ method _annotate_singletons (HashRef $annotation_data) {
 
 =cut
 
-method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_file_path) {
+sub _parse_blast_to_top_hit { #(ArrayRef $blast_out, Path::Class::File $blast_file_path) {
+    my $self = shift;
+    my ($blast_out, $blast_file_path) = @_;
     my %blhits;
     my $hit_ct = 0;
 
@@ -588,7 +595,9 @@ method _parse_blast_to_top_hit (ArrayRef $blast_out, Path::Class::File $blast_fi
 
 =cut
 
-method _blast_to_annotation (HashRef $anno_data) {
+sub _blast_to_annotation { #(HashRef $anno_data) {
+    my $self = shift;
+    my ($anno_data) = @_;
     my $repeats = $anno_data->{repeat_map};
 
     my $top_hit_superfam = {};
