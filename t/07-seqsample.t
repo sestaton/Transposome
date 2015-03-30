@@ -7,7 +7,6 @@ use warnings;
 use IPC::System::Simple qw(capture);
 use Transposome::SeqUtil;
 use Transposome::SeqFactory;
-use Data::Dump;
 
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 8;
@@ -30,7 +29,7 @@ for my $fa ( @$fa_arr ) {
     my $idct = scalar( keys %$seqs );
     is( $seqct, $idct,
 	'The same number of Fasta sequences were sampled and stored' );
-    #dd $seqs;
+
     my $memstore2 =
       Transposome::SeqUtil->new( file => $fa, sample_size => 2, no_store => 1 );
     {
@@ -83,7 +82,7 @@ for my $fq ( @$fq_arr ) {
     my $idct = scalar( keys %$seqs );
     is( $seqct, $idct,
 	'The same number of Fastq sequences were sampled and stored' );
-    #dd $seqs;
+
     my $memstore2 =
 	Transposome::SeqUtil->new( file => $fq, sample_size => 2, no_store => 1, format => 'fastq' );
     {
