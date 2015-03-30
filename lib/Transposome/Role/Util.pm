@@ -2,8 +2,8 @@ package Transposome::Role::Util;
 
 use 5.010;
 use Moose::Role;
-use MooseX::Types::Moose qw(Str);
-use Method::Signatures;
+#use Types::Standard qw(Str);
+#use Method::Signatures;
 
 =head1 NAME
 
@@ -72,7 +72,9 @@ has 'verbose' => (
 
 =cut
 
-method mk_key (@arg) {
+sub mk_key {
+    my $self = shift;
+    my (@arg) = @_;
     return join "~~", map { $_ // " " } @arg;
 }
 
@@ -92,7 +94,9 @@ method mk_key (@arg) {
 
 =cut
 
-method mk_vec (Str $key) {
+sub mk_vec {
+    my $self = shift;
+    my ($key) = @_;
     return split /\~\~/, $key;
 }
 

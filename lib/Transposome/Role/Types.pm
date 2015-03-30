@@ -1,7 +1,8 @@
 package Transposome::Role::Types;
-
 use 5.010;
 use Moose::Role;
+#use Types::Standard qw(Str Num Int);
+#use Type::Utils qw(declare as where inline_as coerce from via); 
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 
@@ -25,6 +26,12 @@ $VERSION = eval $VERSION;
 
 =cut
 
+#my $ModNum = declare
+#    as        Num,
+#    where     { /\_/ || /\d+/ },
+#    inline_as { "$_ =~ /\_/ || $_ =~ /\d+/" };
+
+#coerce $ModNum, from Str, via { $_ =~ s/\_//g; 0+$_ }; 
 subtype 'ModNum'
     => as 'Num'
     => where { /\_/ || /\d+/ };
@@ -32,6 +39,12 @@ subtype 'ModNum'
 coerce 'ModNum',
     from 'Str',
     via { $_ =~ s/\_//g; 0+$_ };
+
+#has 'ModNum' => ( 
+#     is     => 'ro',
+#     isa    => $ModNum,
+#     coerce => 1,
+#);
 
 has 'counter' => (
     traits  => ['Counter'],

@@ -4,7 +4,7 @@ use 5.010;
 use Moose;
 use Cwd;
 use Config;
-use Method::Signatures;
+#use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes         qw(gettimeofday);
 use POSIX               qw(strftime);
@@ -143,7 +143,8 @@ has 'bin_dir' => (
 
 =cut 
 
-method run_allvall_blast {
+sub run_allvall_blast {
+    my $self = shift;
     my $t0      = gettimeofday();
     my $dir     = $self->dir->absolute;
     my $file    = $self->file->absolute;
@@ -241,7 +242,9 @@ method run_allvall_blast {
 
 =cut 
 
-method _make_mgblastdb ($formatdb) {
+sub _make_mgblastdb {
+    my $self = shift;
+    my ($formatdb) = @_;
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
@@ -290,7 +293,9 @@ method _make_mgblastdb ($formatdb) {
 
 =cut 
 
-method _make_tempdb ($file) {
+sub _make_tempdb {
+    my $self = shift; 
+    my $file = $self->file;
     my $format = $self->format;
     my $seqio  = Transposome::SeqFactory->new( file => $file, format => $format )->make_seqio_object;
 
@@ -324,7 +329,9 @@ method _make_tempdb ($file) {
 
 =cut 
 
-method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
+sub _run_blast {
+    my $self = shift;
+    my ($mgblast, $subseq_file, $database, $cpu) = @_;
     my ($dbfile, $dbdir, $dbext)    = fileparse($database, qr/\.[^.]*/);
     my ($subfile, $subdir, $subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
@@ -390,7 +397,9 @@ method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
 
 =cut
 
-method _split_reads (Int $numseqs, Str $format) {
+sub _split_reads {
+    my $self = shift;
+    my ($numseqs, $format) = @_;
     my ($iname, $ipath, $isuffix) = fileparse($self->file->absolute, qr/\.[^.]*/);
     my $dir = $self->dir->absolute;
 
@@ -455,7 +464,9 @@ method _split_reads (Int $numseqs, Str $format) {
 
 =cut 
 
-method _find_mgblast_exes (Path::Class::Dir $realbin) {
+sub _find_mgblast_exes {
+    my $self = shift;
+    my ($realbin) = @_;
     my $formatdb = File::Spec->catfile($realbin, 'formatdb'); # installed in 'sitebin' though not available for testing
     my $mgblast  = File::Spec->catfile($realbin, 'mgblast');  # installed in 'sitebin' though not available for testing
     my $fmtexe   = $self->get_formatdb_exec;                  # set during class initialization

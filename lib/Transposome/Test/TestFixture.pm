@@ -3,7 +3,7 @@ package Transposome::Test::TestFixture;
 use 5.010;
 use Moose;
 use MooseX::Types::Path::Class;
-use Method::Signatures;
+#use Method::Signatures;
 use File::Temp;
 use namespace::autoclean;
 
@@ -75,7 +75,8 @@ has 'build_all' => (
 
 =cut
 
-method fasta_constructor {
+sub fasta_constructor {
+    my $self = shift;
     if ( $self->build_all ) {
         my $proper_fa      = $self->_build_proper_fa_data;
         my $problematic_fa = $self->_build_problematic_fa_data;
@@ -123,7 +124,8 @@ method fasta_constructor {
 
 =cut
 
-method fastq_constructor {
+sub fastq_constructor {
+    my $self = shift;
     if ( $self->build_all ) {
         my $proper_fq      = $self->_build_proper_fq_data;
         my $problematic_fq = $self->_build_problematic_fq_data;
@@ -171,7 +173,8 @@ method fastq_constructor {
 
 =cut
 
-method blast_constructor {
+sub blast_constructor {
+    my $self = shift;
     if ( $self->build_proper ) {
         my $proper_bl = $self->_build_blast_data;
         if ( $self->destroy ) {
@@ -199,7 +202,7 @@ method blast_constructor {
 
 =cut
 
-method _build_proper_fa_data {
+sub _build_proper_fa_data {
     my $tmpfa = File::Temp->new(
         TEMPLATE => "transposome_fa_XXXX",
         DIR      => 't',
@@ -280,7 +283,7 @@ method _build_proper_fa_data {
 
 =cut
 
-method _build_proper_fq_data {
+sub _build_proper_fq_data {
     my $tmpfq = File::Temp->new(
         TEMPLATE => "transposome_fq_XXXX",
         DIR      => 't',
@@ -385,7 +388,7 @@ method _build_proper_fq_data {
 
 =cut
 
-method _build_problematic_fa_data {
+sub _build_problematic_fa_data {
     my $tmpfa = File::Temp->new(
         TEMPLATE => "transposome_fa_XXXX",
         DIR      => 't',
@@ -424,7 +427,7 @@ Title   : _build_problematic_fq_data
 
 =cut
 
-method _build_problematic_fq_data {
+sub _build_problematic_fq_data {
     my $tmpfq = File::Temp->new(
         TEMPLATE => "transposome_fq_XXXX",
         DIR      => 't',
@@ -472,7 +475,7 @@ method _build_problematic_fq_data {
 
 =cut
 
-method _build_blast_data {
+sub _build_blast_data {
     my $tmpbl = File::Temp->new(
         TEMPLATE => "transposome_mgblast_XXXX",
         DIR      => 't',

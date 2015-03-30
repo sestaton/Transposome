@@ -2,7 +2,7 @@ package Transposome::SeqFactory;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
+#use Method::Signatures;
 use namespace::autoclean;
 use Class::Load;
 
@@ -63,8 +63,9 @@ our $VERSION = '0.09.2';
 
 =cut
 
-method make_seqio_object {
-    if ($self->format =~ /fasta/i) {
+sub make_seqio_object {
+    my $self = shift;
+   if ($self->format =~ /fasta/i) {
 	Class::Load::load_class('Transposome::SeqIO::fasta');
 	  return Transposome::SeqIO::fasta->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
 	  return Transposome::SeqIO::fasta->new( file => $self->file, format => $self->format ) if !defined $self->fh;

@@ -2,7 +2,7 @@ package Transposome::SeqIO;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
+#use Method::Signatures;
 use namespace::autoclean;
 use Class::Load;
 

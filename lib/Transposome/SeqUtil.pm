@@ -2,7 +2,7 @@ package Transposome::SeqUtil;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
+#use Method::Signatures;
 use DBI;
 use Cwd;
 use Tie::Hash::DBD;
@@ -62,7 +62,7 @@ has 'in_memory' => (
 has 'sample_size' => (
     is        => 'ro',
     isa       => 'ModNum',
-    predicate => 'has_sample',
+    predicate => 'has_sample_size',
     coerce    => 1,
 );
 
@@ -105,7 +105,8 @@ has 'no_store' => (
 
 =cut
 
-method store_seq {
+sub store_seq {
+    my $self = shift;
     my %seqhash;
     my $dbh;
     my $seq_dbm;
@@ -168,7 +169,8 @@ method store_seq {
 
 =cut
 
-method sample_seq {
+sub sample_seq {
+    my $self = shift;
     # get method vars from class attributes
     my $filename = $self->file->relative;   # file to sample
     my $format   = $self->format;           # sequence format
