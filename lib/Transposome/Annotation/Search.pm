@@ -2,7 +2,7 @@ package Transposome::Annotation::Search;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
+#use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
 use File::Basename;
@@ -87,7 +87,9 @@ $VERSION = eval $VERSION;
                           search
 =cut
 
-method search_clusters (HashRef $blast_data) {
+sub search_clusters {
+    my $self = shift;
+    my ($blast_data) = @_;
     my $blastn  = $blast_data->{blast_exe};
     my $query   = $blast_data->{query_file};
     my $evalue  = $blast_data->{evalue};
@@ -161,7 +163,9 @@ method search_clusters (HashRef $blast_data) {
                           search
 =cut
 
-method search_singletons (HashRef $singles_data) {
+sub search_singletons {
+    my $self = shift;
+    my ($singles_data) = @_;
     my $blastn  = $singles_data->{blast_exe};
     my $query   = $singles_data->{query_file};
     my $evalue  = $singles_data->{evalue};
@@ -202,7 +206,9 @@ method search_singletons (HashRef $singles_data) {
 
 =cut 
 
-method make_blastdb (Path::Class::File $db_fas) {
+sub make_blastdb {
+    my $self = shift;
+    my ($db_fas) = @_;
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
 
