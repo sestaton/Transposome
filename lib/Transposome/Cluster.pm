@@ -2,7 +2,7 @@ package Transposome::Cluster;
 
 use 5.010;
 use Moose;
-use Types::Standard      qw(HashRef);
+#use Types::Standard      qw(HashRef);
 use IPC::System::Simple  qw(system capture EXIT_ANY);
 use File::Path           qw(make_path);
 use POSIX                qw(strftime);
