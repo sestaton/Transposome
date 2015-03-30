@@ -15,11 +15,11 @@ Transposome::Test::TestFixture - Methods for mocking data or data structures for
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
