@@ -8,6 +8,8 @@ Version	Date	Location
   applications and it doesn't require constant checking if Log4perl is initialized.
 - Remove Method::Signatures and type checking on method calls. This module is very
   fast and adds readability to the code, but it has almost as many deps as Moose.
+  Type checking has some performance penalty, so the method calls should be faster
+  now.
 
 0.09.2	03/17/15	Vancouver, BC
 
