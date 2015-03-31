@@ -4,7 +4,6 @@ use 5.010;
 use strict;
 use warnings;
 use Transposome;
-#use Log::Any::Adapter;
 use File::Path qw(make_path remove_tree);
 use File::Basename;
 use Getopt::Long;
@@ -60,7 +59,6 @@ if ( !$opts{config} ) {
 
 $opts{analysis} //= 'all';
 my $trans_obj = Transposome->new( config => $opts{config} );
-#Log::Any::Adapter->set('Log4perl');
 
 # Parse configuration
 my $config = $trans_obj->get_configuration;
@@ -131,7 +129,6 @@ sub init_transposome {
 
     load_classes('File::Spec', 'Log::Log4perl', 'Log::Any::Adapter', 'Time::HiRes', 'POSIX');
 
-    #Log::Any::Adapter->set('Log4perl');
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
     my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
@@ -145,9 +142,9 @@ sub init_transposome {
     log4perl.appender.Screen.stderr  = 1
     log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
     };
+
     Log::Log4perl::init( \$conf );
     Log::Any::Adapter->set('Log4perl');
-
     #my $log = Log::Log4perl::get_logger("Transposome");
     my $log = Log::Any->get_logger( category => "Transposome" );
     
