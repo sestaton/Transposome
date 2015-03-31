@@ -75,12 +75,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moose'                            => 2.0802,
-	#'MooseX::Log::Log4perl'            => 0.46,
         'MooseX::Types::Path::Class'       => 0.06,
-	#'MooseX::Types'                    => 0.38,
-	#'Method::Signatures'               => 20131010,
-	#'namespace::autoclean'             => 0.13,
-	#'Try::Tiny'                        => 0.12,
 	'IPC::System::Simple'              => 1.21,
 	'DBD::SQLite'                      => 1.44,
 	'Tie::Hash::DBD'                   => 0.13,
