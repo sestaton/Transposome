@@ -2,18 +2,16 @@ package Transposome::Cluster;
 
 use 5.010;
 use Moose;
-#use Types::Standard      qw(HashRef);
 use IPC::System::Simple  qw(system capture EXIT_ANY);
 use File::Path           qw(make_path);
 use POSIX                qw(strftime);
-#use Method::Signatures;
+use Log::Any             qw($log);
 use Graph::UnionFind;
 use File::Spec;
 use File::Basename;
 use Try::Tiny;
 use Path::Class::File;
 use Config;
-use Log::Any qw($log);
 use namespace::autoclean;
 
 with 'Transposome::Role::File', 
@@ -104,23 +102,14 @@ sub louvain_method {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::louvain_method started at:         $st.");
-    #}
-    #else {
-	#say STDERR "Transposome::Cluster::louvain_method started at:         $st." if $self->verbose;
-    #}
+    $log->info("Transposome::Cluster::louvain_method started at:         $st.");
+    say STDERR "Transposome::Cluster::louvain_method started at:         $st." if $self->verbose;
 
     try {
 	system([0..5], "$lconvert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
     }
     catch {
-	#if (Log::Log4perl::initialized()) {
-	    $log->error("Louvain 'convert' failed. Caught error: $_.");
-	#}
-	#else {
-	#    say STDERR "Louvain 'convert' failed. Caught error: $_.";
-	#}
+	$log->error("Louvain 'convert' failed. Caught error: $_.");
 	exit(1);
     };
 
@@ -128,12 +117,7 @@ sub louvain_method {
 	system([0..5],"$lcommunity $cls_bin_path -l -1 -w $cls_tree_weights_path -v >$cls_tree_path 2>$cls_tree_log_path");
     }
     catch {
-	#if (Log::Log4perl::initialized()) {
-	    $log->error("Louvain 'community' failed. Caught error: $_.");
-	#}
-	#else {
-	#    say STDERR "Louvain 'community' failed. Caught error: $_.";
-	#}
+	$log->error("Louvain 'community' failed. Caught error: $_.");
 	exit(1);
     };
 
@@ -146,7 +130,6 @@ sub louvain_method {
     }
     catch {
 	$log->error("grep failed. Caught error: $_.");
-	 #   if Log::Log4perl::initialized();
 	exit(1);
     };
 
@@ -159,12 +142,7 @@ sub louvain_method {
 	    system([0..5],"$lhierarchy $cls_tree_path -l $i > $cls_graph_comm_path");
 	}
 	catch {
-	    #if (Log::Log4perl::initialized()) {
-		$log->error("Louvain 'hierarchy' failed. Caught error: $_.");
-	    #}
-	    #else {
-	#	say STDERR "Louvain 'hierarchy' failed. Caught error: $_.";
-	 #   }
+	    $log->error("Louvain 'hierarchy' failed. Caught error: $_.");
 	    exit(1);
 	};
 
@@ -174,12 +152,8 @@ sub louvain_method {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::louvain_method completed at:       $ft.");
-    #}
-    #else {
-#	say STDERR "Transposome::Cluster::louvain_method completed at:       $ft." if $self->verbose;
- #   }
+    $log->info("Transposome::Cluster::louvain_method completed at:       $ft.");
+    say STDERR "Transposome::Cluster::louvain_method completed at:       $ft." if $self->verbose;
 
     return \@comm;
 }
@@ -219,15 +193,12 @@ sub find_pairs {
     my $uf = Graph::UnionFind->new;
 
     # log results
-    open my $rep, '>', $cls_log_path or die "\n[ERROR]: Could not open file: $cls_log_path\n";
+    open my $rep, '>', $cls_log_path 
+	or die "\n[ERROR]: Could not open file: $cls_log_path\n";
     say $rep "# Cluster connections above threshold";
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::find_pairs started at:             $st.");
-    #}
-    #else {
-	#say STDERR "Transposome::Cluster::find_pairs started at:             $st." if $self->verbose;
-    #}
+    $log->info("Transposome::Cluster::find_pairs started at:             $st.");
+    say STDERR "Transposome::Cluster::find_pairs started at:             $st." if $self->verbose;
 
     my %vertex;
     my %read_pairs;
@@ -299,12 +270,8 @@ sub find_pairs {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::find_pairs completed at:           $ft.");
-    #}
-    #else {
-	#say STDERR "Transposome::Cluster::find_pairs completed at:           $ft." if $self->verbose;
-    #}
+    $log->info("Transposome::Cluster::find_pairs completed at:           $ft.");
+    say STDERR "Transposome::Cluster::find_pairs completed at:           $ft." if $self->verbose;
 
     return(\%read_pairs, \%vertex, \$uf);
 }
@@ -347,21 +314,15 @@ sub make_clusters {
 
     my @graph_comm_sort = reverse sort { ($a =~ /(\d)$/) <=> ($b =~ /(\d)$/) } @$graph_comm;
     my $graph = shift @graph_comm_sort;
-    #if (Log::Log4perl::initialized()){
-	$log->logdie("\n[ERROR]: Community clustering failed. Exiting.\n") unless defined $graph;
-    #}
+    $log->logdie("\n[ERROR]: Community clustering failed. Exiting.\n") unless defined $graph;
     my $graph_path = File::Spec->catfile($out_dir, $graph);
     my %clus;
     my %index;
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::make_clusters started at:          $st.");
-    #}
-    #else {
-	#say STDERR "Transposome::Cluster::make_clusters started at:          $st." if $self->verbose;
-    #}
+    $log->info("Transposome::Cluster::make_clusters started at:          $st.");
+    say STDERR "Transposome::Cluster::make_clusters started at:          $st." if $self->verbose;
 
     open my $idx, '<', $idx_file or die "\n[ERROR]: Could not open file: $idx_file\n";
     while (my $idpair = <$idx>) {
@@ -410,25 +371,15 @@ sub make_clusters {
     }
 
     if ($cls_ct == 0 ) {
-	#if (Log::Log4perl::initialized()) {
 	$log->error("No clusters found. This likely results from analyzing too few sequences. 
-                           Report this issue if it persists. Exiting.");
-	#}
-	#else {
-	#    say STDERR "No clusters found. This likely results from analyzing too few sequences.".
-	#	"Report this issue if it persists. Exiting.";
-	#}
+                     Report this issue if it persists. Exiting.");
 	exit(1);
     }
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-  #  if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::make_clusters completed at:        $ft.");
-    #}
-    #else {
-#	say STDERR "Transposome::Cluster::make_clusters completed at:        $ft." if $self->verbose;
- #   }
+    $log->info("Transposome::Cluster::make_clusters completed at:        $ft.");
+    say STDERR "Transposome::Cluster::make_clusters completed at:        $ft." if $self->verbose;
 
     return $cluster_file;
 }
@@ -516,7 +467,8 @@ sub merge_clusters {
     my $cls_dir_path    = $ipath.$cls_dir;
     make_path($cls_dir_path, {verbose => 0, mode => 0711,});
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
-    open my $clsnew, '>', $cls_with_merges_path or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
+    open my $clsnew, '>', $cls_with_merges_path 
+	or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
 
     my ($rpname, $rppath, $rpsuffix) = fileparse($cls_log_file, qr/\.[^.]*/);
     my $rp_path = File::Spec->catfile($out_dir, $rpname.$rpsuffix);
@@ -527,12 +479,9 @@ sub merge_clusters {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::merge_clusters started at:         $st.");
-    #}
-    #else {
-#	say STDERR "Transposome::Cluster::merge_clusters started at:         $st." if $self->verbose;
-#    }
+    $log->info("Transposome::Cluster::merge_clusters started at:         $st.");
+    say STDERR "Transposome::Cluster::merge_clusters started at:         $st." if $self->verbose;
+
     
     my %cluster;
     for my $v (keys %$vertex) {
@@ -567,10 +516,9 @@ sub merge_clusters {
 			delete $seqs->{$read};
 		    }
 		    else {
-			$self->log->warn("$read not found. This indicates something went wrong processing the input. ".
+			$log->warn("$read not found. This indicates something went wrong processing the input. ".
 					 "Please check your input.")
-			    if Log::Log4perl::initialized();
-		    }
+			}
 		}
 	    }
 	    print $clsnew q{ };
@@ -603,7 +551,6 @@ sub merge_clusters {
 		    $log->warn("$non_paired_read not found. ".
 				     "This indicates something went wrong processing the input. ".
 			       "Please check your input.");
-			#if Log::Log4perl::initialized();
 		}
 	    }
 	    close $clsout;
@@ -616,7 +563,8 @@ sub merge_clusters {
     my $singletons_num = scalar keys %$seqs;
     my $singletons_file = "singletons_$singletons_num.fas";
     my $singletons_file_path = File::Spec->catfile($cls_dir_path, $singletons_file);
-    open my $singlesout, '>', $singletons_file_path or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
+    open my $singlesout, '>', $singletons_file_path 
+	or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
 
     for my $seqid (keys %$seqs) {
 	say $singlesout join "\n", ">".$seqid, $seqs->{$seqid};
@@ -625,12 +573,8 @@ sub merge_clusters {
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::Cluster::merge_clusters completed at:       $ft.");
-    #}
-    #else {
-	#say STDERR "Transposome::Cluster::merge_clusters completed at:       $ft." if $self->verbose;
-    #}
+    $log->info("Transposome::Cluster::merge_clusters completed at:       $ft.");
+    say STDERR "Transposome::Cluster::merge_clusters completed at:       $ft." if $self->verbose;
 
     return ({ cluster_directory    => $cls_dir_path,
               singletons_file      => $singletons_file_path,
@@ -689,12 +633,7 @@ sub _find_community_exes {
 	}
     }
     else {
-	#if (Log::Log4perl::initialized()) {
-	    $log->error("Unable to find clusting executables. This is a bug, please report it. Exiting.");
-	#}
-	#else {
-	 #   say STDERR "Unable to find clusting executables. This is a bug, please report it. Exiting.";
-	#}
+	$log->error("Unable to find clusting executables. This is a bug, please report it. Exiting.");
 	exit(1);
     }
 }

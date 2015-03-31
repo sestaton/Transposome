@@ -2,7 +2,6 @@ package Transposome;
 
 use 5.010;
 use Moose;
-#use Method::Signatures;
 use YAML::Tiny;
 use Log::Any qw($log);
 use namespace::autoclean;

@@ -2,13 +2,12 @@ package Transposome::SeqUtil;
 
 use 5.010;
 use Moose;
-#use Method::Signatures;
 use DBI;
 use Cwd;
 use Tie::Hash::DBD;
 use Transposome::SeqFactory;
-use namespace::autoclean;
 use feature 'say';
+use namespace::autoclean;
 
 with 'Transposome::Role::File',
      'Transposome::Role::Types';

@@ -2,7 +2,6 @@ package Transposome::Annotation::Summary;
 
 use 5.010;
 use Moose::Role;
-#use Method::Signatures;
 use POSIX qw(strftime);
 use Log::Any qw($log);
 
@@ -131,25 +130,18 @@ sub clusters_annotation_to_summary {
     }
     close $outsum;
     
-    #if (Log::Log4perl::initialized()) {
-        $log->info("Results - Total repeat fraction from annotations: $total_gcov");
-    #}
-    #else {
-     #   say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
-    #}
+    $log->info("Results - Total repeat fraction from annotations: $total_gcov");
+    say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-        $log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
-        $log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
-    #}
-    #else {
-     #   if ($self->verbose) {
-     #       say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
-     #       say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
-     #   }
-    #}
+    $log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
+    $log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
+
+    if ($self->verbose) {
+	say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
+	say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
+    }
 }
 
 

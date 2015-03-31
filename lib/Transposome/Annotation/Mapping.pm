@@ -2,7 +2,7 @@ package Transposome::Annotation::Mapping;
 
 use 5.010;
 use Moose::Role;
-#use Method::Signatures;
+use Log::Any qw($log);
 
 requires 'mk_key', 'map_family_name';
 

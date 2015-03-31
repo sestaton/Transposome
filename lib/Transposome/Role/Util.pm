@@ -2,8 +2,6 @@ package Transposome::Role::Util;
 
 use 5.010;
 use Moose::Role;
-#use Types::Standard qw(Str);
-#use Method::Signatures;
 
 =head1 NAME
 

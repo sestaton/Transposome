@@ -2,11 +2,11 @@ package Transposome::Annotation::Search;
 
 use 5.010;
 use Moose::Role;
-#use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
 use File::Basename;
 use Try::Tiny;
+use Log::Any qw($log);
 
 =head1 NAME
 
@@ -111,12 +111,7 @@ sub search_clusters {
 	@blast_out = capture(EXIT_ANY, @blastcmd);
     }
     catch { 
-	if (Log::Log4perl::initialized()) {
-	     $self->log->error("blastn failed. Caught error: $_.");
-	} 
-	else {
-	     say STDERR "blastn failed. Caught error: $_.";
-	} 
+	$log->error("blastn failed. Caught error: $_.");
 	exit(1);
     }; 
 
@@ -182,8 +177,7 @@ sub search_singletons {
         $exit_code = system([0..5], @blastcmd);
     }
     catch {
-        $self->log->error("blastn failed with exit code: $exit_code. Caught error: $_.")
-            if Log::Log4perl::initialized();
+        $log->error("blastn failed with exit code: $exit_code. Caught error: $_.");
         exit(1);
     };
     return $exit_code;
@@ -220,16 +214,9 @@ sub make_blastdb {
         my @makedbout = capture([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-        if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to make blast database. Here is the exception: $_.");
-	    $self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.");
-	    $self->log->error("These cause problems with BLAST+. Exiting.");
-        }
-        else {
-            say STDERR "Unable to make blast database. Here is the exception: $_.";
-            say STDERR "Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.";
-            say STDERR "These cause problems with BLAST+. Exiting.";
-        } 
+	$log->error("Unable to make blast database. Here is the exception: $_.");
+	$log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.");
+	$log->error("These cause problems with BLAST+. Exiting.");
         exit(1);
     };
 

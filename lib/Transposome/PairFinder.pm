@@ -2,7 +2,6 @@ package Transposome::PairFinder;
 
 use 5.010;
 use Moose;
-#use Method::Signatures;
 use DBI;
 use Tie::Hash::DBD;
 use Try::Tiny;
@@ -12,7 +11,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
 use POSIX      qw(strftime);
-use Log::Any qw($log);
+use Log::Any   qw($log);
 use namespace::autoclean;
 
 with 'Transposome::Role::File', 
@@ -67,18 +66,13 @@ has 'fraction_coverage' => (
     default   => 0.55,
 );
 
-sub BUILD { #(@_) {
+sub BUILD {
     my $self = shift;
     try {
 	die unless -s $self->file;
     }
     catch {
-	#if (Log::Log4perl::initialized()) {
-	    $log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
-	#}
-	#else {
-	 #   say STDERR "There seems to be no content in the input file. Check the blast results and try again. Exiting.";
-	#}
+	$log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
 	exit(1);
     };
 }
@@ -130,12 +124,8 @@ sub parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::PairFinder::parse_blast started at:   $st.");
-    #}
-    #else {
-	#say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
-    #}
+    $log->info("Transposome::PairFinder::parse_blast started at:   $st.");
+    say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
     
     my %match_pairs;
     my %match_index;
@@ -265,16 +255,13 @@ sub parse_blast {
     
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    #if (Log::Log4perl::initialized()) {
-	$log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
-	$log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
-    #}
-    #else {
-	#if ($self->verbose) {
-	#    say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
-	#    say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
-	#}
-    #}
+    $log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
+    $log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
+    
+    if ($self->verbose) {
+	say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
+	say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
+    }
     
     return ($idx_path, $int_path, $edge_path);
 }
@@ -302,7 +289,6 @@ sub _validate_format {
     my @f = split /\t/, $line;
     unless (@f == 12) {
 	$log->error("'$line' is not the correct format in file: $self->file. Exiting.");
-	 #   if Log::Log4perl::initialized();
 	exit(1);
     }
 }

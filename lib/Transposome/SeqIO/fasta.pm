@@ -2,7 +2,6 @@ package Transposome::SeqIO::fasta;
 
 use 5.010;
 use Moose;
-#use Method::Signatures;
 use namespace::autoclean;
 
 extends 'Transposome::SeqIO';

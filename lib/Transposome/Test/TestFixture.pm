@@ -2,8 +2,7 @@ package Transposome::Test::TestFixture;
 
 use 5.010;
 use Moose;
-use MooseX::Types::Path::Class;
-#use Method::Signatures;
+#use MooseX::Types::Path::Class;
 use File::Temp;
 use namespace::autoclean;
 
