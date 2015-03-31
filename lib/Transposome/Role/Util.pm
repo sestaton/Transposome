@@ -2,8 +2,6 @@ package Transposome::Role::Util;
 
 use 5.010;
 use Moose::Role;
-use MooseX::Types::Moose qw(Str);
-use Method::Signatures;
 
 =head1 NAME
 
@@ -11,11 +9,11 @@ Transposome::Role::Util - Numerous utility routines for Transposome.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -72,7 +70,9 @@ has 'verbose' => (
 
 =cut
 
-method mk_key (@arg) {
+sub mk_key {
+    my $self = shift;
+    my (@arg) = @_;
     return join "~~", map { $_ // " " } @arg;
 }
 
@@ -92,7 +92,9 @@ method mk_key (@arg) {
 
 =cut
 
-method mk_vec (Str $key) {
+sub mk_vec {
+    my $self = shift;
+    my ($key) = @_;
     return split /\~\~/, $key;
 }
 

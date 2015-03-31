@@ -2,7 +2,6 @@ package Transposome::PairFinder;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use DBI;
 use Tie::Hash::DBD;
 use Try::Tiny;
@@ -12,10 +11,10 @@ use File::Basename;
 use File::Path qw(make_path);
 use List::Util qw(sum max);
 use POSIX      qw(strftime);
+use Log::Any   qw($log);
 use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::File', 
+with 'Transposome::Role::File', 
      'Transposome::Role::Util';
 
 =head1 NAME
@@ -24,11 +23,11 @@ Transposome::PairFinder - Parse mgblast and find best scoring unique matches.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -67,17 +66,13 @@ has 'fraction_coverage' => (
     default   => 0.55,
 );
 
-method BUILD (@_) {
+sub BUILD {
+    my $self = shift;
     try {
 	die unless -s $self->file;
     }
     catch {
-	if (Log::Log4perl::initialized()) {
-	    $self->log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
-	}
-	else {
-	    say STDERR "There seems to be no content in the input file. Check the blast results and try again. Exiting.";
-	}
+	$log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
 	exit(1);
     };
 }
@@ -104,7 +99,8 @@ method BUILD (@_) {
 
 =cut
 
-method parse_blast {
+sub parse_blast {
+    my $self = shift;
     my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
@@ -128,12 +124,8 @@ method parse_blast {
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-	$self->log->info("Transposome::PairFinder::parse_blast started at:   $st.");
-    }
-    else {
-	say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
-    }
+    $log->info("Transposome::PairFinder::parse_blast started at:   $st.");
+    say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
     
     my %match_pairs;
     my %match_index;
@@ -263,15 +255,12 @@ method parse_blast {
     
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-	$self->log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
-	$self->log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
-    }
-    else {
-	if ($self->verbose) {
-	    say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
-	    say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
-	}
+    $log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
+    $log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
+    
+    if ($self->verbose) {
+	say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
+	say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
     }
     
     return ($idx_path, $int_path, $edge_path);
@@ -294,11 +283,12 @@ method parse_blast {
 
 =cut
 
-method _validate_format ($line) {
+sub _validate_format {
+    my $self = shift;
+    my ($line) = @_;
     my @f = split /\t/, $line;
     unless (@f == 12) {
-	$self->log->error("'$line' is not the correct format in file: $self->file. Exiting.")
-	    if Log::Log4perl::initialized();
+	$log->error("'$line' is not the correct format in file: $self->file. Exiting.");
 	exit(1);
     }
 }

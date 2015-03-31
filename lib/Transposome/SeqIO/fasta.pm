@@ -2,7 +2,6 @@ package Transposome::SeqIO::fasta;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
 
 extends 'Transposome::SeqIO';
@@ -13,11 +12,11 @@ Transposome::SeqIO::fasta - Class for reading FASTA data.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 
 =head1 SYNOPSIS
 
@@ -63,7 +62,8 @@ our $VERSION = '0.09.2';
 
 =cut
 
-method next_seq {
+sub next_seq {
+    my $self = shift;
     local $/ = "\n>";
     my $fh   = $self->fh;
     return unless my $record = $fh->getline;
@@ -101,7 +101,9 @@ Args    : A sequence header                                    Scalar
 
 =cut
 
-method _set_id_per_encoding ($id) {
+sub _set_id_per_encoding {
+    my $self = shift;
+    my ($id) = @_;
     if ($id =~ /(\S+)\s(\d)\S+/) {
 	return $1."/".$2;
     }

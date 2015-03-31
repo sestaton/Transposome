@@ -2,7 +2,6 @@ package Transposome::SeqIO::fastq;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
 
 extends 'Transposome::SeqIO';
@@ -13,11 +12,11 @@ Transposome::SeqIO::fastq - Class for reading FASTQ data.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 
 =head1 SYNOPSIS
 
@@ -63,7 +62,8 @@ our $VERSION = '0.09.2';
 
 =cut
 
-method next_seq {
+sub next_seq {
+    my $self = shift;
     my $fh   = $self->fh;
     my $line = $fh->getline;
     return unless defined $line && $line =~ /\S/;
@@ -127,7 +127,9 @@ Args    : A sequence header                                    Scalar
 
 =cut
 
-method _set_id_per_encoding ($line) {
+sub _set_id_per_encoding {
+    my $self = shift;
+    my ($line) = @_;
     if ($line =~ /^.?(\S+)\s(\d)\S+/) {
 	return $1."/".$2;
     }

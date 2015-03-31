@@ -4,11 +4,12 @@ use 5.010;
 use Moose;
 use Cwd;
 use Config;
-use Method::Signatures;
+#use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes         qw(gettimeofday);
 use POSIX               qw(strftime);
 use File::Path          qw(make_path);
+use Log::Any            qw($log);
 use File::Temp;
 use Path::Class::File;
 use File::Basename;
@@ -17,8 +18,7 @@ use Try::Tiny;
 use Transposome::SeqFactory;
 use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::File', 
+with 'Transposome::Role::File', 
      'Transposome::Role::Types',
      'Transposome::Role::Util';
 
@@ -28,11 +28,11 @@ Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -143,7 +143,8 @@ has 'bin_dir' => (
 
 =cut 
 
-method run_allvall_blast {
+sub run_allvall_blast {
+    my $self = shift;
     my $t0      = gettimeofday();
     my $dir     = $self->dir->absolute;
     my $file    = $self->file->absolute;
@@ -162,12 +163,12 @@ method run_allvall_blast {
 
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-	$self->log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.");
-    }
-    else {
-	say STDERR "Transposome::Run::Blast::run_allvall_blast started at:   $st." if $self->verbose;
-    }
+    #if (Log::Log4perl::initialized()) {
+	$log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.");
+    #}
+    #else {
+	#say STDERR "Transposome::Run::Blast::run_allvall_blast started at:   $st." if $self->verbose;
+    #}
 
     my ($seq_files, $seqct) = $self->_split_reads($numseqs, $format);
     
@@ -210,16 +211,16 @@ method run_allvall_blast {
     my $final_time = sprintf("%.2f",$total_elapsed/60);
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
 
-    if (Log::Log4perl::initialized()) {
-	$self->log->info("Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.");
-	$self->log->info("Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is:\n$outfile.");
-    }
-    else {
-	if ($self->verbose) {
-	    say STDERR "Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.";
-	    say STDERR "Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is:\n$outfile.";
-	}
-    }
+    #if (Log::Log4perl::initialized()) {
+	$log->info("Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.");
+	$log->info("Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is:\n$outfile.");
+    #}
+    #else {
+	#if ($self->verbose) {
+	 #   say STDERR "Transposome::Run::Blast::run_allvall_blast finished running mgblast on $seqct sequences in $final_time minutes.";
+	  #  say STDERR "Transposome::Run::Blast::run_allvall_blast completed at: $ft. Final output file is:\n$outfile.";
+	#}
+    #}
     unlink glob("$database*");
     return $out_path;
 }
@@ -241,7 +242,9 @@ method run_allvall_blast {
 
 =cut 
 
-method _make_mgblastdb ($formatdb) {
+sub _make_mgblastdb {
+    my $self = shift;
+    my ($formatdb) = @_;
     my $file  = $self->file->absolute;
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
@@ -259,12 +262,12 @@ method _make_mgblastdb ($formatdb) {
         system([0..5],"$formatdb -p F -i $tempdb -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-	if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to make mgblast database. Here is the exception: $_\nExiting.");
-	}
-	else {
-	    say STDERR "Unable to make mgblast database. Here is the exception: $_\nExiting.";
-	}
+	#if (Log::Log4perl::initialized()) {
+	    $log->error("Unable to make mgblast database. Here is the exception: $_\nExiting.");
+	#}
+	#else {
+	 #   say STDERR "Unable to make mgblast database. Here is the exception: $_\nExiting.";
+	#}
         exit(1);
     };
     unlink $tempdb;
@@ -290,7 +293,9 @@ method _make_mgblastdb ($formatdb) {
 
 =cut 
 
-method _make_tempdb ($file) {
+sub _make_tempdb {
+    my $self = shift; 
+    my $file = $self->file;
     my $format = $self->format;
     my $seqio  = Transposome::SeqFactory->new( file => $file, format => $format )->make_seqio_object;
 
@@ -324,7 +329,9 @@ method _make_tempdb ($file) {
 
 =cut 
 
-method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
+sub _run_blast {
+    my $self = shift;
+    my ($mgblast, $subseq_file, $database, $cpu) = @_;
     my ($dbfile, $dbdir, $dbext)    = fileparse($database, qr/\.[^.]*/);
     my ($subfile, $subdir, $subext) = fileparse($subseq_file, qr/\.[^.]*/);
     my $suffix = ".bln";
@@ -359,12 +366,12 @@ method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
         $exit_value = system([0..5], @blast_cmd);
     }
     catch {
-	if (Log::Log4perl::intialized()) {
-	    $self->log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.");
-	}
-	else {
-	    say STDERR "BLAST exited with exit value $exit_value. Here is the exception: $_.";
-	}
+	#if (Log::Log4perl::intialized()) {
+	    $log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.");
+	#}
+	#else {
+	 #   say STDERR "BLAST exited with exit value $exit_value. Here is the exception: $_.";
+	#}
     };
 
     return $subseq_out;
@@ -390,7 +397,9 @@ method _run_blast ($mgblast, $subseq_file, $database, Int $cpu) {
 
 =cut
 
-method _split_reads (Int $numseqs, Str $format) {
+sub _split_reads {
+    my $self = shift;
+    my ($numseqs, $format) = @_;
     my ($iname, $ipath, $isuffix) = fileparse($self->file->absolute, qr/\.[^.]*/);
     my $dir = $self->dir->absolute;
 
@@ -455,7 +464,9 @@ method _split_reads (Int $numseqs, Str $format) {
 
 =cut 
 
-method _find_mgblast_exes (Path::Class::Dir $realbin) {
+sub _find_mgblast_exes {
+    my $self = shift;
+    my ($realbin) = @_;
     my $formatdb = File::Spec->catfile($realbin, 'formatdb'); # installed in 'sitebin' though not available for testing
     my $mgblast  = File::Spec->catfile($realbin, 'mgblast');  # installed in 'sitebin' though not available for testing
     my $fmtexe   = $self->get_formatdb_exec;                  # set during class initialization
@@ -484,12 +495,12 @@ method _find_mgblast_exes (Path::Class::Dir $realbin) {
 	}
     }
     else {
-	if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.");
-	}
-	else {
-	    say STDERR "Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.";
-	}
+	#if (Log::Log4perl::initialized()) {
+	    $log->error("Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.");
+	#}
+	#else {
+	 #   say STDERR "Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.";
+	#}
 	exit(1);
     }
 }

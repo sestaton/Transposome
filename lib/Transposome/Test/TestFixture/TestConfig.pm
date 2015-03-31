@@ -3,7 +3,6 @@ package Transposome::Test::TestFixture::TestConfig;
 use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
-use Method::Signatures;
 use File::Temp;
 use aliased 'Transposome::Test::TestFixture';
 use namespace::autoclean;
@@ -14,11 +13,11 @@ Transposome::Test::TestFixture::TestConfig - Methods for mocking configuration d
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -72,7 +71,8 @@ has 'repeat_db' => (
 
 =cut
 
-method config_constructor {
+sub config_constructor {
+    my $self = shift;
     if ( $self->build_proper ) {
 	my $exclude = $self->exclude || undef;
 	my $proper_yml = $self->_build_config_data($exclude);
@@ -100,7 +100,9 @@ method config_constructor {
 
 =cut
 
-method _build_config_data ($exclude?) {
+sub _build_config_data {
+    my $self = shift;
+    my ($exclude) = @_;
     my $tmpyml = File::Temp->new(
         TEMPLATE => "transposome_config_XXXX",
         DIR      => 't',

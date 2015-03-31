@@ -2,12 +2,11 @@ package Transposome;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use YAML::Tiny;
+use Log::Any qw($log);
 use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl',
-     'Transposome::Role::Config';
+with 'Transposome::Role::Config';
 
 =head1 NAME
 
@@ -15,11 +14,11 @@ Transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -35,7 +34,8 @@ has 'config' => (
     documentation => qq{The Transposome configuration file},
 );
 
-method get_configuration {
+sub get_configuration {
+    my $self = shift;
     my $configfile   = YAML::Tiny->read( $self->config );
     my $valid_config = $self->parse_configuration( $configfile );
     return $valid_config;

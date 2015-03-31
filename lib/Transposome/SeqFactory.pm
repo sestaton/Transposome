@@ -2,7 +2,6 @@ package Transposome::SeqFactory;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
 use Class::Load;
 
@@ -14,11 +13,11 @@ Transposome::SeqFactory - Class for constructing a Transposome::SeqIO object for
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 
 =head1 SYNOPSIS
 
@@ -63,7 +62,8 @@ our $VERSION = '0.09.2';
 
 =cut
 
-method make_seqio_object {
+sub make_seqio_object {
+    my $self = shift;
     if ($self->format =~ /fasta/i) {
 	Class::Load::load_class('Transposome::SeqIO::fasta');
 	  return Transposome::SeqIO::fasta->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
@@ -76,8 +76,6 @@ method make_seqio_object {
       }
     else {
         my $unrecognized = $self->format;
-        #$self->log->error("Unable to set sequence format. '$unrecognized' is not recognized. Exiting.")
-            #if Log::Log4perl::initialized();
         say STDERR "Unable to set sequence format. '$unrecognized' is not recognized. Exiting.";
         exit(1);
     }

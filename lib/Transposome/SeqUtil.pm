@@ -2,13 +2,12 @@ package Transposome::SeqUtil;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use DBI;
 use Cwd;
 use Tie::Hash::DBD;
 use Transposome::SeqFactory;
-use namespace::autoclean;
 use feature 'say';
+use namespace::autoclean;
 
 with 'Transposome::Role::File',
      'Transposome::Role::Types';
@@ -19,11 +18,11 @@ Transposome::SeqUtil - Utilities for handling Fasta/q sequence files.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -62,7 +61,7 @@ has 'in_memory' => (
 has 'sample_size' => (
     is        => 'ro',
     isa       => 'ModNum',
-    predicate => 'has_sample',
+    predicate => 'has_sample_size',
     coerce    => 1,
 );
 
@@ -105,7 +104,8 @@ has 'no_store' => (
 
 =cut
 
-method store_seq {
+sub store_seq {
+    my $self = shift;
     my %seqhash;
     my $dbh;
     my $seq_dbm;
@@ -168,7 +168,8 @@ method store_seq {
 
 =cut
 
-method sample_seq {
+sub sample_seq {
+    my $self = shift;
     # get method vars from class attributes
     my $filename = $self->file->relative;   # file to sample
     my $format   = $self->format;           # sequence format

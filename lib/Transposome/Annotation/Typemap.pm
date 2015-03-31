@@ -2,7 +2,6 @@ package Transposome::Annotation::Typemap;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
 use Storable        qw(freeze);
 use List::MoreUtils qw(first_index);
 
@@ -12,11 +11,11 @@ Transposome::Annotation::Typemap - Create a map of repeats to the family level.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -67,7 +66,9 @@ $VERSION = eval $VERSION;
 
 =cut
 
-method map_repeat_types ($infile) {
+sub map_repeat_types {
+    my $self = shift;
+    my ($infile) = @_;
     open my $in, '<', $infile 
 	or die "\n[ERROR]: Could not open file: $infile\n";
 
@@ -138,7 +139,9 @@ method map_repeat_types ($infile) {
 
 =cut
 
-method _map_repeat_taxonomy ($matches) {
+sub _map_repeat_taxonomy {
+    my $self = shift;
+    my ($matches) = @_;
     my %repeats;
 
     for my $type (keys %$matches) { 
@@ -192,7 +195,8 @@ method _map_repeat_taxonomy ($matches) {
 
 =cut 
 
-method _build_repeat_map {
+sub _build_repeat_map {
+    my $self = shift;
     my $matches = {};
     
     $matches->{'transposable_element'}{'dna_transposon'} 

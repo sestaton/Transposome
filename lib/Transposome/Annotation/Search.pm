@@ -2,11 +2,11 @@ package Transposome::Annotation::Search;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use Path::Class::File;
 use File::Basename;
 use Try::Tiny;
+use Log::Any qw($log);
 
 =head1 NAME
 
@@ -14,11 +14,11 @@ Transposome::Annotation::Search - Run the BLAST search on the clusters and singl
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -87,7 +87,9 @@ $VERSION = eval $VERSION;
                           search
 =cut
 
-method search_clusters (HashRef $blast_data) {
+sub search_clusters {
+    my $self = shift;
+    my ($blast_data) = @_;
     my $blastn  = $blast_data->{blast_exe};
     my $query   = $blast_data->{query_file};
     my $evalue  = $blast_data->{evalue};
@@ -109,12 +111,7 @@ method search_clusters (HashRef $blast_data) {
 	@blast_out = capture(EXIT_ANY, @blastcmd);
     }
     catch { 
-	if (Log::Log4perl::initialized()) {
-	     $self->log->error("blastn failed. Caught error: $_.");
-	} 
-	else {
-	     say STDERR "blastn failed. Caught error: $_.";
-	} 
+	$log->error("blastn failed. Caught error: $_.");
 	exit(1);
     }; 
 
@@ -161,7 +158,9 @@ method search_clusters (HashRef $blast_data) {
                           search
 =cut
 
-method search_singletons (HashRef $singles_data) {
+sub search_singletons {
+    my $self = shift;
+    my ($singles_data) = @_;
     my $blastn  = $singles_data->{blast_exe};
     my $query   = $singles_data->{query_file};
     my $evalue  = $singles_data->{evalue};
@@ -178,8 +177,7 @@ method search_singletons (HashRef $singles_data) {
         $exit_code = system([0..5], @blastcmd);
     }
     catch {
-        $self->log->error("blastn failed with exit code: $exit_code. Caught error: $_.")
-            if Log::Log4perl::initialized();
+        $log->error("blastn failed with exit code: $exit_code. Caught error: $_.");
         exit(1);
     };
     return $exit_code;
@@ -202,7 +200,9 @@ method search_singletons (HashRef $singles_data) {
 
 =cut 
 
-method make_blastdb (Path::Class::File $db_fas) {
+sub make_blastdb {
+    my $self = shift;
+    my ($db_fas) = @_;
     my $makeblastdb = $self->get_makeblastdb_exec;
     my ($dbname, $dbpath, $dbsuffix) = fileparse($db_fas, qr/\.[^.]*/);
 
@@ -214,16 +214,9 @@ method make_blastdb (Path::Class::File $db_fas) {
         my @makedbout = capture([0..5],"$makeblastdb -in $db_fas -dbtype nucl -title $db -out $db_path 2>&1 > /dev/null");
     }
     catch {
-        if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to make blast database. Here is the exception: $_.");
-	    $self->log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.");
-	    $self->log->error("These cause problems with BLAST+. Exiting.");
-        }
-        else {
-            say STDERR "Unable to make blast database. Here is the exception: $_.";
-            say STDERR "Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.";
-            say STDERR "These cause problems with BLAST+. Exiting.";
-        } 
+	$log->error("Unable to make blast database. Here is the exception: $_.");
+	$log->error("Ensure you have removed non-literal characters (i.e., "*" or "-") in your repeat database file.");
+	$log->error("These cause problems with BLAST+. Exiting.");
         exit(1);
     };
 

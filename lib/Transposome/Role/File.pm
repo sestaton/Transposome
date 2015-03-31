@@ -6,7 +6,7 @@ use MooseX::Types::Path::Class;
 #use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use IO::File;
 use Symbol;
-use Method::Signatures;
+#use Method::Signatures;
 
 =head1 NAME
 
@@ -14,11 +14,11 @@ Transposome::Role::File - File handling methods for Transposome.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -59,7 +59,8 @@ has 'format' => (
     default   => 'fasta'
 );
 
-method _build_fh {
+sub _build_fh {
+    my $self = shift;
     my $file = $self->file->absolute;
     my $fh = IO::File->new();
 
@@ -100,7 +101,8 @@ method _build_fh {
 
 =cut
 
-method get_fh {
+sub get_fh {
+    my $self = shift;
     my $file = $self->file;
     my $fh;
     if ($file =~ /\.gz$/) {

@@ -2,8 +2,8 @@ package Transposome::Annotation::Summary;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
 use POSIX qw(strftime);
+use Log::Any qw($log);
 
 =head1 NAME
 
@@ -11,11 +11,11 @@ Transposome::Annotation::Summary - Generate an annotation summary for the whole 
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -82,7 +82,9 @@ $VERSION = eval $VERSION;
 
 =cut 
 
-method clusters_annotation_to_summary (HashRef $annotation_results) {
+sub clusters_annotation_to_summary {
+    my $self = shift;
+    my ($annotation_results) = @_;
     my $anno_rp_path      = $annotation_results->{annotation_report};
     my $anno_sum_rep_path = $annotation_results->{annotation_summary};
     my $singles_rp_path   = $annotation_results->{singletons_report};
@@ -127,25 +129,18 @@ method clusters_annotation_to_summary (HashRef $annotation_results) {
         }
     }
     close $outsum;
-
-    if (Log::Log4perl::initialized()) {
-        $self->log->info("Results - Total repeat fraction from annotations: $total_gcov");
-    }
-    else {
-        say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
-    }
+    
+    $log->info("Results - Total repeat fraction from annotations: $total_gcov");
+    say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
-    if (Log::Log4perl::initialized()) {
-        $self->log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
-        $self->log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
-    }
-    else {
-        if ($self->verbose) {
-            say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
-            say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
-        }
+    $log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
+    $log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
+
+    if ($self->verbose) {
+	say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
+	say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
     }
 }
 

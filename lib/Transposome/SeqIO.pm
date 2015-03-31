@@ -2,9 +2,8 @@ package Transposome::SeqIO;
 
 use 5.010;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
-use Class::Load;
+#use Class::Load;
 
 with 'Transposome::Role::File';
 
@@ -14,11 +13,11 @@ Transposome::SeqIO - Base class for reading FASTA/Q data.
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 
 =head1 SYNOPSIS
 

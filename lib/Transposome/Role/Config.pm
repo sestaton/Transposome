@@ -2,7 +2,7 @@ package Transposome::Role::Config;
 
 use 5.010;
 use Moose::Role;
-use Method::Signatures;
+#use Method::Signatures;
 
 =head1 NAME
 
@@ -10,11 +10,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.09.2
+Version 0.09.3
 
 =cut
 
-our $VERSION = '0.09.2';
+our $VERSION = '0.09.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -44,7 +44,9 @@ $VERSION = eval $VERSION;
 
 =cut 
 
-method parse_configuration ($yaml) {
+sub parse_configuration {
+    my $self = shift;
+    my ($yaml) = @_;
     my %config;
     my $index = 0;
 
@@ -118,7 +120,9 @@ method parse_configuration ($yaml) {
 
 =cut 
 
-method _validate_params ($config) {
+sub _validate_params {
+    my $self = shift;
+    my ($config) = @_;
     for my $k (keys %$config) {
 	my $v = $config->{$k};
         if (not defined $v) {

@@ -1,6 +1,14 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.3	03/30/15	Vancouver, BC
+
+- Streamline logging methods by not using a MooseX role (now using Log::Any).
+  This also allows users to plug in any logger they want for their own
+  applications and it doesn't require constant checking if Log4perl is initialized.
+- Remove Method::Signatures and type checking on method calls. This module is very
+  fast and adds readability to the code, but it has almost as many deps as Moose.
+
 0.09.2	03/17/15	Vancouver, BC
 
 - Rework annotation methods to not walk the entire repeat taxonomy. The methods
