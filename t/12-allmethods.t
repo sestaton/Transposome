@@ -8,6 +8,7 @@ use File::Spec;
 use File::Path    qw(remove_tree);
 use Module::Path  qw(module_path);
 use Log::Log4perl qw(:easy);
+use Log::Any::Adapter;
 use Transposome;
 use Transposome::PairFinder;
 use Transposome::Cluster;
@@ -109,6 +110,8 @@ my $log_conf = qq{
   };
 
 Log::Log4perl::init( \$log_conf );
+Log::Any::Adapter->set('Log4perl');
+#my $log = Log::Any->get_logger( category => "Transposome" );
 
 my $cwd      = getcwd();
 my $bin      = File::Spec->catdir($cwd, 'bin');
@@ -134,7 +137,8 @@ my $blast_res = Transposome::PairFinder->new(
     dir               => $config->{output_directory},
     in_memory         => $config->{in_memory},
     percent_identity  => $config->{percent_identity},
-    fraction_coverage => $config->{fraction_coverage}
+    fraction_coverage => $config->{fraction_coverage},
+    verbose           => 0,
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -153,7 +157,8 @@ my $cluster = Transposome::Cluster->new(
     dir             => $config->{output_directory},
     merge_threshold => $config->{merge_threshold},
     cluster_size    => $config->{cluster_size},
-    bin_dir         => $realbin
+    bin_dir         => $realbin,
+    verbose         => 0,
 );
 
 my $comm = $cluster->louvain_method;
@@ -193,7 +198,8 @@ my $annotation = Transposome::Annotation->new(
     dir      => $config->{output_directory},
     file     => $config->{cluster_log_file},
     threads  => 1,
-    cpus     => 1
+    cpus     => 1,
+    verbose  => 0,
 );
 
 my $annotation_results = $annotation->annotate_clusters( $cluster_data );
