@@ -103,7 +103,6 @@ sub louvain_method {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::louvain_method started at:         $st.");
-    say STDERR "Transposome::Cluster::louvain_method started at:         $st." if $self->verbose;
 
     try {
 	system([0..5], "$lconvert -i $int_file -o $cls_bin_path -w $cls_tree_weights_path");
@@ -153,7 +152,6 @@ sub louvain_method {
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::louvain_method completed at:       $ft.");
-    say STDERR "Transposome::Cluster::louvain_method completed at:       $ft." if $self->verbose;
 
     return \@comm;
 }
@@ -198,7 +196,6 @@ sub find_pairs {
     say $rep "# Cluster connections above threshold";
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs started at:             $st.");
-    say STDERR "Transposome::Cluster::find_pairs started at:             $st." if $self->verbose;
 
     my %vertex;
     my %read_pairs;
@@ -271,9 +268,8 @@ sub find_pairs {
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs completed at:           $ft.");
-    say STDERR "Transposome::Cluster::find_pairs completed at:           $ft." if $self->verbose;
 
-    return(\%read_pairs, \%vertex, \$uf);
+    return (\%read_pairs, \%vertex, \$uf);
 }
 
 =head2 make_clusters
@@ -322,7 +318,6 @@ sub make_clusters {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::make_clusters started at:          $st.");
-    say STDERR "Transposome::Cluster::make_clusters started at:          $st." if $self->verbose;
 
     open my $idx, '<', $idx_file or die "\n[ERROR]: Could not open file: $idx_file\n";
     while (my $idpair = <$idx>) {
@@ -379,7 +374,6 @@ sub make_clusters {
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::make_clusters completed at:        $ft.");
-    say STDERR "Transposome::Cluster::make_clusters completed at:        $ft." if $self->verbose;
 
     return $cluster_file;
 }
@@ -480,8 +474,6 @@ sub merge_clusters {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::merge_clusters started at:         $st.");
-    say STDERR "Transposome::Cluster::merge_clusters started at:         $st." if $self->verbose;
-
     
     my %cluster;
     for my $v (keys %$vertex) {
@@ -574,7 +566,6 @@ sub merge_clusters {
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::merge_clusters completed at:       $ft.");
-    say STDERR "Transposome::Cluster::merge_clusters completed at:       $ft." if $self->verbose;
 
     return ({ cluster_directory    => $cls_dir_path,
               singletons_file      => $singletons_file_path,

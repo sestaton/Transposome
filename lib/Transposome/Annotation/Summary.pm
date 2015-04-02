@@ -137,11 +137,6 @@ sub clusters_annotation_to_summary {
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Annotation::clusters_annotation_to_summary started at:   $st.");
     $log->info("Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.");
-
-    if ($self->verbose) {
-	say STDERR "Transposome::Annotation::clusters_annotation_to_summary started at:   $st.";
-	say STDERR "Transposome::Annotation::clusters_annotation_to_summary completed at: $ft.";
-    }
 }
 
 

@@ -125,7 +125,6 @@ sub parse_blast {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::PairFinder::parse_blast started at:   $st.");
-    say STDERR "Transposome::PairFinder::parse_blast started at:   $st." if $self->verbose;
     
     my %match_pairs;
     my %match_index;
@@ -257,11 +256,6 @@ sub parse_blast {
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
     $log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
-    
-    if ($self->verbose) {
-	say STDERR "Transposome::PairFinder::parse_blast completed at: $ft.";
-	say STDERR "Final output files are:\n$int_file,\n$idx_file,\n$edge_file."
-    }
     
     return ($idx_path, $int_path, $edge_path);
 }

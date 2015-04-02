@@ -106,12 +106,7 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-	if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.");
-	}
-	else {
-	    say STDERR "Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.";
-	}
+	$log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.");
 	exit(1);
     };
 
@@ -119,12 +114,7 @@ sub BUILD {
         die unless $self->has_blastn_exec;
     }
     catch {
-	if (Log::Log4perl::initialized()) {
-	    $self->log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.");
-	}
-	else {
-	    say STDERR "Unable to find blastn. Check you PATH to see that it is installed. Exiting.";
-	}
+	$log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.");
 	exit(1);
     };
 }
@@ -225,7 +215,6 @@ sub annotate_clusters {
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
-    say STDERR "Transposome::Annotation::annotate_clusters started at:   $st." if $self->verbose;
 
     my ($repeatmap, $type_map) = $self->map_repeat_types($database);
     my %repeats = %{ thaw($repeatmap) };
@@ -340,16 +329,6 @@ sub annotate_clusters {
     $log->info("Results - Repeat fraction from clusters:          $rep_frac");
     $log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
     $log->info("Results - Total repeat fraction:                  $total_rep_frac");
-
-    if ($self->verbose) {
-	say STDERR "Transposome::Annotation::annotate_clusters completed at: $ft.";
-	say STDERR "Results - Total sequences:                        $seqct";
-	say STDERR "Results - Total sequences clustered:              $cls_tot";
-	say STDERR "Results - Total sequences unclustered:            $single_tot";
-	say STDERR "Results - Repeat fraction from clusters:          $rep_frac";
-	say STDERR "Results - Singleton repeat fraction:              $singleton_rep_frac";
-	say STDERR "Results - Total repeat fraction:                  $total_rep_frac";
-    }
 
     return ({
 	annotation_report     => $anno_rp_path, 
