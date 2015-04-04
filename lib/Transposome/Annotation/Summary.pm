@@ -2,7 +2,7 @@ package Transposome::Annotation::Summary;
 
 use 5.010;
 use Moose::Role;
-use POSIX qw(strftime);
+use POSIX    qw(strftime);
 use Log::Any qw($log);
 
 =head1 NAME
@@ -131,7 +131,6 @@ sub clusters_annotation_to_summary {
     close $outsum;
     
     $log->info("Results - Total repeat fraction from annotations: $total_gcov");
-    say STDERR "Results - Total repeat fraction from annotations: $total_gcov" if $self->verbose;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
