@@ -63,7 +63,7 @@ sub test_annotation {
     my $cluster = Transposome::Cluster->new(
 					file            => $int_file,
 					dir             => $outdir,
-					merge_threshold => 2,
+					merge_threshold => 0.001,
 					cluster_size    => 1,
 					bin_dir         => $realbin,
 					verbose         => 0,
@@ -179,7 +179,7 @@ sub test_annotation {
 }
     
 END {
-#    remove_tree( $outdir, { safe => 1 } );
+    remove_tree( $outdir, { safe => 1 } );
     unlink glob("t/cluster_test_rep*");
     unlink $blfl;
     unlink $blfl2;

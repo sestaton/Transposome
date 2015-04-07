@@ -42,7 +42,7 @@ my $realbin = $bdir->resolve;
 my $cluster = Transposome::Cluster->new(
     file            => $int_file,
     dir             => $outdir,
-    merge_threshold => 2,
+    merge_threshold => 0.001,
     cluster_size    => 1,
     bin_dir         => $realbin,
     verbose         => 0,
@@ -171,6 +171,6 @@ is( $cluster_data->{total_cluster_num} + $single_ct, 70,
     'Expected number of reads went into clusters and singletons file' );
 
 END {
-    remove_tree( $outdir, { safe => 1 } );
+    #remove_tree( $outdir, { safe => 1 } );
     unlink $blfl;
 }
