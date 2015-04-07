@@ -89,6 +89,7 @@ sub clusters_annotation_to_summary {
     my $anno_sum_rep_path = $annotation_results->{annotation_summary};
     my $singles_rp_path   = $annotation_results->{singletons_report};
     my $total_readct      = $annotation_results->{total_sequence_num};
+    my $total_annotated_n = $annotation_results->{total_annotated_num};
     my $rep_frac          = $annotation_results->{repeat_fraction};
     my $blasts            = $annotation_results->{cluster_blast_reports};
     my $superfams         = $annotation_results->{cluster_superfamilies};
