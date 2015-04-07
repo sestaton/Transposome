@@ -334,7 +334,7 @@ sub annotate_clusters {
 	annotation_report     => $anno_rp_path, 
 	annotation_summary    => $anno_sum_rep_path, 
 	singletons_report     => $singles_rp_path, 
-	total_sequence_num    => $total_readct, 
+	total_sequence_num    => $seqct, 
 	repeat_fraction       => $rep_frac, 
 	cluster_blast_reports => $blasts, 
 	cluster_superfamilies => $superfams });
