@@ -211,6 +211,13 @@ sub make_clusters {
     
     load_classes('Transposome::Cluster', 'Transposome::SeqUtil');
 
+    my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
+					      in_memory => $config->{in_memory},
+					      format    => $config->{sequence_format},
+                                              dir       => $config->{output_directory} );
+
+    my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
+
     my $cluster = Transposome::Cluster->new( file            => $int_file,
 					     dir             => $config->{output_directory},
 					     merge_threshold => $config->{merge_threshold},
@@ -219,15 +226,10 @@ sub make_clusters {
     
     my $comm = $cluster->louvain_method;
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-    my ($read_pairs, $vertex, $uf) = $cluster->find_pairs($cluster_file, $config->{cluster_log_file});
+    my ($read_pairs, $vertex, $uf) = $cluster->find_pairs({ cluster_file     => $cluster_file, 
+                                                            cluster_log_file => $config->{cluster_log_file},
+                                                            total_seq_num    => $seqct });
  
-    my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
-					      in_memory => $config->{in_memory},
-					      format    => $config->{sequence_format},
-                                              dir       => $config->{output_directory} );
-
-    my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
-
     my $cluster_data
        = $cluster->merge_clusters({ graph_vertices         => $vertex,
                                     sequence_hash          => $seqs,
@@ -274,7 +276,7 @@ sub annotate_clusters {
     my $anno_tar_file = basename($anno_dir_path);
     my $cls_tar_path  = File::Spec->catfile($outdir, $cls_tar_file.".tgz");
     my $anno_tar_path = File::Spec->catfile($outdir, $anno_tar_file.".tgz");
-    #$cls_tar_file .= ".tgz";
+    #$cls_tar_file .= ".tgz"; 
     #$anno_tar_file .= ".tgz";
 
     my (@clusters, @annotations);
@@ -290,7 +292,7 @@ sub annotate_clusters {
     $atar->add_files(@annotations);
     $atar->write($anno_tar_path, &COMPRESS_GZIP);
     #chdir "..";
-
+    
     remove_tree( $cls_dir_path,  { safe => 1 } );
     remove_tree( $anno_dir_path, { safe => 1 } );
 }
