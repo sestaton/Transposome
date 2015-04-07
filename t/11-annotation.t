@@ -16,6 +16,8 @@ use Transposome::Annotation;
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 48;
 
+use Data::Dump;
+
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'annotation_t');
 my $report  = 'cluster_test_rep.txt';
@@ -75,15 +77,18 @@ sub test_annotation {
     ok( defined($cluster_file),
     'Can successfully make communities following clusters' );
     
-    my ( $read_pairs, $vertex, $uf ) =
-	$cluster->find_pairs( $cluster_file, $report );
-    ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
-    
     my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
     my ( $seqs, $seqct ) = $memstore->store_seq;
     is( $seqct, 70, 'Correct number of sequences stored' );
     ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
+
+    my ( $read_pairs, $vertex, $uf ) =
+	$cluster->find_pairs({ cluster_file     => $cluster_file, 
+			       cluster_log_file => $report,
+			       total_seq_num    => $seqct });
+    ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
     
+
     my $cluster_data =
 	$cluster->merge_clusters({ graph_vertices         => $vertex,
 				   sequence_hash          => $seqs,
@@ -103,7 +108,10 @@ sub test_annotation {
 						  cpus     => 1,
 						  verbose  => 0,
 						  );
-    
+
+    #say "cluster_data: ";
+    #dd $cluster_data;
+
     ok( defined($annotation), 'new() returned something correctly' );
     ok(
        $annotation->isa('Transposome::Annotation'),
@@ -134,11 +142,14 @@ sub test_annotation {
 	    singletons_file    => $cluster_data->{singletons_file}, 
 	    total_sequence_num => $seqct, 
 	    total_cluster_num  => $cluster_data->{total_cluster_num} });
-    
+
+    #say "annotation_res: ";
+    #dd $annotation_results;
+
     like( $annotation_results->{total_sequence_num}, qr/\d+/,
 	  'Returned the expected type for the total number of reads clustered' );
-    is( $annotation_results->{total_sequence_num}, 46, 'Correct number of reads annotated' );
-    is( $annotation_results->{total_sequence_num}, $cluster_data->{total_cluster_num}, 
+    is( $annotation_results->{total_annotated_num}, 46, 'Correct number of reads annotated' );
+    is( $annotation_results->{total_annotated_num}, $cluster_data->{total_cluster_num}, 
 	'Same number of reads clustered and annotated' );
     ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
 	'Correct data structure returned for creating annotation summary (1)' );
@@ -168,7 +179,7 @@ sub test_annotation {
 }
     
 END {
-    remove_tree( $outdir, { safe => 1 } );
+#    remove_tree( $outdir, { safe => 1 } );
     unlink glob("t/cluster_test_rep*");
     unlink $blfl;
     unlink $blfl2;

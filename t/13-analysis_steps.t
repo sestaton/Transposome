@@ -47,8 +47,8 @@ my ($clsdir, $seqtot, $clstot) = cluster_analysis($script, $conf_file, $outdir, 
 my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir, $seqtot, $clstot);
 
 # clean up
-remove_tree( $outdir, { safe => 1 } );
-unlink $conf_file;
+#remove_tree( $outdir, { safe => 1 } );
+#unlink $conf_file;
 
 #
 # Methods

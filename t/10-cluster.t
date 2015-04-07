@@ -78,13 +78,15 @@ ok( defined($cluster_file),
     close $in;
 }
 
-my ( $read_pairs, $vertex, $uf ) =
-  $cluster->find_pairs( $cluster_file, $report );
-ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
-
-#diag("Indexing sequences, this will take a few seconds...");
 my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
 my ( $seqs, $seqct ) = $memstore->store_seq;
+
+my ( $read_pairs, $vertex, $uf ) =
+  $cluster->find_pairs({ cluster_file     => $cluster_file, 
+			 cluster_log_file => $report,
+		         total_seq_num    => $seqct });
+
+ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $cluster_data =
    $cluster->merge_clusters({ graph_vertices         => $vertex,

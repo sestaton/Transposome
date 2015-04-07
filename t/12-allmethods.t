@@ -70,7 +70,7 @@ is( $config->{percent_identity}, 90,
     'Can correctly set percent identity for analysis' );
 is( $config->{fraction_coverage}, 0.55, 
     'Can correctly set fraction coverage for analysis' );
-is( $config->{merge_threshold}, 2, 
+is( $config->{merge_threshold}, 0.001, 
     'Can correctly set merge threshold for analysis' );
 
 ok(
@@ -168,10 +168,6 @@ my $cluster_file = $cluster->make_clusters( $comm, $idx_file );
 ok( defined($cluster_file),
     'Can successfully make communities following clusters' );
 
-my ( $read_pairs, $vertex, $uf ) =
-  $cluster->find_pairs( $cluster_file, $config->{cluster_log_file} );
-ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
-
 my $memstore = Transposome::SeqUtil->new(
     file      => $config->{sequence_file},
     in_memory => $config->{in_memory}
@@ -180,6 +176,12 @@ my $memstore = Transposome::SeqUtil->new(
 my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
+
+my ( $read_pairs, $vertex, $uf ) =
+  $cluster->find_pairs({ cluster_file     => $cluster_file, 
+                         cluster_log_file => $config->{cluster_log_file},
+                         total_seq_num    => $seqct });
+ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
 
 my $cluster_data =
   $cluster->merge_clusters({ graph_vertices         => $vertex,
@@ -204,9 +206,9 @@ my $annotation = Transposome::Annotation->new(
 
 my $annotation_results = $annotation->annotate_clusters( $cluster_data );
 
-is( $annotation_results->{total_sequence_num}, 48,       'Correct number of reads annotated' );
-is( $annotation_results->{total_sequence_num}, $cluster_data->{total_cluster_num}, 
-'Same number of reads clustered and annotated' );
+is( $annotation_results->{total_annotated_num}, 48, 'Correct number of reads annotated' );
+is( $annotation_results->{total_annotated_num}, $cluster_data->{total_cluster_num}, 
+    'Same number of reads clustered and annotated' );
 
 ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
