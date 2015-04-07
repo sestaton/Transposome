@@ -41,8 +41,8 @@ $VERSION = eval $VERSION;
 
 has 'merge_threshold' => (
     is       => 'ro',
-    isa      => 'Int',
-    required => 1,
+    isa      => 'Num',
+    default => 0.001,
 );
 
 has 'cluster_size' => (
@@ -182,7 +182,12 @@ sub louvain_method {
 
 sub find_pairs {
     my $self = shift;
-    my ($cls_file, $cls_log_file) = @_;
+    my ($cluster_data) = @_;
+    my $cls_file     = $cluster_data->{cluster_file};
+    my $cls_log_file = $cluster_data->{cluster_log_file};
+    my $total_seq_num   = $cluster_data->{total_seq_num};
+    my $merge_threshold = sprintf("%.0f", $total_seq_num * $self->merge_threshold);
+ 
     my $out_dir                      = $self->dir->relative;
     my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
@@ -256,7 +261,7 @@ sub find_pairs {
 	my ($i, $j) = $self->mk_vec($p);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
         my $j_noct = $j; $j_noct =~ s/\_.*//;
-        if ($cls_conn_ct{$p} >= $self->merge_threshold) {   
+        if ($cls_conn_ct{$p} >= $merge_threshold) {   
             say $rep join "\t", $i_noct, $j_noct, $cls_conn_ct{$p};
             ++$vertex{$_} for $i, $j;
             $uf->union($i, $j);
@@ -501,7 +506,7 @@ sub merge_clusters {
     
 	for my $clus (@$group) {
 	    if (exists $read_pairs->{$clus}) {
-		print $clsnew join q{ },@{$read_pairs->{$clus}};
+		print $clsnew join q{ }, @{$read_pairs->{$clus}};
 		for my $read (@{$read_pairs->{$clus}}) {
 		    if (exists $seqs->{$read}) {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
@@ -509,7 +514,7 @@ sub merge_clusters {
 		    }
 		    else {
 			$log->warn("$read not found. This indicates something went wrong processing the input. ".
-					 "Please check your input.")
+				   "Please check your input.")
 			}
 		}
 	    }
@@ -541,7 +546,7 @@ sub merge_clusters {
 		}
 		else {
 		    $log->warn("$non_paired_read not found. ".
-				     "This indicates something went wrong processing the input. ".
+			       "This indicates something went wrong processing the input. ".
 			       "Please check your input.");
 		}
 	    }
