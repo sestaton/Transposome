@@ -2,7 +2,6 @@ package Transposome::Role::Config;
 
 use 5.010;
 use Moose::Role;
-#use Method::Signatures;
 
 =head1 NAME
 
@@ -80,6 +79,9 @@ sub parse_configuration {
     $config{fraction_coverage} = $yaml->[0]->{clustering_options}->[$index]->{fraction_coverage};
     $index++;
     $config{merge_threshold}   = $yaml->[0]->{clustering_options}->[$index]->{merge_threshold};
+    unless ($config{merge_threshold}) {
+	$config{merge_threshold} = 0.001;
+    }
 
     # annotation options from config
     $index = 0;
