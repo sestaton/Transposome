@@ -311,7 +311,8 @@ sub annotate_clusters {
     remove_tree( $cls_dir_path,  { safe => 1 } );
     remove_tree( $anno_dir_path, { safe => 1 } );
     
-    log_interval( $t0, $log ) if $analysis eq 'annotation';
+    log_interval( $t0, $log ) 
+	if defined $analysis && $analysis eq 'annotation';
 }
 
 sub log_interval {
