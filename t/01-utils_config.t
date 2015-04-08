@@ -7,7 +7,7 @@ use File::Spec;
 use Transposome;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::Most tests => 7;
+use Test::Most tests => 8;
 
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
