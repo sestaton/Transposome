@@ -42,7 +42,7 @@ $VERSION = eval $VERSION;
 has 'merge_threshold' => (
     is       => 'ro',
     isa      => 'Num',
-    default => 0.001,
+    default  => 0.001,
 );
 
 has 'cluster_size' => (
