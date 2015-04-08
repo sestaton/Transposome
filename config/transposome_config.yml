@@ -9,7 +9,6 @@ clustering_options:
   - in_memory:          1
   - percent_identity:   90
   - fraction_coverage:  0.55
-  - merge_threshold:    100
 annotation_input:
   - repeat_database:    repeats.fas
 annotation_options:
