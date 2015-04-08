@@ -70,7 +70,7 @@ is( $config->{percent_identity}, 90,
     'Can correctly set percent identity for analysis' );
 is( $config->{fraction_coverage}, 0.55, 
     'Can correctly set fraction coverage for analysis' );
-is( $config->{merge_threshold}, 0.001, 
+is( $config->{merge_threshold}, 0.029, 
     'Can correctly set merge threshold for analysis' );
 
 ok(

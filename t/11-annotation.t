@@ -63,7 +63,7 @@ sub test_annotation {
     my $cluster = Transposome::Cluster->new(
 					file            => $int_file,
 					dir             => $outdir,
-					merge_threshold => 0.001,
+					merge_threshold => 0.029,
 					cluster_size    => 1,
 					bin_dir         => $realbin,
 					verbose         => 0,
