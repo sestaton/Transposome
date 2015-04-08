@@ -47,8 +47,8 @@ my ($clsdir, $seqtot, $clstot) = cluster_analysis($script, $conf_file, $outdir, 
 my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir, $seqtot, $clstot);
 
 # clean up
-#remove_tree( $outdir, { safe => 1 } );
-#unlink $conf_file;
+remove_tree( $outdir, { safe => 1 } );
+unlink $conf_file;
 
 #
 # Methods
@@ -83,6 +83,7 @@ sub blast_analysis {
 
     $script .= " --analysis blast --config $conf_file";
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    say $stdout;
 
     my @files;
     find( sub {
@@ -99,6 +100,7 @@ sub findpairs_analysis {
 
     $script .= " --analysis findpairs --config $conf_file --blastdb $blastdb";
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    say $stdout;
 
     my @files;
     find( sub {
@@ -122,7 +124,8 @@ sub cluster_analysis {
     $script .= " --analysis cluster --config $conf_file";
     $script .= " -int $int_file -idx $idx_file -edges $edge_file";
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
-    
+    say $stdout;
+
     my (@files, @dirs, @fastas);
     find( sub { push @dirs, $File::Find::name if -d and /cls_fasta_files/ }, $outdir );
     my $clsdir = shift @dirs;
@@ -158,8 +161,8 @@ sub annotation_analysis {
     $script .= " --analysis annotation --config $conf_file --clsdir $clsdir -seqct $seqct -clsct $cls_tot";
 
     my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
-    #say $stderr;
-
+    say $stdout;
+    
     my @files;
     find( sub { push @files, $File::Find::name if -f and /\.tgz$/ }, $outdir );
 
