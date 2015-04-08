@@ -4,7 +4,7 @@ Version	Date	Location
 0.09.4	04/08/15	Vancouver, BC
 
 - Fix bug in logging some methods twice.
-- Fix bug in reporting incorrect number of total reads to annotation summary.
+- Fix bug in reporting incorrect number of total reads to annotation summary (introduced in v0.09.3).
 - Fix bug in configuration tests with running the same tests unintentionally.
 - Remove cluster membership file after clustering because it is really of no
   use since the clusters and FASTA files are provided.
