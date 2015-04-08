@@ -130,7 +130,7 @@ sub _build_config_data {
     say $tmpyml "  - in_memory:         1";
     say $tmpyml "  - percent_identity:  90";
     say $tmpyml "  - fraction_coverage: 0.55";
-    say $tmpyml "  - merge_threshold:   0.029";
+    say $tmpyml "  - merge_threshold:   0.029" unless defined $exclude && $exclude eq 'merge_threshold';
     say $tmpyml "annotation_input:";
     say $tmpyml "  - repeat_database:  $repeat_db";
     say $tmpyml "annotation_options:";
