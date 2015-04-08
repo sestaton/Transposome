@@ -175,7 +175,7 @@ sub run_blast {
     load_classes('Transposome::Run::Blast');
 
     my ( $t0, $log ) = init_transposome( $config )
-	if $analysis eq 'blast';
+	if defined $analysis && $analysis eq 'blast';
 
     my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					      format    => $config->{sequence_format},
@@ -197,7 +197,7 @@ sub find_pairs {
     load_classes('Transposome::PairFinder');
 
     my ( $t0, $log ) = init_transposome( $config )
-	if $analysis eq 'findpairs';
+	if defined $analysis && $analysis eq 'findpairs';
 
     my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
 						  dir               => $config->{output_directory},
@@ -219,7 +219,7 @@ sub make_clusters {
     load_classes('Transposome::Cluster', 'Transposome::SeqUtil');
 
     my ( $t0, $log ) = init_transposome( $config )
-	if $analysis eq 'cluster';
+	if defined $analysis && $analysis eq 'cluster';
 
     my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
 					      in_memory => $config->{in_memory},
@@ -263,7 +263,7 @@ sub annotate_clusters {
     load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
 
     my ( $t0, $log ) = init_transposome( $config )
-	if $analysis eq 'annotation';
+	if defined $analysis && $analysis eq 'annotation';
 
     my @clsfastas;
     find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
