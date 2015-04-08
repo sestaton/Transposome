@@ -102,10 +102,24 @@ my $test7 = TestFixture->new(
     exclude      => 'blast_evalue',
 );
 
-my $test7_conf = $test5->config_constructor;
+my $test7_conf = $test7->config_constructor;
 my ($test7_conf_file) = @$test7_conf;
 
 ok( defined($test7_conf_file), 'Correctly build configuration data without blast_evalue' );
+
+my $test8 = TestFixture->new(
+    seq_file     => $seqfile,
+    seq_format   => 'fasta',
+    repeat_db    => $repeatdb,
+    destroy      => 0,
+    build_proper => 1,
+    exclude      => 'merge_threshold',
+);
+
+my $test8_conf = $test8->config_constructor;
+my ($test8_conf_file) = @$test8_conf;
+
+ok( defined($test8_conf_file), 'Correctly build configuration data without merge_threshold' );
 
 unlink glob("t/transposome_mgblast_*"); 
 unlink glob("t/transposome_config_*");
