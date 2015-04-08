@@ -1,6 +1,15 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.4	04/08/15	Vancouver, BC
+
+- Fix bug in logging some methods twice.
+- Fix bug in reporting incorrect number of total reads to annotation summary.
+- Fix bug in configuration tests with running the same tests unintentionally.
+- Remove cluster membership file after clustering because it is really of no
+  use since the clusters and FASTA files are provided.
+- Remove merge_threshold option in configuration to simplify usage.
+
 0.09.3	03/30/15	Vancouver, BC
 
 - Streamline logging methods by not using a MooseX role (now using Log::Any).
