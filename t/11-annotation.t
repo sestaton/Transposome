@@ -16,7 +16,7 @@ use Transposome::Annotation;
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 48;
 
-use Data::Dump;
+#use Data::Dump;
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'annotation_t');
