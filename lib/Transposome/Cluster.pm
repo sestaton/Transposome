@@ -364,6 +364,7 @@ sub make_clusters {
     }
     close $cls_out;
     close $mem;
+    unlink $membership_file_path;
 
     for (@$graph_comm) {
 	my $graph_file = File::Spec->catfile($out_dir, $_);
