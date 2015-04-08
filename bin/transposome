@@ -77,19 +77,19 @@ if ($opts{analysis} eq 'all') {
     }
 }
 elsif ($opts{analysis} eq 'blast') {
-    my $blastdb = run_blast( $config );
+    my $blastdb = run_blast( $config, $opts{analysis} );
     die "Blast failed. Please check the input sequence file and logs and try again. Report this issue if it persists. Exiting."
         unless -s $blastdb;
 }
 elsif ($opts{analysis} eq 'findpairs') {
-    my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $opts{blastdb} );
+    my ( $idx_file, $int_file, $edge_file ) = find_pairs( $config, $opts{blastdb}, $opts{analysis} );
 }
 elsif ($opts{analysis} eq 'cluster') {
     my $cluster_data =
-	make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
+	make_clusters( $config, $opts{idx_file}, $opts{int_file}, $opts{edge_file}, $opts{analysis} );
 }
 elsif ($opts{analysis} eq 'annotation') {
-    annotate_clusters( $config, $opts{cls_dir}, $opts{seqct}, $opts{cls_tot} );
+    annotate_clusters( $config, $opts{cls_dir}, $opts{seqct}, $opts{cls_tot}, $opts{analysis} );
 }
 else {
     say "\nERROR: '$opts{analysis}' is not recognized. See the manual by typing '$script -m',".
@@ -145,7 +145,6 @@ sub init_transposome {
 
     Log::Log4perl::init( \$conf );
     Log::Any::Adapter->set('Log4perl');
-    #my $log = Log::Log4perl::get_logger("Transposome");
     my $log = Log::Any->get_logger( category => "Transposome" );
     
     my $t0 = [Time::HiRes::gettimeofday()];
@@ -171,9 +170,12 @@ sub init_transposome {
 }
 
 sub run_blast {
-    my ($config) = @_;
+    my ($config, $analysis) = @_;
 
     load_classes('Transposome::Run::Blast');
+
+    my ( $t0, $log ) = init_transposome( $config )
+	if $analysis eq 'blast';
 
     my $blast = Transposome::Run::Blast->new( file      => $config->{sequence_file},
 					      format    => $config->{sequence_format},
@@ -185,13 +187,17 @@ sub run_blast {
     
     my $blastdb = $blast->run_allvall_blast;
 
+    #log_interval( $t0, $log ) if $analysis eq 'blast';
     return $blastdb;
 }
 
 sub find_pairs {
-    my ($config, $blastdb) = @_;
+    my ($config, $blastdb, $analysis) = @_;
 
     load_classes('Transposome::PairFinder');
+
+    my ( $t0, $log ) = init_transposome( $config )
+	if $analysis eq 'findpairs';
 
     my $blast_res = Transposome::PairFinder->new( file              => $blastdb,  
 						  dir               => $config->{output_directory},
@@ -201,15 +207,19 @@ sub find_pairs {
                                                   verbose           => 1 );
     
     my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
-
     unlink $blastdb;
+
+    #log_interval( $t0, $log ) if $analysis eq 'findpairs';
     return ($idx_file, $int_file, $hs_file);
 }
 
 sub make_clusters {
-    my ($config, $idx_file, $int_file, $hs_file) = @_;
+    my ($config, $idx_file, $int_file, $hs_file, $analysis) = @_;
     
     load_classes('Transposome::Cluster', 'Transposome::SeqUtil');
+
+    my ( $t0, $log ) = init_transposome( $config )
+	if $analysis eq 'cluster';
 
     my $memstore = Transposome::SeqUtil->new( file      => $config->{sequence_file}, 
 					      in_memory => $config->{in_memory},
@@ -226,9 +236,10 @@ sub make_clusters {
     
     my $comm = $cluster->louvain_method;
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-    my ($read_pairs, $vertex, $uf) = $cluster->find_pairs({ cluster_file     => $cluster_file, 
-                                                            cluster_log_file => $config->{cluster_log_file},
-                                                            total_seq_num    => $seqct });
+    my ($read_pairs, $vertex, $uf) 
+        = $cluster->find_pairs({ cluster_file     => $cluster_file, 
+                                 cluster_log_file => $config->{cluster_log_file},
+                                 total_seq_num    => $seqct });
  
     my $cluster_data
        = $cluster->merge_clusters({ graph_vertices         => $vertex,
@@ -242,13 +253,17 @@ sub make_clusters {
     untie %$seqs unless $config->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
 
+    #log_interval( $t0, $log ) if $analysis eq 'cluster';
     return $cluster_data;
 }
 
 sub annotate_clusters {
-    my ($config, $cls_dir_path, $seqct, $cls_tot) = @_;
+    my ($config, $cls_dir_path, $seqct, $cls_tot, $analysis) = @_;
 
     load_classes('Transposome::Annotation', 'File::Find', 'Archive::Tar');
+
+    my ( $t0, $log ) = init_transposome( $config )
+	if $analysis eq 'annotation';
 
     my @clsfastas;
     find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
@@ -295,6 +310,8 @@ sub annotate_clusters {
     
     remove_tree( $cls_dir_path,  { safe => 1 } );
     remove_tree( $anno_dir_path, { safe => 1 } );
+    
+    log_interval( $t0, $log ) if $analysis eq 'annotation';
 }
 
 sub log_interval {
