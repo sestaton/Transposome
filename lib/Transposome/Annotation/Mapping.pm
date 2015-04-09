@@ -105,7 +105,7 @@ sub map_hit_family {
                 for my $family (@{$superfam_h->{$superfam}}) {
                     if ($top_hit =~ /$family/) {
                         my $family_name = $self->map_family_name($family);
-                        $top_hit_superfam{$top_hit} = $superfam;
+                        $top_hit_superfam{$top_hit} = $self->mk_key($family_name, $superfam);
                         my $anno_key = $self->mk_key($filebase, 
 						     $type,
 						     $class,
