@@ -212,7 +212,7 @@ is( $annotation_results->{total_annotated_num}, $cluster_data->{total_cluster_nu
 
 ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
     'Correct data structure returned for creating annotation summary (1)' );
-ok( ref($annotation_results->{cluster_superfamilies}) eq 'ARRAY',
+ok( ref($annotation_results->{cluster_superfamilies}) eq 'HASH',
     'Correct data structure returned for creating annotation summary (2)' );
 
 $annotation->clusters_annotation_to_summary( $annotation_results );

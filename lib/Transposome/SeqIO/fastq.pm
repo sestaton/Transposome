@@ -12,11 +12,11 @@ Transposome::SeqIO::fastq - Class for reading FASTQ data.
 
 =head1 VERSION
 
-Version 0.09.4
+Version 0.09.5
 
 =cut
 
-our $VERSION = '0.09.4';
+our $VERSION = '0.09.5';
 
 =head1 SYNOPSIS
 

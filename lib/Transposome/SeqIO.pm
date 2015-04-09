@@ -13,11 +13,11 @@ Transposome::SeqIO - Base class for reading FASTA/Q data.
 
 =head1 VERSION
 
-Version 0.09.4
+Version 0.09.5
 
 =cut
 
-our $VERSION = '0.09.4';
+our $VERSION = '0.09.5';
 
 =head1 SYNOPSIS
 
