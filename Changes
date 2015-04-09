@@ -1,6 +1,11 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.5	04/09/15	Vancouver, BC
+
+- Fix bug in annotation summary file not reporting family correctly (top hit for each
+  cluster was being reported).
+
 0.09.4	04/08/15	Vancouver, BC
 
 - Fix bug in logging some methods twice.
