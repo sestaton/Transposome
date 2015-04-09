@@ -241,6 +241,7 @@ sub annotate_clusters {
 
     # data structures for holding mapping results
     my %all_cluster_annotations; # container for annotations; used for creating summary
+    my %top_hit_superfam;        # container for top_hit -> family -> superfamily mapping; used for creating summary
 
     ## annotate singletons, then add total to results
     my $singleton_annotations
@@ -306,6 +307,7 @@ sub annotate_clusters {
     }
 
     @all_cluster_annotations{keys %$_} = values %$_ for @$cluster_annotations;
+    @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
 
     open my $out, '>', $anno_rp_path 
 	or die "\n[ERROR]: Could not open file: $anno_rp_path\n";
@@ -338,7 +340,7 @@ sub annotate_clusters {
 	total_annotated_num   => $total_readct,
 	repeat_fraction       => $rep_frac, 
 	cluster_blast_reports => $blasts, 
-	cluster_superfamilies => $superfams });
+	cluster_superfamilies => \%top_hit_superfam });
 }
 
 =head2 _annotate_singletons
