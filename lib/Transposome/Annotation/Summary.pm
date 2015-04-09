@@ -92,27 +92,29 @@ sub clusters_annotation_to_summary {
     my $total_annotated_n = $annotation_results->{total_annotated_num};
     my $rep_frac          = $annotation_results->{repeat_fraction};
     my $blasts            = $annotation_results->{cluster_blast_reports};
-    my $superfams         = $annotation_results->{cluster_superfamilies};
+    my $top_hit_superfam  = $annotation_results->{cluster_superfamilies};
     
     # log results
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     
-    my %top_hit_superfam;
-    @top_hit_superfam{keys %$_} = values %$_ for @$superfams;
-
     open my $outsum, '>', $anno_sum_rep_path 
         or die "\n[ERROR]: Could not open file: $anno_sum_rep_path\n";
     
     my %annot;
     my %fams;
+    my %superfams;
     my $total_ct = 0;
     my $hashct   = @$blasts;
     my $hitct;
 
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
-            $total_ct += $blast->{$fam};
-	    $fams{$fam} += $blast->{$fam};
+	    if (exists $top_hit_superfam->{$fam}) {
+		my ($family, $superfam) = $self->mk_vec($top_hit_superfam->{$fam});
+		$total_ct += $blast->{$fam};
+		$fams{$family} += $blast->{$fam};
+		$superfams{$family} = $superfam;
+	    }
         }
     }
     my $total_gcov = 0;
@@ -121,13 +123,12 @@ sub clusters_annotation_to_summary {
         "HitPerc", "GenomeFrac";
 
     for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
-        if (exists $top_hit_superfam{$k}) {
-            my $hit_perc   = sprintf("%.12f", $fams{$k}/$total_ct);
-            my $gperc_corr = $hit_perc * $rep_frac;
-            $total_gcov += $gperc_corr;
-            say $outsum join "\t", $total_readct, $top_hit_superfam{$k}, $k, 
-	        $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
-        }
+	my $sf = $superfams{$k};
+	my $hit_perc   = sprintf("%.12f", $fams{$k}/$total_ct);
+	my $gperc_corr = $hit_perc * $rep_frac;
+	$total_gcov += $gperc_corr;
+	say $outsum join "\t", $total_readct, $sf, $k, 
+	    $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
     }
     close $outsum;
     
