@@ -145,7 +145,7 @@ sub map_family_name {
     my ($family) = @_;
     my $family_name;
 
-    if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?[_-]?[a-zA-Z-]+?\d*?)/) {
+    if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?)/) { #[_-]?[a-zA-Z-]+?\d*?)/) {
         $family_name = $1;
     }
     elsif ($family =~ /(^D[HT][ACHMT][_-][a-zA-Z]*\d*?)/) {
