@@ -14,7 +14,7 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::More tests => 48;
+use Test::Most tests => 50;
 
 #use Data::Dump;
 
@@ -109,9 +109,6 @@ sub test_annotation {
 						  verbose  => 0,
 						  );
 
-    #say "cluster_data: ";
-    #dd $cluster_data;
-
     ok( defined($annotation), 'new() returned something correctly' );
     ok(
        $annotation->isa('Transposome::Annotation'),
@@ -143,9 +140,6 @@ sub test_annotation {
 	    total_sequence_num => $seqct, 
 	    total_cluster_num  => $cluster_data->{total_cluster_num} });
 
-    #say "annotation_res: ";
-    #dd $annotation_results;
-
     like( $annotation_results->{total_sequence_num}, qr/\d+/,
 	  'Returned the expected type for the total number of reads clustered' );
     is( $annotation_results->{total_annotated_num}, 46, 'Correct number of reads annotated' );
@@ -153,7 +147,7 @@ sub test_annotation {
 	'Same number of reads clustered and annotated' );
     ok( ref($annotation_results->{cluster_blast_reports}) eq 'ARRAY',
 	'Correct data structure returned for creating annotation summary (1)' );
-    ok( ref($annotation_results->{cluster_superfamilies}) eq 'ARRAY',
+    ok( ref($annotation_results->{cluster_superfamilies}) eq 'HASH',
 	'Correct data structure returned for creating annotation summary (2)' );
 
     ## test if annotation reports are generated correctly
@@ -170,12 +164,26 @@ sub test_annotation {
     open my $annosum, '<', $anno_sum_rep_path;
     $annoct++ while (<$annorep>);
     close $annorep;
-    $anno_sumct++ while (<$annosum>);
+
+    my @families = qw(RLG_wily RLG_teda RLG_rewu RLG_X);
+    @families = sort @families;
+    my @anno_fams;
+    while (<$annosum>) {
+	$anno_sumct++;
+	chomp;
+	my @f = split /\t/;
+	next if /^ReadNum/i;
+	push @anno_fams, $f[2];
+    }
     close $annosum;
 
     ## this is a test introduced in v0.09.2 to ensure all the annotations are logged
     ok( $annoct > 2, 'All annotations written to report file' );
     ok( $anno_sumct > 2, 'Summary annotations written to file' );
+
+    ## check if the family mapping succeeded 
+    @anno_fams = sort @anno_fams;
+    is_deeply( \@families, \@anno_fams, 'All TE familes correctly annotated' );
 }
     
 END {
