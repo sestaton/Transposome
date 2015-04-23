@@ -5,11 +5,11 @@ use Moose;
 use DBI;
 use Tie::Hash::DBD;
 use Try::Tiny;
-use DBM::Deep;
+#use DBM::Deep;
 use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
-use List::Util qw(sum max);
+#use List::Util qw(sum max);
 use POSIX      qw(strftime);
 use Log::Any   qw($log);
 use namespace::autoclean;
@@ -135,18 +135,27 @@ sub parse_blast {
 	unlink $dbm if -e $dbm;
 	unlink $dbi if -e $dbi;
 	
-	tie %match_pairs, 'DBM::Deep', { 
-	    file      => $dbm, 
-	    locking   => 1, 
-	    autoflush => 0, 
-	    type      => DBM::Deep::TYPE_HASH 
-	};
+	#tie %match_pairs, 'DBM::Deep', { 
+	    #file      => $dbm, 
+	    #locking   => 1, 
+	    #autoflush => 0, 
+	    #type      => DBM::Deep::TYPE_HASH 
+	#};
 
 	my $dsn  = "dbi:SQLite:dbname=$dbi";
         my $user = "";
         my $pass = "";
 
 	tie %match_index, "Tie::Hash::DBD", $dsn, {
+	    PrintError       => 0, 
+	    RaiseError       => 1,
+	    AutoCommit       => 1,
+	    FetchHashKeyName => 'NAME_lc'
+	};
+
+	$dsn = "dbi:SQLite:dbname=$dbm";
+
+	tie %match_pairs, "Tie::Hash::DBD", $dsn, {
 	    PrintError       => 0, 
 	    RaiseError       => 1,
 	    AutoCommit       => 1,
@@ -172,13 +181,13 @@ sub parse_blast {
 
 	    if ( ($neg_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
-		    push @{$match_pairs{$pair}}, $score;
+		    $match_pairs{$pair} = $score if $score > $match_pairs{$pair};
 		}
 		elsif (exists $match_pairs{$revpair}) {
-		    push @{$match_pairs{$revpair}}, $score;
+		    $match_pairs{$revpair} = $score if $score > $match_pairs{$revpair};
 		}
 		else {
-		    $match_pairs{$pair}   = [$score];
+		    $match_pairs{$pair}   = $score;
 		    $match_index{$q_name} = $index unless exists $match_index{$q_name};
 		    $index++;
 		    $match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -193,13 +202,13 @@ sub parse_blast {
 
 	    if ( ($pos_query_cov >= $self->fraction_coverage) && ($pid >= $self->percent_identity) ) {
 		if (exists $match_pairs{$pair}) {
-		    push @{$match_pairs{$pair}}, $score;
+		    $match_pairs{$pair} = $score if $score > $match_pairs{$pair};
 		}
 		elsif (exists $match_pairs{$revpair}) {
-		    push @{$match_pairs{$revpair}}, $score;
+		    $match_pairs{$revpair} = $score if $score > $match_pairs{$revpair};
 		}
 		else {
-		    $match_pairs{$pair}   = [$score];
+		    $match_pairs{$pair}   = $score;
 		    $match_index{$q_name} = $index unless exists $match_index{$q_name};
 		    $index++;
 		    $match_index{$s_name} = $index unless exists $match_index{$s_name};
@@ -217,41 +226,95 @@ sub parse_blast {
     }
     close $idx;
 
-    open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
-    open my $edge,  '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
+    #open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+    #open my $edge,  '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
 
-    while (my ($match, $scores) = each %match_pairs) {
-	my $match_score = max(@$scores);
+    my (%good_pairs, %good_edges);
+    my $dbp = File::Spec->catfile($self->dir, "mgblast_goodpairs.dbm");
+    my $dbe = File::Spec->catfile($self->dir, "mgblast_goodedges.dbm");
+
+    unless ($self->in_memory) {
+	my $dsn  = "dbi:SQLite:dbname=$dbp";
+	my $user = "";
+	my $pass = "";
+	
+	tie %good_pairs, "Tie::Hash::DBD", $dsn, {
+	    PrintError       => 0, 
+	    RaiseError       => 1,
+	    AutoCommit       => 1,
+	    FetchHashKeyName => 'NAME_lc'
+	};
+	
+	$dsn = "dbi:SQLite:dbname=$dbe";
+	
+	tie %good_edges, "Tie::Hash::DBD", $dsn, {
+	    PrintError       => 0, 
+	    RaiseError       => 1,
+	    AutoCommit       => 1,
+	    FetchHashKeyName => 'NAME_lc'
+	};
+	
+    }
+
+    while (my ($match, $match_score) = each %match_pairs) {
+	#my $match_score = max(@$scores);
 	my ($qry, $sbj) = $self->mk_vec($match);
 	my $revmatch    = $self->mk_key($sbj, $qry);
 	if (exists $match_pairs{$revmatch}) {
-	    my $rev_match_score = max(@{$match_pairs{$revmatch}});
+	    my $rev_match_score = $match_pairs{$revmatch};
 	    if ($rev_match_score > $match_score) {
 		if (exists $match_index{$sbj} && exists $match_index{$qry}) {
-		    say $edge join "\t", $sbj, $qry, $rev_match_score;
-		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
-		    delete $match_pairs{$match};
+		    #say $edge join "\t", $sbj, $qry, $rev_match_score;
+		    #say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
+		    #delete $match_pairs{$match};
+		    my $edge_key = $self->mk_key($sbj, $qry);
+		    my $pair_key = $self->mk_key($match_index{$sbj}, $match_index{$qry});                     
+		    $good_edges{$edge_key} = $rev_match_score;
+		    $good_pairs{$pair_key} = $rev_match_score;
 		}
 	    }
-	    else {
-		delete $match_pairs{$revmatch};
-	    }
+	    #else {
+		#delete $match_pairs{$revmatch};
+	    #}
 	}
 	else {
 	    if (exists $match_index{$qry} && exists $match_index{$sbj}) {
-		say $edge join "\t", $qry, $sbj, $match_score;
-		say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
+		#say $edge join "\t", $qry, $sbj, $match_score;
+		#say $int join "\t", $match_index{$qry}, $match_index{$sbj}, $match_score;
+		my $edge_key = $self->mk_key($qry, $sbj);
+		my $pair_key = $self->mk_key($match_index{$qry}, $match_index{$sbj});                     
+		$good_edges{$edge_key} = $match_score;
+		$good_pairs{$pair_key} = $match_score;
 	    }
 	}
     }
-    close $int;
-    close $edge;
+    #close $int;
+    #close $edge;
     
     untie %match_index unless $self->in_memory;
     untie %match_pairs unless $self->in_memory;
     unlink $dbi if -e $dbi;
     unlink $dbm if -e $dbm;
     
+    open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
+    open my $edge, '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
+
+    while (my ($pair, $pair_score) = each %good_pairs) {
+	my ($qry, $sbj) = $self->mk_vec($pair);
+	say $int join "\t", $qry, $sbj, $pair_score;
+    }
+    close $int;
+    untie %good_pairs unless $self->in_memory;
+    unlink $dbp if -e $dbp;
+
+    while (my ($edge_pair, $edge_score) = each %good_edges) {
+	my ($qry, $sbj) = $self->mk_vec($edge_pair);
+	say $edge join "\t", $qry, $sbj, $edge_score;
+    }
+    close $edge;
+    untie %good_edges unless $self->in_memory;
+    unlink $dbe if -e $dbe;
+
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::PairFinder::parse_blast completed at: $ft.");
