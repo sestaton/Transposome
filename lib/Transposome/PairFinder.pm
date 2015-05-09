@@ -134,12 +134,12 @@ sub parse_blast {
 	unlink $dbi if -e $dbi;
 	
 	my $mi_dbh = DBI->connect("dbi:SQLite:dbname=$dbi", undef, undef, {
-	    AutoCommit => 1,
-	    RaiseError => 1,
-	    PrintError => 0,
+	    AutoCommit       => 1,
+	    RaiseError       => 1,
+	    PrintError       => 0,
 	    FetchHashKeyName => 'Name_lc',
-	    journal_mode => 'TRUNCATE',
-	    synchronous  => 0,
+	    journal_mode     => 'TRUNCATE',
+	    synchronous      => 0,
 	});
 
 
@@ -233,6 +233,7 @@ sub parse_blast {
 		    say $edge join "\t", $sbj, $qry, $rev_match_score;
 		    say $int join "\t", $match_index{$sbj}, $match_index{$qry}, $rev_match_score;
 		    delete $match_pairs{$match};
+		}
 	    }
 	    else {
 		delete $match_pairs{$revmatch};
@@ -259,6 +260,7 @@ sub parse_blast {
     $log->info("Final output files are:\n$int_file,\n$idx_file,\n$edge_file.");
     
     return ($idx_path, $int_path, $edge_path);
+
 }
 
 =head2 _validate_format
