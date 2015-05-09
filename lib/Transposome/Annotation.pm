@@ -23,11 +23,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.09.5
+Version 0.09.6
 
 =cut
 
-our $VERSION = '0.09.5';
+our $VERSION = '0.09.6';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
