@@ -117,16 +117,16 @@ sub store_seq {
 	$seq_dbm = File::Spec->catfile($dir, "transposome_seqstore.dbm");
         unlink $seq_dbm if -e $seq_dbm;
 
-	my $dsn  = "dbi:SQLite:dbname=$seq_dbm";
-        my $user = "";
-        my $pass = "";
+        my $dbh = DBI->connect("dbi:SQLite:dbname=$seq_dbm", undef, undef, {
+            PrintError       => 0, 
+            RaiseError       => 1,
+            AutoCommit       => 1,
+            FetchHashKeyName => 'NAME_lc',
+            synchronous      => 0,
+            journal_mode     => 'TRUNCATE'
+        });
 
-	tie %seqhash, "Tie::Hash::DBD", $dsn, {
-	    PrintError       => 0, 
-	    RaiseError       => 0,
-	    AutoCommit       => 1,
-	    FetchHashKeyName => 'NAME_lc',
-	};
+	tie %seqhash, "Tie::Hash::DBD", $dbh;
     }
 
     my $filename = $self->file->relative;
