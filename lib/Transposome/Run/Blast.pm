@@ -67,7 +67,7 @@ has 'desc_num' => (
 
 has 'seq_num' => (
     is        => 'ro',
-    isa       => 'Num',
+    isa       => 'ModNum',
     predicate => 'has_seq_num',
     required  => 1,
 );
