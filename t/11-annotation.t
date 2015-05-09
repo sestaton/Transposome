@@ -34,7 +34,6 @@ my ($blfl2) = @$blast2;
 
 test_annotation( $blfl );
 # remove results and test annotation without specifying evalue in configuration
-#system("ls -l $outdir");
 remove_tree( $outdir, { safe => 1} );
 test_annotation( $blfl2 );
 
@@ -82,7 +81,7 @@ sub test_annotation {
     is( $seqct, 70, 'Correct number of sequences stored' );
     ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-    my ( $read_pairs, $vertex, $uf ) =
+    my ( $read_pairs, $vertex, $uf, $dbm ) =
 	$cluster->find_pairs({ cluster_file     => $cluster_file, 
 			       cluster_log_file => $report,
 			       total_seq_num    => $seqct });
@@ -94,7 +93,8 @@ sub test_annotation {
 				   sequence_hash          => $seqs,
 				   read_pairs             => $read_pairs,
 				   cluster_log_file       => $report,
-				   graph_unionfind_object => $uf });
+				   graph_unionfind_object => $uf,
+				   dbm_file               => $dbm });
     
     ok( defined($cluster_data->{cluster_directory}),
 	'Can successfully merge communities based on paired-end information' );
