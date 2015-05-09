@@ -19,6 +19,8 @@ use Transposome::Run::Blast;
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 34;
 
+#use Data::Dump;
+
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 
@@ -177,18 +179,21 @@ my ( $seqs, $seqct ) = $memstore->store_seq;
 is( $seqct, 70, 'Correct number of sequences stored' );
 ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-my ( $read_pairs, $vertex, $uf ) =
+my ( $read_pairs, $vertex, $uf, $dbm ) =
   $cluster->find_pairs({ cluster_file     => $cluster_file, 
                          cluster_log_file => $config->{cluster_log_file},
                          total_seq_num    => $seqct });
 ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
+
+#dd $read_pairs and exit;
 
 my $cluster_data =
   $cluster->merge_clusters({ graph_vertices         => $vertex,
                              sequence_hash          => $seqs,
                              read_pairs             => $read_pairs,
                              cluster_log_file       => $config->{cluster_log_file},
-                             graph_unionfind_object => $uf });
+                             graph_unionfind_object => $uf,
+                             dbm_file               => $dbm });
 
 $cluster_data->{total_sequence_num} = $seqct;
 ok( defined($cluster_data->{cluster_directory}),
