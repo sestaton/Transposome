@@ -6,6 +6,8 @@ use IPC::System::Simple  qw(system capture EXIT_ANY);
 use File::Path           qw(make_path);
 use POSIX                qw(strftime);
 use Log::Any             qw($log);
+use DBI;
+use Tie::Hash::DBD;
 use Graph::UnionFind;
 use File::Spec;
 use File::Basename;
@@ -13,6 +15,8 @@ use Try::Tiny;
 use Path::Class::File;
 use Config;
 use namespace::autoclean;
+
+#use Data::Dump;
 
 with 'Transposome::Role::File', 
      'Transposome::Role::Util';
@@ -38,6 +42,14 @@ $VERSION = eval $VERSION;
     ...
 
 =cut
+
+has 'in_memory' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_in_memory',
+    lazy       => 1,
+    default    => 1,
+);
 
 has 'merge_threshold' => (
     is       => 'ro',
@@ -205,9 +217,37 @@ sub find_pairs {
     my %vertex;
     my %read_pairs;
     my %mapped_pairs;
+    my %cls_conn_ct;
+
+    my $dbm = File::Spec->catfile($out_dir, "transposome_readpairs.dbm");
+    my $dbc = File::Spec->catfile($out_dir, "transposome_clusterconn.dbm");
+
+    unless ($self->in_memory) {
+	my $rp_dbh = DBI->connect("dbi:SQLite:dbname=$dbm", undef, undef, {
+            PrintError       => 0, 
+            RaiseError       => 1,
+            AutoCommit       => 1,
+            FetchHashKeyName => 'NAME_lc',
+            synchronous      => 0,
+            journal_mode     => 'TRUNCATE'
+        });
+
+        tie %read_pairs, "Tie::Hash::DBD", $rp_dbh;
+
+	my $cl_dbh = DBI->connect("dbi:SQLite:dbname=$dbc", undef, undef, {
+            PrintError       => 0, 
+            RaiseError       => 1,
+            AutoCommit       => 1,
+            FetchHashKeyName => 'NAME_lc',
+            synchronous      => 0,
+            journal_mode     => 'TRUNCATE'
+        });
+
+        tie %cls_conn_ct, "Tie::Hash::DBD", $cl_dbh;
+    }
 
     {
-        local $/ = '>';
+	local $/ = '>';
         
         open my $in, '<', $cls_file_path or die "\n[ERROR]: Could not open file: $cls_file_path\n";   
         while (my $line = <$in>) {
@@ -216,36 +256,38 @@ sub find_pairs {
             my ($clsid, $seqids) = split /\n/, $line;
             $clsid =~ s/\s/\_/;
             my @ids = split /\s+/, $seqids;       
+	    my $id_key = $self->mk_key(@ids);
             # limit cluster size in .cls file here, if desired
-            push @{$read_pairs{$clsid}}, $_ for @ids;
+            #push @{$read_pairs{$clsid}}, $_ for @ids;
+	    $read_pairs{$clsid} = $id_key;
         }
         close $in;
     }
 
+    #dd \%read_pairs;
+
     while (my ($cls, $reads) = each %read_pairs) {
-        for my $read (@$reads) {
+	my @read_ids = $self->mk_vec($reads);
+        for my $read (@read_ids) {
             my $readbase = $read;
             $readbase =~ s/\/\d$//;
-            if (exists $mapped_pairs{$readbase}) {
-                push @{$mapped_pairs{$readbase}}, {$read => $cls};
-            }
-            else {
-                $mapped_pairs{$readbase} = [{$read => $cls}];
-            }
+	    push @{$mapped_pairs{$readbase}}, {$read => $cls};
         }
     }
 
-    my %cls_conn_ct;
+    #untie %read_pairs unless $self->in_memory;
+    #unlink $dbm if -e $dbm;
+
     my ($cls_i, $cls_j);
     my @sep_reads;
 
-    for my $allpairs (keys %mapped_pairs) {
-        if (@{$mapped_pairs{$allpairs}} < 2) {     # if no pair is found in another cluster, 
+    while (my ($allpairs, $reads) = each %mapped_pairs) {
+	if (@$reads < 2) {                         # if no pair is found in another cluster,
             delete $mapped_pairs{$allpairs};       # remove this pair
         }
         else {
-            push @sep_reads, values %$_ for @{$mapped_pairs{$allpairs}};
-            ($cls_i, $cls_j) = sort @sep_reads;
+            push @sep_reads, values %$_ for @$reads;
+	    ($cls_i, $cls_j) = sort @sep_reads;
             if ($cls_i =~ /$cls_j/) {              # remove reads that have pairs in the same cluster       
                 delete $mapped_pairs{$allpairs};   # which is uninformative for merging clusters
             }
@@ -257,12 +299,12 @@ sub find_pairs {
         @sep_reads = ();
     }
 
-    for my $p (reverse sort { $cls_conn_ct{$a} <=> $cls_conn_ct{$b} } keys %cls_conn_ct) {
-	my ($i, $j) = $self->mk_vec($p);
+    while (my ($pk, $pv) = each %cls_conn_ct) {
+	my ($i, $j) = $self->mk_vec($pk);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
         my $j_noct = $j; $j_noct =~ s/\_.*//;
-        if ($cls_conn_ct{$p} >= $merge_threshold) {   
-            say $rep join "\t", $i_noct, $j_noct, $cls_conn_ct{$p};
+        if ($pv >= $merge_threshold) {   
+	    say $rep join "\t", $i_noct, $j_noct, $pv;
             ++$vertex{$_} for $i, $j;
             $uf->union($i, $j);
         }
@@ -270,11 +312,14 @@ sub find_pairs {
     close $rep;
     unlink $cls_file_path;
 
+    untie %cls_conn_ct unless $self->in_memory;
+    unlink $dbc if -e $dbc;
+
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs completed at:           $ft.");
 
-    return (\%read_pairs, \%vertex, \$uf);
+    return (\%read_pairs, \%vertex, \$uf, $dbm);
 }
 
 =head2 make_clusters
@@ -339,28 +384,27 @@ sub make_clusters {
     while (my $line = <$in>) {
         chomp $line;
         my ($i, $j) = split /\s+/, $line;
-        if (exists $clus{$j}) {
-            push @{$clus{$j}}, $i;
-        }
-        else {
-            $clus{$j} = [$i];
-        }
+	push @{$clus{$j}}, $i;
     }
     close $in;
 
+    #dd \%clus;
+
     my $cls_ct = 0;
-    for my $cls (reverse sort { @{$clus{$a}} <=> @{$clus{$b}} } keys %clus) {
+    while (my ($cls, $cls_ids) = each %clus) {
 	$cls_ct++;
-        my $clus_size = @{$clus{$cls}};
-        say $cls_out ">CL$cls_ct $clus_size";
+	my $clus_size = @$cls_ids;
         my @clus_members;
-        for my $cls_member (@{$clus{$cls}}) {
+	for my $cls_member (@$cls_ids) {
             say $mem "$cls_member $cls_ct";
             if (exists $index{$cls_member}) {
                 push @clus_members, $index{$cls_member};
             }
         }
-        say $cls_out join q{ }, @clus_members;
+	if (@clus_members) {
+	    say $cls_out ">CL$cls_ct $clus_size";
+	    say $cls_out join q{ }, @clus_members;
+	}
     }
     close $cls_out;
     close $mem;
@@ -371,7 +415,7 @@ sub make_clusters {
 	unlink $graph_file;
     }
 
-    if ($cls_ct == 0 ) {
+    if ($cls_ct == 0) {
 	$log->error("No clusters found. This likely results from analyzing too few sequences. 
                      Report this issue if it persists. Exiting.");
 	exit(1);
@@ -428,6 +472,7 @@ sub make_clusters {
            { graph_vertices         => $vertex,
              sequence_hash          => $seqs,
              read_pairs             => $read_pairs,
+             dbm_file               => $dbm,
              cluster_log_file       => $cluster_log_file,
              graph_unionfind_object => $uf });
 
@@ -454,6 +499,7 @@ sub merge_clusters {
     my $uf     = $cluster_data->{graph_unionfind_object};
     my $read_pairs   = $cluster_data->{read_pairs};
     my $cls_log_file = $cluster_data->{cluster_log_file};
+    my $dbm_file     = $cluster_data->{dbm_file};
 
     my $infile = $self->file->relative;
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
@@ -507,8 +553,9 @@ sub merge_clusters {
     
 	for my $clus (@$group) {
 	    if (exists $read_pairs->{$clus}) {
-		print $clsnew join q{ }, @{$read_pairs->{$clus}};
-		for my $read (@{$read_pairs->{$clus}}) {
+		my @ids = $self->mk_vec($read_pairs->{$clus});
+		print $clsnew join q{ }, @ids;
+		for my $read (@ids) {
 		    if (exists $seqs->{$read}) {
 			say $groupout join "\n", ">".$read, $seqs->{$read};
 			delete $seqs->{$read};
@@ -516,7 +563,7 @@ sub merge_clusters {
 		    else {
 			$log->warn("$read not found. This indicates something went wrong processing the input. ".
 				   "Please check your input.")
-			}
+		    }
 		}
 	    }
 	    print $clsnew q{ };
@@ -529,18 +576,19 @@ sub merge_clusters {
 
     # write out those clusters that weren't merged
     say $rep "# Non-grouped clusters";
-    for my $non_paired_cls (keys %$read_pairs) {
+    while (my ($non_paired_cls, $non_paired_clsids) = each %$read_pairs) {
 	my ($non_paired_clsid, $non_paired_clsseqnum) = split /\_/, $non_paired_cls, 2;
+	my @ids = $self->mk_vec($non_paired_clsids);
 	$cls_tot += $non_paired_clsseqnum;
 	say $rep $non_paired_clsid;
-	say $clsnew join "\n", ">$non_paired_clsid $non_paired_clsseqnum", join " ", @{$read_pairs->{$non_paired_cls}};
+	say $clsnew join "\n", ">$non_paired_clsid $non_paired_clsseqnum", join " ", @ids;
 
-	if (@{$read_pairs->{$non_paired_cls}} >= $self->cluster_size) {
+	if (@ids >= $self->cluster_size) {
 	    my $non_paired_clsfile .= $non_paired_cls.".fas";
 	    my $cls_file_path = File::Spec->catfile($cls_dir_path, $non_paired_clsfile);
 	    open my $clsout, '>', $cls_file_path or die "\n[ERROR]: Could not open file: $cls_file_path\n";
 
-	    for my $non_paired_read (@{$read_pairs->{$non_paired_cls}}) {
+	    for my $non_paired_read (@ids) {
 		if (exists $seqs->{$non_paired_read}) {
 		    say $clsout join "\n", ">".$non_paired_read, $seqs->{$non_paired_read};
 		    delete $seqs->{$non_paired_read};
@@ -557,6 +605,9 @@ sub merge_clusters {
     close $rep;
     close $clsnew;
 
+    untie %$read_pairs unless $self->in_memory;
+    unlink $dbm_file if -e $dbm_file;
+
     # write out singletons for rarefaction
     my $singletons_num = scalar keys %$seqs;
     my $singletons_file = "singletons_$singletons_num.fas";
@@ -564,14 +615,15 @@ sub merge_clusters {
     open my $singlesout, '>', $singletons_file_path 
 	or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
 
-    for my $seqid (keys %$seqs) {
-	say $singlesout join "\n", ">".$seqid, $seqs->{$seqid};
+    while (my ($seqid, $seq) = each %$seqs) {
+	say $singlesout join "\n", ">".$seqid, $seq;
     }
     close $singlesout;
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::merge_clusters completed at:       $ft.");
+    $log->info("Results - Total number of clustered reads:  $cls_tot.");
 
     return ({ cluster_directory    => $cls_dir_path,
               singletons_file      => $singletons_file_path,
