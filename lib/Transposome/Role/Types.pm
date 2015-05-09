@@ -38,7 +38,7 @@ subtype 'ModNum'
 
 coerce 'ModNum',
     from 'Str',
-    via { $_ =~ s/\_//g; 0+$_ };
+    via { $_ =~ s/\"|\_//g; 0+$_ };
 
 #has 'ModNum' => ( 
 #     is     => 'ro',
