@@ -232,11 +232,12 @@ sub make_clusters {
 					     dir             => $config->{output_directory},
 					     merge_threshold => $config->{merge_threshold},
 					     cluster_size    => $config->{cluster_size},
-	                                     verbose         => 1 );
+	                                     verbose         => 1,
+                                             in_memory       => $config->{in_memory} );
     
     my $comm = $cluster->louvain_method;
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-    my ($read_pairs, $vertex, $uf) 
+    my ($read_pairs, $vertex, $uf, $dbm) 
         = $cluster->find_pairs({ cluster_file     => $cluster_file, 
                                  cluster_log_file => $config->{cluster_log_file},
                                  total_seq_num    => $seqct });
@@ -246,7 +247,8 @@ sub make_clusters {
                                     sequence_hash          => $seqs,
                                     read_pairs             => $read_pairs,
                                     cluster_log_file       => $config->{cluster_log_file},
-                                    graph_unionfind_object => $uf });
+                                    graph_unionfind_object => $uf,
+                                    dbm_file               => $dbm });
 
     $cluster_data->{total_sequence_num} = $seqct;
     unlink $idx_file, $int_file, $hs_file;
