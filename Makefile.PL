@@ -92,7 +92,6 @@ WriteMakefile(
 	'Capture::Tiny'                    => 0,
 	'List::MoreUtils'                  => 0,
 	'Lingua::EN::Inflect'              => 0,
-	'DBM::Deep'                        => 0,
 	'File::Path'                       => 0,
 	'Graph'                            => 0,
 	'aliased'                          => 0,
