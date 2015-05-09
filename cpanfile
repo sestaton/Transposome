@@ -5,7 +5,6 @@ requires 'Module::Path',               '0.09';
 requires 'Path::Class',                '0.32';
 requires 'YAML::Tiny',                 '1.62';
 requires 'Parallel::ForkManager',      '0.7.0';
-requires 'DBM::Deep',                  '2.0008';
 requires 'DBD::SQLite',                '1.44';
 requires 'Tie::Hash::DBD',             '0.13';
 requires 'Log::Log4perl',              '1.40';
