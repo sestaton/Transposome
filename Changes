@@ -1,6 +1,19 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.6	04/09/15	Vancouver, BC
+
+- Report cluster number after clustering process so it is easy to run the standalone
+  annotation step.
+- Fix empty clusters (i.e, singletons) being written to the cluster file.
+- Remove use of DBM-Deep, which was contributing to two bugs (a memory leak and an issue
+  with creating large DBM files).
+- Rework methods in PairFinder and Cluster classes to be more memory
+  efficient. This includes using a new indexing method with SQLite. A number of methods now use 
+  autovivication to reduce the number of hash lookups and simplify the code.
+- Fix type constaints on the format of numbers accepted by the Transposome::Run::Blast class.
+- Rework tests for clustering methods to better handle behavior of indexing vs in-memory analysis.
+
 0.09.5	04/09/15	Vancouver, BC
 
 - Fix bug in annotation summary file not reporting family correctly (top hit for each
