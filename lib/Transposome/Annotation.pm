@@ -186,7 +186,15 @@ sub annotate_clusters {
     my $singletons_file_path = $cluster_data->{singletons_file};
     my $seqct   = $cluster_data->{total_sequence_num};
     my $cls_tot = $cluster_data->{total_cluster_num};
-    
+
+    unless (defined $seqct) {
+	die "\n[ERROR]: 'total_sequence_num' value is not set. Exiting.";
+    }
+
+    unless (defined $cls_tot) {
+	die "\n[ERROR]: 'total_cluster_num' value is not set. Exiting.";
+    }
+
     # set paths for annotate_clusters() method
     my $database = $self->database->absolute;
     my $db_path  = $self->make_blastdb($database);
