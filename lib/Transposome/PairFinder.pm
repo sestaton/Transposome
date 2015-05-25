@@ -285,7 +285,7 @@ sub _validate_format {
     my ($line) = @_;
     my @f = split /\t/, $line;
     unless (@f == 12) {
-	$log->error("'$line' is not the correct format in file: $self->file. Exiting.");
+	$log->error("'$line' is not the correct format in file: ".$self->file.". Exiting.");
 	exit(1);
     }
 }
