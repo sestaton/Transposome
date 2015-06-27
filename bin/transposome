@@ -387,7 +387,8 @@ Options:
     -m|man              :    Print the full documentation.
 
 Citation: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
-          families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
+          families from unassembled sequence reads. Bioinformatics, 31:1827-1829.
+
 END
 }
 
