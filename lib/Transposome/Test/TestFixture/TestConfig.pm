@@ -122,7 +122,7 @@ sub _build_config_data {
     say $tmpyml "blast_input:";
     say $tmpyml "  - sequence_file:     $seq_file";
     say $tmpyml "  - sequence_format:   $seq_format";
-    say $tmpyml "  - sequence_num:      10" unless defined $exclude && $exclude eq 'sequence_num';
+    say $tmpyml "  - sequence_num:      1_0" unless defined $exclude && $exclude eq 'sequence_num';
     say $tmpyml "  - cpu:               1" unless defined $exclude && $exclude eq 'cpu';
     say $tmpyml "  - thread:            1";
     say $tmpyml "  - output_directory:  t/test_transposome_cli_out";
