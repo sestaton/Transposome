@@ -70,6 +70,7 @@ has 'seq_num' => (
     isa       => 'ModNum',
     predicate => 'has_seq_num',
     required  => 1,
+    coerce    => 1,
 );
 
 has 'percent_identity' => (
