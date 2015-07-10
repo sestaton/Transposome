@@ -1,6 +1,10 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.7	07/10/15	Vancouver, BC
+
+- Fix type constraint for allowing numbers to be passed in with underscores.
+
 0.09.6	04/09/15	Vancouver, BC
 
 - Report cluster number after clustering process so it is easy to run the standalone
