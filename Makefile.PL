@@ -28,9 +28,6 @@ my $mgbin   = File::Spec->catfile($bindir, $mgbl);
 my $fmtbin  = File::Spec->catfile($bindir, $fmtdb);
 my $trnbin  = File::Spec->catfile($bindir, $transp);
 
-## we should avoid this hack since the build system
-## will handle this for us
-#find_perl($trnbin);
 my $make_log = "comm_make_log";
 chdir $srcdir;
 system("make all 2> $make_log") == 0
@@ -110,29 +107,3 @@ WriteMakefile(
     clean => { FILES => 'Transposome-* bin/louvain_* bin/formatdb bin/mgblast' },
     test  => { TESTS => 't/*.t' },
 );
-
-sub find_perl {
-    my ($trnbin) = @_;
-    
-    my $perl = $Config{perlpath};
-    my $tmp  = $trnbin.".tmp";
-
-    open my $in, '<', $trnbin;
-    open my $out, '>', $tmp;
-
-    while (my $line = <$in>) {
-	chomp $line;
-	if ($line =~ /(\/usr\/bin\/env\s+perl)/) {
-	    $line =~ s/$1/$perl/;
-	    say $out $line;
-	}
-	else {
-	    say $out $line;
-	}
-    }
-    close $in;
-    close $out;
-
-    move $tmp, $trnbin or die "move failed: $!";
-    chmod 0755, $trnbin;
-}
