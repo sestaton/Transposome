@@ -28,7 +28,9 @@ my $mgbin   = File::Spec->catfile($bindir, $mgbl);
 my $fmtbin  = File::Spec->catfile($bindir, $fmtdb);
 my $trnbin  = File::Spec->catfile($bindir, $transp);
 
-find_perl($trnbin);
+## we should avoid this hack since the build system
+## will handle this for us
+#find_perl($trnbin);
 my $make_log = "comm_make_log";
 chdir $srcdir;
 system("make all 2> $make_log") == 0
