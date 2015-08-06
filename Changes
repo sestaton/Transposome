@@ -1,6 +1,10 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.09.8	08//06/15	Vancouver, BC
+
+- Allow program to run if not under some shell.
+
 0.09.7	07/10/15	Vancouver, BC
 
 - Fix type constraint for allowing numbers to be passed in with underscores.
