@@ -1,6 +1,6 @@
-#!/usr/bin/env perl
+#!perl
 
-eval 'exec /usr/bin/env perl -w -S $0 ${1+"$@"}'
+eval 'exec perl -w -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
 use 5.010;
