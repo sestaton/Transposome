@@ -3,6 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 use Cwd;
+use Config;
 use File::Spec;
 use File::Copy qw(copy move);
 use autodie    qw(open);
@@ -11,11 +12,12 @@ my $root   = getcwd();
 my $srcdir = "src";
 my $bindir = File::Spec->catdir($root, 'bin');
 my $bldbin = File::Spec->catdir($root, 'build', 'ci', 'bin');
-my $mgbl  = "mgblast";
-my $fmtdb = "formatdb";
-my $conv  = "louvain_convert";
-my $comm  = "louvain_community";
-my $hier  = "louvain_hierarchy";
+my $transp = "transposome";
+my $mgbl   = "mgblast";
+my $fmtdb  = "formatdb";
+my $conv   = "louvain_convert";
+my $comm   = "louvain_community";
+my $hier   = "louvain_hierarchy";
 
 my $convbin = File::Spec->catfile($bindir, $conv);
 my $commbin = File::Spec->catfile($bindir, $comm);
@@ -24,7 +26,9 @@ my $mgbld   = File::Spec->catfile($bldbin, $mgbl);
 my $fmtbld  = File::Spec->catfile($bldbin, $fmtdb);
 my $mgbin   = File::Spec->catfile($bindir, $mgbl);
 my $fmtbin  = File::Spec->catfile($bindir, $fmtdb);
+my $trnbin  = File::Spec->catfile($bindir, $transp);
 
+find_perl($trnbin);
 my $make_log = "comm_make_log";
 chdir $srcdir;
 system("make all 2> $make_log") == 0
@@ -105,3 +109,28 @@ WriteMakefile(
     test  => { TESTS => 't/*.t' },
 );
 
+sub find_perl {
+    my ($trnbin) = @_;
+    
+    my $perl = $Config{perlpath};
+    my $tmp  = $trnbin.".tmp";
+
+    open my $in, '<', $trnbin;
+    open my $out, '>', $tmp;
+
+    while (my $line = <$in>) {
+	chomp $line;
+	if ($line =~ /(\/usr\/bin\/env\s+perl)/) {
+	    $line =~ s/$1/$perl/;
+	    say $out $line;
+	}
+	else {
+	    say $out $line;
+	}
+    }
+    close $in;
+    close $out;
+
+    move $tmp, $trnbin or die "move failed: $!";
+    chmod 0755, $trnbin;
+}
