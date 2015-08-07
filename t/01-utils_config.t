@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 use File::Spec;
@@ -123,4 +121,3 @@ ok( defined($nomergethresh_conf_file), 'Correctly build configuration data witho
 
 unlink glob("t/transposome_mgblast_*"); 
 unlink glob("t/transposome_config_*");
-

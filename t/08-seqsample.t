@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 #TODO: add tests for sampling with index
 use 5.010;
 use strict;
