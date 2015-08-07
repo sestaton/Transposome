@@ -4,6 +4,8 @@ Version	Date	Location
 0.09.8	08//06/15	Vancouver, BC
 
 - Allow program to run if not under some shell.
+- Do not rely on environment variables for finding Perl and building package
+  or running tests.
 
 0.09.7	07/10/15	Vancouver, BC
 
