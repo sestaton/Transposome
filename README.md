@@ -21,7 +21,7 @@ Note that the following commands assume a fresh cloud instance with no compilers
 
 For Ubuntu/Debian as the OS:
 
-    apt-get install -y build-essential lib32z1 git ncbi-blast+
+    apt-get install -y build-essential lib32z1 git ncbi-blast+ curl
     curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
 For RHEL/Fedora:
