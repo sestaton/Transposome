@@ -106,7 +106,7 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-	$log->error("Unable to find makeblastdb. Check you PATH to see that it is installed. Exiting.");
+	$log->error("Unable to find makeblastdb. Check your PATH to see that it is installed. Exiting.");
 	exit(1);
     };
 
@@ -114,7 +114,7 @@ sub BUILD {
         die unless $self->has_blastn_exec;
     }
     catch {
-	$log->error("Unable to find blastn. Check you PATH to see that it is installed. Exiting.");
+	$log->error("Unable to find blastn. Check your PATH to see that it is installed. Exiting.");
 	exit(1);
     };
 }
