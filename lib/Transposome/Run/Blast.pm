@@ -174,6 +174,13 @@ sub run_allvall_blast {
     open my $out, '>>', $out_path or die "\n[ERROR]: Could not open file: $out_path\n";
 
     my $pm = Parallel::ForkManager->new($thread);
+
+    local $SIG{INT} = sub {
+        $log->warn("Caught SIGINT; Waiting for child processes to finish.");
+        $pm->wait_all_children;
+        exit 1;
+    };
+
     $pm->run_on_finish( sub { my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_ref) = @_;
 			      for my $bl (sort keys %$data_ref) {
 				  open my $report, '<', $bl or die "\n[ERROR]: Could not open file: $bl\n";
@@ -190,6 +197,7 @@ sub run_allvall_blast {
 
     for my $seqs (@$seq_files) {
 	$pm->start($seqs) and next;
+	$SIG{INT} = sub { $pm->finish };
 	my $blast_out = $self->_run_blast($mgblast, $seqs, $database, $cpu);
 	$blasts{$blast_out} = 1;
     
