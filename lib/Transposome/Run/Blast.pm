@@ -27,11 +27,11 @@ Transposome::Run::Blast - Run all vs. all BLAST to generate graph edges.
 
 =head1 VERSION
 
-Version 0.09.8
+Version 0.09.9
 
 =cut
 
-our $VERSION = '0.09.8';
+our $VERSION = '0.09.9';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -244,7 +244,7 @@ sub _make_mgblastdb {
     my $fname = $self->file->basename;
     my $dir   = $self->dir->absolute; 
 
-    my $log = "formatdb.log";
+    my $fdblog = "formatdb.log";
     $fname =~ s/\.f.*//;
     my $db    = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
@@ -261,7 +261,7 @@ sub _make_mgblastdb {
         exit(1);
     };
     unlink $tempdb;
-    unlink $log if -e $log;
+    unlink $fdblog if -e $fdblog;
 
     return $db_path;
 }
