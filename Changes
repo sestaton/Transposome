@@ -1,7 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.09.8	08//06/15	Vancouver, BC
+0.09.9	03/10/16	Vancouver, BC
+
+- Add handler for exceptions with BLAST threads so all children exit correctly.
+- Fix variable naming issue with logging in Transposome::Run::Blast class.
+
+0.09.8	08/06/15	Vancouver, BC
 
 - Allow program to run if not under some shell.
 - Do not rely on environment variables for finding Perl and building package
