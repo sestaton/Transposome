@@ -30,7 +30,7 @@ For RHEL/Fedora:
     yum install -y glibc.i686 gcc-c++ git ncbi-blast+
     curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
-It is **highly** recommended that you use these methods to install and update Transposome and not try to install manually. However, if you run into issues, it is possible to download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
+If you run into issues with the above steps, it is likely that you are missing a dependency. In this case, download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
     tar xzf Transposome.tar.gz
     cd Transposome
