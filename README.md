@@ -32,7 +32,7 @@ For RHEL/Fedora:
 
 Note for CentOS users: 
 
-All of the above commands for RHEL will work on CentOS except for the ncbi-blast+ package. Please install this package separately from the [NCBI ftp archive](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST) by copying the binaries to somewhere in your PATH (e.g., /usr/local/bin), or for regular users, just extend your PATH to the path to the blast 'bin' directory.
+All of the above commands for RHEL will work on CentOS except for the ncbi-blast+ package. Please install this package separately from the [NCBI downloads page](http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download) copying the binaries to somewhere in your PATH (e.g., /usr/local/bin), or for regular users, just extend your PATH to the path to the blast 'bin' directory.
 
 If you run into issues with the above steps, it is likely that you are missing a dependency. In this case, download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
