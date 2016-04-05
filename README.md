@@ -30,6 +30,10 @@ For RHEL/Fedora:
     yum install -y glibc.i686 gcc-c++ git ncbi-blast+
     curl -L cpanmin.us | perl - git://github.com/sestaton/Transposome.git
 
+Note for CentOS users: 
+
+All of the above commands for RHEL will work on CentOS except for the ncbi-blast+ package. Please install this package separately from the [NCBI ftp archive](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) by copying the binaries to somewhere in your PATH (e.g., /usr/local/bin), or for regular users, just extend your PATH to the path to the blast 'bin' directory.
+
 If you run into issues with the above steps, it is likely that you are missing a dependency. In this case, download the latest [release](https://github.com/sestaton/Transposome/releases) and install manually (see the [troubleshooting](https://github.com/sestaton/Transposome/wiki/Troubleshooting) page for more information) with the following commands.
 
     tar xzf Transposome.tar.gz
