@@ -14,11 +14,11 @@ Transposome - Investigate the repeat strucuture of a genome through unassembled 
 
 =head1 VERSION
 
-Version 0.09.8
+Version 0.09.9
 
 =cut
 
-our $VERSION = '0.09.8';
+our $VERSION = '0.09.9';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
