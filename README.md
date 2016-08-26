@@ -3,7 +3,7 @@ Transposome
 
 Annotation of transposable element families from unassembled sequence reads
 
-[![Build Status](https://travis-ci.org/sestaton/Transposome.png?branch=master)](https://travis-ci.org/sestaton/Transposome) [![Coverage Status](https://coveralls.io/repos/github/sestaton/Transposome/badge.svg?branch=master)](https://coveralls.io/github/sestaton/Transposome?branch=master)
+[![Build Status](https://travis-ci.org/sestaton/Transposome.svg?branch=master)](https://travis-ci.org/sestaton/Transposome) [![Coverage Status](https://coveralls.io/repos/github/sestaton/Transposome/badge.svg?branch=master)](https://coveralls.io/github/sestaton/Transposome?branch=master)
 
 ### What is Transposome?
 
