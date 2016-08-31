@@ -14,11 +14,11 @@ Transposome::Annotation::Search - Run the BLAST search on the clusters and singl
 
 =head1 VERSION
 
-Version 0.09.9
+Version 0.10.0
 
 =cut
 
-our $VERSION = '0.09.9';
+our $VERSION = '0.10.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS

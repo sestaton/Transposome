@@ -1,6 +1,7 @@
 Revision history for Transposome
 
 Version	Date	Location
+
 0.09.9	03/10/16	Vancouver, BC
 
 - Add handler for exceptions with BLAST threads so all children exit correctly.

@@ -12,11 +12,11 @@ Transposome::Annotation::Mapping - Map BLAST hits to the full repeat taxonomy
 
 =head1 VERSION
 
-Version 0.09.9
+Version 0.10.0
 
 =cut
 
-our $VERSION = '0.09.9';
+our $VERSION = '0.10.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
