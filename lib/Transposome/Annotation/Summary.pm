@@ -119,16 +119,14 @@ sub clusters_annotation_to_summary {
     }
     my $total_gcov = 0;
 
-    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "ReadCt/ReadsWithHit", 
-        "HitPerc", "GenomeFrac";
+    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "GenomeFraction";
 
     for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
 	my $sf = $superfams{$k};
 	my $hit_perc   = sprintf("%.12f", $fams{$k}/$total_ct);
 	my $gperc_corr = $hit_perc * $rep_frac;
 	$total_gcov += $gperc_corr;
-	say $outsum join "\t", $total_readct, $sf, $k, 
-	    $fams{$k}."/".$total_ct, $hit_perc, $gperc_corr;
+	say $outsum join "\t", $total_readct, $sf, $k, $gperc_corr;
     }
     close $outsum;
     
