@@ -411,11 +411,14 @@ sub _annotate_singletons {
    if (-s $singles_rp_path) {
         open my $singles_fh, '<', $singles_rp_path 
 	    or die "\n[ERROR]: Could not open file: $singles_rp_path\n";
-	while (<$singles_fh>) {
-	    chomp;
-	    $singleton_hits++;
-	    my @f = split;
-	    $blasthits{$f[1]}++;
+	while (my $line = <$singles_fh>) {
+	    chomp $line;
+	    my @f = split /\t/, $line;
+	    if ($f[2] >= 80 && $f[3] >= 80) {
+		# percent_id && hit_length
+		$singleton_hits++;
+		$blasthits{$f[1]}++;
+	    }
         }
 	close $singles_fh;
     }
