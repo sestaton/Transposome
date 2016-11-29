@@ -50,7 +50,7 @@ These steps will give a clear indication of any issues. Updating your installati
 
 Following installation, get the Transposome configuration file:
 
-    curl -L https://raw.githubusercontent.com/sestaton/Transposome/master/config/transposome_config.yml > transposome_config.yml 
+    curl -sL https://git.io/bPVv > transposome_config.yml 
 
 Next, edit the configuration file by specifying the location of data files and parameters for analysis. Note that if you downloaded manually, a configuration file can be found in the 'config' directory, or the configuration file on the [Quick Start](https://github.com/sestaton/Transposome/wiki/Quick-Start) page can be copied into a text editor and saved locally. It makes no difference which way you create the configuration file, though the `curl` method is faster.
 
