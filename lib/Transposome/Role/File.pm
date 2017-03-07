@@ -14,11 +14,11 @@ Transposome::Role::File - File handling methods for Transposome.
 
 =head1 VERSION
 
-Version 0.10.0
+Version 0.10.1
 
 =cut
 
-our $VERSION = '0.10.0';
+our $VERSION = '0.10.1';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
