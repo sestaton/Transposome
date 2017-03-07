@@ -1,6 +1,13 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.10.1	03.07/17	Vancouver, BC
+
+- Bug fix for directory structure of archived cluster FASTA files and 
+  annotations. The results were being extracted to the results directory
+  under a directory of the same name, so the results were in a useless
+  subdirectory. Now the results are simply archived/compressed as is.
+
 0.10.0	08/31/16	Vancouver, BC
 
 - Reduce fields in summary annotation file, and expand column headdings, 
