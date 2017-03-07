@@ -15,11 +15,11 @@ transposome - A toolkit for annotation of transposable element families from una
 
 =head1 VERSION
 
-Version 0.10.0
+Version 0.10.1
 
 =cut
 
-our $VERSION = '0.10.0';
+our $VERSION = '0.10.1';
 #$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -287,31 +287,28 @@ sub annotate_clusters {
 
     $annotation->clusters_annotation_to_summary( $annotation_results );
 
-    my $anno_dir_path = $cls_dir_path."_annotations";
-    my $outdir        = dirname($cls_dir_path);
-    my $cls_tar_file  = basename($cls_dir_path);
-    my $anno_tar_file = basename($anno_dir_path);
-    my $cls_tar_path  = File::Spec->catfile($outdir, $cls_tar_file.".tgz");
-    my $anno_tar_path = File::Spec->catfile($outdir, $anno_tar_file.".tgz");
-    #$cls_tar_file .= ".tgz"; 
-    #$anno_tar_file .= ".tgz";
+    my $outdir       = dirname($cls_dir_path);
+    my $cls_res_dir  = basename($cls_dir_path);
+    my $anno_res_dir = join "_", basename($cls_res_dir), "annotations";
+    chdir $outdir;
+
+    my $cls_tar_file  = $cls_res_dir.".tgz"; 
+    my $anno_tar_file = $anno_res_dir.".tgz";
 
     my (@clusters, @annotations);
-    find( sub { push @clusters,    $File::Find::name }, $cls_dir_path );
-    find( sub { push @annotations, $File::Find::name }, $anno_dir_path );
+    find( sub { push @clusters,    $File::Find::name }, $cls_res_dir );
+    find( sub { push @annotations, $File::Find::name }, $anno_res_dir );
 
-    #chdir $outdir;
     my $ctar = Archive::Tar->new;
     $ctar->add_files(@clusters);
-    $ctar->write($cls_tar_path, &COMPRESS_GZIP);
+    $ctar->write($cls_tar_file, &COMPRESS_GZIP);
 
     my $atar = Archive::Tar->new;
     $atar->add_files(@annotations);
-    $atar->write($anno_tar_path, &COMPRESS_GZIP);
-    #chdir "..";
+    $atar->write($anno_tar_file, &COMPRESS_GZIP);
     
-    remove_tree( $cls_dir_path,  { safe => 1 } );
-    remove_tree( $anno_dir_path, { safe => 1 } );
+    remove_tree( $cls_res_dir,  { safe => 1 } );
+    remove_tree( $anno_res_dir, { safe => 1 } );
     
     log_interval( $t0, $log ) 
 	if defined $analysis && $analysis eq 'annotation';
