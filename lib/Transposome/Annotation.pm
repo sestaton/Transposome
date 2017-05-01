@@ -320,7 +320,7 @@ sub annotate_clusters {
 
     open my $out, '>', $anno_rp_path 
 	or die "\n[ERROR]: Could not open file: $anno_rp_path\n";
-    say $out join "\t", "Cluster", "Read_count", "Type", "Class", 
+    say $out join "\t", "Cluster", "Read_count", "Type", "Order", 
         "Superfamily", "Family","Top_hit","Top_hit_genome_fraction";
 
     for my $readct (reverse sort { $a <=> $b } keys %all_cluster_annotations) {
