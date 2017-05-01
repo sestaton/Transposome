@@ -12,11 +12,11 @@ Transposome::Annotation::Mapping - Map BLAST hits to the full repeat taxonomy
 
 =head1 VERSION
 
-Version 0.10.1
+Version 0.10.2
 
 =cut
 
-our $VERSION = '0.10.1';
+our $VERSION = '0.10.2';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -87,7 +87,7 @@ sub map_hit_family {
 
     my $type = $self->_map_repeat_type($class);
 
-    if ($class =~ /pseudogene|integrated_virus/) {
+    if ($class =~ /pseudogene|integrated_virus|autonomous_replication_sequence/) {
         my $anno_key = $self->mk_key($filebase,
 				     $type,
 				     $class,

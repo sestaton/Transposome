@@ -9,11 +9,11 @@ Transposome::Role::Util - Numerous utility routines for Transposome.
 
 =head1 VERSION
 
-Version 0.10.1
+Version 0.10.2
 
 =cut
 
-our $VERSION = '0.10.1';
+our $VERSION = '0.10.2';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
