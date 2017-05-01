@@ -257,10 +257,10 @@ sub _build_repeat_map {
     $matches->{'integrated_virus'} 
         = [{'DNA_Virus' => []}, {'Caulimoviridae' => []}];
 
-    # This is for D. melanogaster annotations. We
-    # could annotate other ARS such as Helicase, Primase, RNase H, etc.
+    # This is for D. melanogaster (ARS406) and Triticum aestivum (ARS_TA) ARS sequences.
+    # We could annotate other ARS such as Helicase, Primase, RNase H, etc.
     $matches->{'autonomous_replication_sequence'}
-        = [{'ARS406' => []}];
+        = [{'ARS406' => []}, {'ARS_TA' => []}, ];
     
     return $matches;
 }
