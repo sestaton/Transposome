@@ -87,8 +87,6 @@ sub map_hit_family {
 
     my $type = $self->_map_repeat_type($class);
 
-    # These are currently not being added to the total summary file/results.
-    # We need to modify the output format to accommodate them.
     if ($class =~ /pseudogene|integrated_virus|autonomous_replication_sequence/) {
         my $anno_key = $self->mk_key($filebase,
 				     $type,
@@ -100,8 +98,8 @@ sub map_hit_family {
 
         $cluster_annot{$readct} = $anno_key;
 	$top_hit_superfam{$top_hit} = $self->mk_key('-', '-', $class);
+
 	return (\%top_hit_superfam, \%cluster_annot);
-        #return (undef, \%cluster_annot);
     }
     else {
 	for my $superfam_h (@$arr_ref) {
