@@ -1,7 +1,12 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.10.1	03.07/17	Vancouver, BC
+0.10.2	04/01/17	Vancouver, BC
+
+- Add methods to annotate 'autonomous replication sequence' types in wheat,
+  fruit fly, and other species.
+  
+0.10.1	03/07/17	Vancouver, BC
 
 - Bug fix for directory structure of archived cluster FASTA files and 
   annotations. The results were being extracted to the results directory
