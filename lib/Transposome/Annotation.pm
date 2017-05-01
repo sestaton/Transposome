@@ -12,6 +12,7 @@ use File::Basename;
 use File::Spec;
 use Try::Tiny;
 use namespace::autoclean;
+#use Data::Dump::Color;
 
 with 'Transposome::Annotation::Methods', 
      'Transposome::Role::File', 
@@ -23,11 +24,11 @@ Transposome::Annotation - Annotate clusters for repeat types.
 
 =head1 VERSION
 
-Version 0.10.1
+Version 0.10.2
 
 =cut
 
-our $VERSION = '0.10.1';
+our $VERSION = '0.10.2';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -227,7 +228,7 @@ sub annotate_clusters {
     my ($repeatmap, $type_map) = $self->map_repeat_types($database);
     my %repeats = %{ thaw($repeatmap) };
     #dd $type_map;
-
+    
     ## get input files
     opendir my $dir, $cls_with_merges_dir 
 	or die "\n[ERROR]: Could not open directory: $cls_with_merges_dir. Exiting.\n";
@@ -570,7 +571,7 @@ sub _blast_to_annotation {
     
     for my $type (keys %$repeats) {
         if (defined $anno_data->{repeat_type} && $type eq $anno_data->{repeat_type}) { 
-            if ($type =~ /(pseudogene|integrated_virus)/) {
+            if ($type =~ /(pseudogene|integrated_virus|autonomous_replication_sequence)/) {
                 $anno_data->{'class'} = $1;
                 ($top_hit_superfam, $cluster_annot) = $self->map_hit_family($repeats->{$type}, $anno_data);
             }

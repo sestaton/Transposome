@@ -4,6 +4,7 @@ use 5.010;
 use Moose::Role;
 use Storable        qw(freeze);
 use List::MoreUtils qw(first_index);
+#use Data::Dump::Color;
 
 =head1 NAME
 
@@ -11,11 +12,11 @@ Transposome::Annotation::Typemap - Create a map of repeats to the family level.
 
 =head1 VERSION
 
-Version 0.10.1
+Version 0.10.2
 
 =cut
 
-our $VERSION = '0.10.1';
+our $VERSION = '0.10.2';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -74,7 +75,7 @@ sub map_repeat_types {
 
     my $matches = $self->_build_repeat_map();
     my $repeats = $self->_map_repeat_taxonomy($matches);
-
+ 
     my (%family_map, %type_map, %seen);
 
     while (my $line = <$in>) {
@@ -91,7 +92,7 @@ sub map_repeat_types {
         }
     }
     close $in;
-
+ 
     for my $mapped_sfam (keys %family_map) {
         my $mapped_sfam_cp = lc($mapped_sfam);
         for my $mapped_fam (@{$family_map{$mapped_sfam}}) {
@@ -115,7 +116,7 @@ sub map_repeat_types {
             }
         }
     }
-
+    
     my $repeats_ser = freeze $repeats;
     return ($repeats_ser, \%type_map);
 }
@@ -173,6 +174,9 @@ sub _map_repeat_taxonomy {
         }
         elsif ($type eq 'integrated_virus') { 
             $repeats{'integrated_virus'} = $matches->{$type};
+        }
+	elsif ($type eq 'autonomous_replication_sequence') { 
+            $repeats{'autonomous_replication_sequence'} = $matches->{$type};
         }
     }
     return \%repeats; 
@@ -252,6 +256,11 @@ sub _build_repeat_map {
 
     $matches->{'integrated_virus'} 
         = [{'DNA_Virus' => []}, {'Caulimoviridae' => []}];
+
+    # This is for D. melanogaster annotations. We
+    # could annotate other ARS such as Helicase, Primase, RNase H, etc.
+    $matches->{'autonomous_replication_sequence'}
+        = [{'ARS406' => []}];
     
     return $matches;
 }
