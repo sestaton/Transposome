@@ -1,10 +1,16 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.10.2	04/01/17	Vancouver, BC
+0.11.0	04/01/17	Vancouver, BC
 
 - Add methods to annotate 'autonomous replication sequence' types in wheat,
   fruit fly, and other species.
+- Modify annotation summary methods to include sequence types other than
+  transposable elements, such as: pseudogenes, integrated virus, and autonomous
+  replication sequences.
+- Change summary annotation format to incorporate sequence types other than
+  transposons. We added a column for the 'Order' since the 'Superfamily' and 'Family' may not be
+  applicable or defined.
   
 0.10.1	03/07/17	Vancouver, BC
 
