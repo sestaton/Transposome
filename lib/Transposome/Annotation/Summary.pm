@@ -4,6 +4,9 @@ use 5.010;
 use Moose::Role;
 use POSIX    qw(strftime);
 use Log::Any qw($log);
+#use Data::Dump::Color;
+
+with 'Transposome::Role::Util';
 
 =head1 NAME
 
@@ -110,23 +113,31 @@ sub clusters_annotation_to_summary {
     for my $blast (@$blasts) {
         for my $fam (keys %$blast) {
 	    if (exists $top_hit_superfam->{$fam}) {
-		my ($family, $superfam) = $self->mk_vec($top_hit_superfam->{$fam});
+		my ($family, $superfam, $class) = $self->mk_vec($top_hit_superfam->{$fam});
 		$total_ct += $blast->{$fam};
-		$fams{$family} += $blast->{$fam};
-		$superfams{$family} = $superfam;
+		$fams{$class}{$family} += $blast->{$fam};
+		$superfams{$class}{$family} = $superfam;
 	    }
         }
     }
     my $total_gcov = 0;
 
-    say $outsum join "\t", "ReadNum", "Superfamily", "Family", "GenomeFraction";
+    my %summary_sort;
+    for my $type (keys %fams) {
+	for my $k (keys %{$fams{$type}}) {
+	    my $sf = $superfams{$type}{$k};
+	    my $hit_perc   = sprintf("%.12f", $fams{$type}{$k}/$total_ct);
+	    my $gperc_corr = $hit_perc * $rep_frac;
+	    $total_gcov += $gperc_corr;
+	    $summary_sort{$gperc_corr} = $self->mk_key($total_readct, $type, $sf, $k);
+	}
+    }
+    
+    say $outsum join "\t", "ReadNum", "Order", "Superfamily", "Family", "GenomeFraction";
 
-    for my $k (reverse sort { $fams{$a} <=> $fams{$b} } keys %fams) {
-	my $sf = $superfams{$k};
-	my $hit_perc   = sprintf("%.12f", $fams{$k}/$total_ct);
-	my $gperc_corr = $hit_perc * $rep_frac;
-	$total_gcov += $gperc_corr;
-	say $outsum join "\t", $total_readct, $sf, $k, $gperc_corr;
+    for my $gperc (reverse sort { $a <=> $b } keys %summary_sort) {
+	my @summary = $self->mk_vec($summary_sort{$gperc});
+	say $outsum join "\t", @summary, $gperc;
     }
     close $outsum;
     
