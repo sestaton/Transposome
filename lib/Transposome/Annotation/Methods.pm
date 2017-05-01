@@ -14,11 +14,11 @@ Transposome::Annotation::Methods - An interface role to simplify importing all a
 
 =head1 VERSION
 
-Version 0.10.2
+Version 0.11.0
 
 =cut
 
-our $VERSION = '0.10.2';
+our $VERSION = '0.11.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
