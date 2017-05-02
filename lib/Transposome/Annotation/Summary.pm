@@ -129,14 +129,19 @@ sub clusters_annotation_to_summary {
 	    my $hit_perc   = sprintf("%.12f", $fams{$type}{$k}/$total_ct);
 	    my $gperc_corr = $hit_perc * $rep_frac;
 	    $total_gcov += $gperc_corr;
-	    $summary_sort{$gperc_corr} = $self->mk_key($total_readct, $type, $sf, $k);
+	    my $key = $self->mk_key($gperc_corr, $total_readct, $type, $sf, $k);
+	    $summary_sort{$key} = 1; #$self->mk_key($total_readct, $type, $sf, $k);
 	}
     }
-    
+
     say $outsum join "\t", "ReadNum", "Order", "Superfamily", "Family", "GenomeFraction";
 
-    for my $gperc (reverse sort { $a <=> $b } keys %summary_sort) {
-	my @summary = $self->mk_vec($summary_sort{$gperc});
+    for my $id ( map $_->[0],
+		 sort { $a->[1] <=> $b->[1] || $a->[3] cmp $b->[3] }
+		 map [ $_, split /\~\~/ ],
+		 keys %summary_sort ) { 
+	my @summary = $self->mk_vec($id);
+	my $gperc = shift @summary;
 	say $outsum join "\t", @summary, $gperc;
     }
     close $outsum;
