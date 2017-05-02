@@ -171,7 +171,7 @@ sub test_annotation {
 	chomp;
 	my @f = split /\t/;
 	next if /^ReadNum/i;
-	push @anno_fams, $f[2];
+	push @anno_fams, $f[3];
     }
     close $annosum;
 
