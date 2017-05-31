@@ -12,7 +12,7 @@ use Transposome::SeqUtil;
 use Transposome::Annotation;
 
 use aliased 'Transposome::Test::TestFixture';
-use Test::Most tests => 50;
+use Test::Most tests => 56;
 
 #use Data::Dump;
 
@@ -182,6 +182,16 @@ sub test_annotation {
     ## check if the family mapping succeeded 
     @anno_fams = sort @anno_fams;
     is_deeply( \@families, \@anno_fams, 'All TE familes correctly annotated' );
+
+    ## added in v0.11.1 to test getting superfamily and family name from IDs
+    my $family   = shift @families;
+    $family     .= '_some33othername'; 
+    my $famname  = $annotation->map_family_name($family);
+    my $sfamname = $annotation->map_superfamily_name($family);
+    ok( $family eq 'RLG_X_some33othername', 'Generated expected ID for testing' );
+    ok( $famname eq 'RLG_X', 'Returned expected results from map_family_name() method' );
+    ok( $sfamname eq 'Gypsy', 'Returned expected results from map_superfamily_name() method' );
+
 }
     
 END {
