@@ -169,6 +169,82 @@ sub map_family_name {
     return $family_name;
 }
 
+=head2 map_superfamily_name
+
+ Title   : map_superfamily_name
+
+ Usage   : my $superfamily_name = $self->map_superfamily_name($match);
+           
+ Function: Get the superfamily common name based on the 3-letter code
+                                                                            Return_type
+ Returns : The TE superfamily name                                          Scalar
+            
+                                                                            Arg_type
+ Args    : A BLAST hit or any sequence identifier                           Scalar
+
+=cut
+
+sub map_superfamily_name {
+    my $self = shift;
+    my ($id) = @_;
+
+    my ($sfamily_code) = ($id =~ /(^[A-Z]{3})_/);
+    unless (defined $sfamily_code) {
+	say STDERR "\n[WARNING]: Could not get 3-letter code from: $id. Skipping.\n";
+	return;
+    }
+
+    my %sfcode_table = (
+        'RYD' => 'DIRS',
+        'RYN' => 'Ngaro',
+        'RYX' => 'Unknown_DIRS',
+        'RYV' => 'VIPER',
+        'RII' => 'I',
+        'RIJ' => 'Jockey',
+        'RIL' => 'L1',
+        'RIR' => 'R2',
+        'RIT' => 'RTE',
+        'RIX' => 'Unknown_LINE',
+        'RLB' => 'Bel/Pao',
+        'RLG' => 'Gypsy',
+        'RLC' => 'Copia',
+        'RLE' => 'ERV',
+        'RLR' => 'Retrovirus',
+        'RLX' => 'Unknown_LTR',
+        'PPP' => 'Penelope',
+        'RPX' => 'Unknown_PLE',
+        'RSS' => '5S',
+        'RSL' => '7SL',
+        'RST' => 'tRNA',
+        'RSX' => 'Unknown_SINE',
+        'RXX' => 'Unknown_retrotransposon',
+        'DYC' => 'Crypton',
+        'DYX' => 'Unknown_Crypton',
+        'DTC' => 'CACTA',
+        'DTA' => 'hAT',
+        'DTE' => 'Merlin',
+        'DTM' => 'Mutator',
+        'DTP' => 'P',
+        'DTH' => 'PIF/Harbinger',
+        'DTB' => 'PiggyBac',
+        'DTT' => 'Tc1/Mariner',
+        'DTR' => 'Transib',
+        'DTX' => 'Unknown_TIR',
+        'DXX' => 'Unknown_DNA_transposon',
+        'DHH' => 'Helitron',
+        'DHX' => 'Unknown_Helitron',
+        'DMM' => 'Maverick',
+        'DMX' => 'Unknown_Maverick',
+	'RST' => 'SINE2/tRNA' );
+    
+    if (exists $sfcode_table{$sfamily_code}) {
+	return $sfcode_table{$sfamily_code};
+    }
+    else {
+	say STDERR "\n[WARNING]: No 3-letter code could be found for: $sfamily_code\n";
+    }
+}
+
 =head2 _map_repeat_type
 
  Title   : _map_repeat_type
