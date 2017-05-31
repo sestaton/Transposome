@@ -89,6 +89,14 @@ has 'makeblastdb_exec' => (
     predicate => 'has_makeblastdb_exec',
 );
 
+has 'debug' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_debug',
+    lazy       => 1,
+    default    => 0,
+);
+
 sub BUILD {
     my $self = shift;
     my @path = split /:|;/, $ENV{PATH};
