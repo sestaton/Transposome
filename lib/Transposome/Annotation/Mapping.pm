@@ -191,7 +191,7 @@ sub map_superfamily_name {
     my ($sfamily_code) = ($id =~ /(^[A-Z]{3})_/);
     unless (defined $sfamily_code) {
 	say STDERR "\n[WARNING]: Could not get 3-letter code from: $id. Skipping.\n";
-	return;
+	return 0;
     }
 
     my %sfcode_table = (
@@ -242,6 +242,7 @@ sub map_superfamily_name {
     }
     else {
 	say STDERR "\n[WARNING]: No 3-letter code could be found for: $sfamily_code\n";
+	return 0;
     }
 }
 
