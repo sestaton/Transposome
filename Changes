@@ -1,6 +1,13 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.11.1	05/31/17	Vancouver, Bc
+
+- Add method to return the common superfamily name based on the commonly used 3-letter
+  codes for transposons.
+- Add tests for annotation methods that do mapping of family and superfamily 
+  names from IDs.
+
 0.11.0	04/01/17	Vancouver, BC
 
 - Add methods to annotate 'autonomous replication sequence' types in wheat,
