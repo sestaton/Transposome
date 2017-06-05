@@ -60,6 +60,47 @@ has 'qual' => (
     clearer   => 'clear_qual',
 );
 
+# this attribute is for dealing with IDs from different platforms (e.g., Illumina, Roche, etc.)
+has 'seqtype' => (
+    is        => 'ro',
+    isa       => 'Str',
+    lazy      => 1,
+    default   => undef,
+    reader    => 'get_seqtype',
+    predicate => 'has_seqtype',
+);
+
+=head2 set_id_per_encoding
+
+Title   : set_id_per_encoding
+
+Usage   : my $idpair = $obj->set_id_per_encoding($id);
+          
+Function: Try to determine format of sequence files
+          and preserve paired-end information.
+                                                               Return_type
+Returns : A corrected sequence header if Illumina              Scalar
+          Illumina 1.8+ is detected                           
+        
+                                                               Arg_type
+Args    : A sequence header                                    Scalar
+
+=cut
+
+sub set_id_per_encoding {
+    my $self = shift;
+    my ($id) = @_;
+    if ($id =~ /(\S+)\s+(\d):?\S+/) {
+        return $1."/".$2;
+    }
+    elsif ($id =~ /(\S+)/) {
+        return $1;
+    }
+    else {
+        return '';
+    }
+}
+
 =head1 AUTHOR
 
 S. Evan Staton, C<< <statonse at gmail.com> >>
