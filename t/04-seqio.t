@@ -19,6 +19,22 @@ for my $fa ( @$proper_fa_arr ) {
     my $seqio_fa = Transposome::SeqFactory->new( file => $fa )->make_seqio_object;
     while ( my $seq = $seqio_fa->next_seq ) {
         ok( $seq->has_id,  "Fasta sequence $seq_num has an ID" );
+	ok( $seq->get_id =~ /\s+\d:|\/\d$/,  "Fasta sequence $seq_num has an ID in the expected format" );
+        ok( $seq->has_seq, "Fasta sequence $seq_num has a sequence" );
+        ok( !$seq->has_qual,
+            "Fasta sequence $seq_num does not have quality scores" );
+    }
+    #unlink $fa;
+    $seq_num++;
+}
+$seq_num = 1;
+
+# test parsing correctly formatted sequence files with illumina 'seqtype' attribute
+for my $fa ( @$proper_fa_arr ) {
+    my $seqio_fa = Transposome::SeqFactory->new( file => $fa, seqtype => 'illumina' )->make_seqio_object;
+    while ( my $seq = $seqio_fa->next_seq ) {
+        ok( $seq->has_id,  "Fasta sequence $seq_num has an ID" );
+	ok( $seq->get_id =~ /\/\d$/,  "Fasta sequence $seq_num has an ID in the expected format" );
         ok( $seq->has_seq, "Fasta sequence $seq_num has a sequence" );
         ok( !$seq->has_qual,
             "Fasta sequence $seq_num does not have quality scores" );
@@ -28,10 +44,25 @@ for my $fa ( @$proper_fa_arr ) {
 }
 $seq_num = 1;
 
+#exit;
 for my $fq (@$proper_fq_arr) {
     my $seqio_fq = Transposome::SeqFactory->new( file => $fq, format => 'fastq' )->make_seqio_object;
     while ( my $seq = $seqio_fq->next_seq ) {
         ok( $seq->has_id,   "Fastq sequence $seq_num has an ID" );
+	ok( $seq->get_id =~ /\s+\d:|\/\d$/,  "Fastq sequence $seq_num has an ID in the expected format" );
+        ok( $seq->has_seq,  "Fastq sequence $seq_num has a sequence" );
+        ok( $seq->has_qual, "Fastq sequence $seq_num has quality scores" );
+    }
+    #unlink $fq;
+    $seq_num++;
+}
+$seq_num = 1;
+
+for my $fq (@$proper_fq_arr) {
+    my $seqio_fq = Transposome::SeqFactory->new( file => $fq, format => 'fastq', seqtype => 'illumina' )->make_seqio_object;
+    while ( my $seq = $seqio_fq->next_seq ) {
+        ok( $seq->has_id,   "Fastq sequence $seq_num has an ID" );
+	ok( $seq->get_id =~ /\/\d$/,  "Fastq sequence $seq_num has an ID in the expected format" );
         ok( $seq->has_seq,  "Fastq sequence $seq_num has a sequence" );
         ok( $seq->has_qual, "Fastq sequence $seq_num has quality scores" );
     }
