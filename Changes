@@ -1,7 +1,17 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.11.1	05/31/17	Vancouver, Bc
+0.11.2	06/05/17	Vancouver, BC
+
+- Bug fix for transforming sequence IDs that appeared to be Illumina but are not (fixes #37).
+- Refactor SeqIO superclass to have ID setting method inherited by subclasses instead of repeating
+  the code in each subclass.
+- Refactor SeqFactory class to take a hash of options/arguments instead of repeating code to set
+  class attributes based on the sequence format.
+- Add 'seqtype' class attribute so that Illumina data can be safely transformed into a 
+  single ID with no spaces to work better with Transposome and external tools like BLAST. 
+
+0.11.1	05/31/17	Vancouver, BC
 
 - Add method to return the common superfamily name based on the commonly used 3-letter
   codes for transposons.
