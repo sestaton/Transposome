@@ -71,9 +71,14 @@ sub next_seq {
 
     my $name;
     if (substr($line, 0, 1) eq '@') {
-        $name = $self->_set_id_per_encoding($line);
-        $self->set_id($name);
+	if ($self->has_seqtype && $self->get_seqtype =~ /illumina/i) { 
+	    $name = $self->set_id_per_encoding($line);
+	}
+	else {
+	    $name = $line;
+	}
     }
+    $self->set_id($name);
 
     my ($sline, $seq);
     while ($sline = $fh->getline) {
@@ -107,38 +112,6 @@ sub next_seq {
     $self->set_qual($qual);
 
     return $self;
-}
-
-
-=head2 _set_id_per_encoding
-
-Title   : _set_id_per_encoding
-
-Usage   : This is a private method, don't use it directly.
-          
-Function: Try to determine format of sequence files
-          and preserve paired-end information.
-                                                               Return_type
-Returns : A corrected sequence header if Illumina              Scalar
-          Illumina 1.8+ is detected                           
-        
-                                                               Arg_type
-Args    : A sequence header                                    Scalar
-
-=cut
-
-sub _set_id_per_encoding {
-    my $self = shift;
-    my ($line) = @_;
-    if ($line =~ /^.?(\S+)\s(\d)\S+/) {
-	return $1."/".$2;
-    }
-    elsif ($line =~ /^.?(\S+)/) {
-	return $1;
-    }
-    else {
-	return '';
-    }
 }
 
 =head1 AUTHOR
