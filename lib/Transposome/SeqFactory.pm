@@ -7,6 +7,16 @@ use Class::Load;
 
 with 'Transposome::Role::File';
 
+# this attribute is for dealing with IDs from different platforms (e.g., Illumina, Roche, etc.)
+has 'seqtype' => (
+    is        => 'ro',
+    isa       => 'Str',
+    lazy      => 1,
+    default   => undef,
+    reader    => 'get_seqtype',
+    predicate => 'has_seqtype',
+);
+
 =head1 NAME
 
 Transposome::SeqFactory - Class for constructing a Transposome::SeqIO object for reading FASTA/Q data.
@@ -64,22 +74,32 @@ our $VERSION = '0.11.1';
 
 sub make_seqio_object {
     my $self = shift;
+
+    my %args;
+    $args{file} = $self->file 
+	if !defined $self->fh;
+    $args{fh} = $self->fh 
+	if defined $self->fh;
+    if ($self->has_seqtype && $self->get_seqtype =~ /illumina/i) {
+	$args{seqtype} = $self->get_seqtype;
+    }
+
     if ($self->format =~ /fasta/i) {
 	Class::Load::load_class('Transposome::SeqIO::fasta');
-	  return Transposome::SeqIO::fasta->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
-	  return Transposome::SeqIO::fasta->new( file => $self->file, format => $self->format ) if !defined $self->fh;
+	$args{format} = $self->format;
+	return Transposome::SeqIO::fasta->new(%args);
       }
     elsif ($self->format =~ /fastq/i) {
 	Class::Load::load_class('Transposome::SeqIO::fastq');
-	  return Transposome::SeqIO::fastq->new( fh   => $self->fh,   format => $self->format ) if defined $self->fh;
-          return Transposome::SeqIO::fastq->new( file => $self->file, format => $self->format ) if !defined $self->fh;
+	$args{format} = $self->format;
+	return Transposome::SeqIO::fastq->new(%args);
       }
     else {
         my $unrecognized = $self->format;
-        say STDERR "Unable to set sequence format. '$unrecognized' is not recognized. Exiting.";
+        say STDERR "Unable to set sequence format. '$unrecognized' is not recognized. Should be 'fasta' or 'fastq'. Exiting.";
         exit(1);
     }
-};
+}
 
 =head1 AUTHOR
 
