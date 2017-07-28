@@ -12,11 +12,11 @@ Transposome::Annotation::Mapping - Map BLAST hits to the full repeat taxonomy
 
 =head1 VERSION
 
-Version 0.11.2
+Version 0.11.3
 
 =cut
 
-our $VERSION = '0.11.2';
+our $VERSION = '0.11.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -147,18 +147,19 @@ sub map_family_name {
     my ($family) = @_;
     my $family_name;
 
-    if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?)/) { #[_-]?[a-zA-Z-]+?\d*?)/) {
-        $family_name = $1;
-    }
-    elsif ($family =~ /(^D[HT][ACHMT][_-][a-zA-Z]*\d*?)/) {
-        $family_name = $1;
-    }
-    elsif ($family =~ /(^PPP[_-][a-zA-Z]*\d*?)/) {
-        $family_name = $1;
-    }
-    elsif ($family =~ /(^R[IS][LT][_-][a-zA-Z]*\d*?)/) {
-        $family_name = $1;
-    }
+    if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z]*\d+?)/) {
+	#if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?)/) { #[_-]?[a-zA-Z-]+?\d*?)/) {
+        #$family_name = $1;
+    #}
+    #elsif ($family =~ /(^D[HT][ACHMT][_-][a-zA-Z]*\d*?)/) {
+        #$family_name = $1;
+    #}
+    #elsif ($family =~ /(^PPP[_-][a-zA-Z]*\d*?)/) {
+        #$family_name = $1;
+    #}
+    #elsif ($family =~ /(^R[IS][LT][_-][a-zA-Z]*\d*?)/) {
+        #$family_name = $1;
+    #}
     else {
         $family_name = $family;
     }

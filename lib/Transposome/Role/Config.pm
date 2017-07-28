@@ -9,11 +9,11 @@ Transposome::Role::Config - Attributes and routines for parsing Transposome conf
 
 =head1 VERSION
 
-Version 0.11.2
+Version 0.11.3
 
 =cut
 
-our $VERSION = '0.11.2';
+our $VERSION = '0.11.3';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
