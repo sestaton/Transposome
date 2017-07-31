@@ -220,8 +220,8 @@ sub _build_repeat_map {
     
     $matches->{'transposable_element'}{'ltr_retrotransposon'} 
         = [{'Gypsy' => []}, {'Copia' => []}, 
-	   {'BEL' => []}, {'DIRS' => []}, {'Unknown_LTR' => []},
-	   {'unclassified' => []}];
+	   {'BEL' => []}, {'DIRS' => []}, {'TRIM' => []}, {'LARD' => []},
+	   {'Unknown_LTR' => []}, {'unclassified' => []}];
 
     $matches->{'transposable_element'}{'endogenous_retrovirus'} 
         = [{'ERV1' => []}, {'ERV2' => []}, 
