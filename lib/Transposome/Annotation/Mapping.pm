@@ -147,19 +147,9 @@ sub map_family_name {
     my ($family) = @_;
     my $family_name;
 
-    if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z]*\d+?)/) {
-	#if ($family =~ /(^RL[GCX][_-][a-zA-Z]*\d*?)/) { #[_-]?[a-zA-Z-]+?\d*?)/) {
-        #$family_name = $1;
-    #}
-    #elsif ($family =~ /(^D[HT][ACHMT][_-][a-zA-Z]*\d*?)/) {
-        #$family_name = $1;
-    #}
-    #elsif ($family =~ /(^PPP[_-][a-zA-Z]*\d*?)/) {
-        #$family_name = $1;
-    #}
-    #elsif ($family =~ /(^R[IS][LT][_-][a-zA-Z]*\d*?)/) {
-        #$family_name = $1;
-    #}
+    if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z]*(?:\d+)?)_/) { 
+        $family_name = $1;
+    }
     else {
         $family_name = $family;
     }
@@ -213,6 +203,7 @@ sub map_superfamily_name {
         'RLE' => 'ERV',
         'RLR' => 'Retrovirus',
         'RLX' => 'Unknown_LTR',
+	'RLT' => 'TRIM',
         'PPP' => 'Penelope',
         'RPX' => 'Unknown_PLE',
         'RSS' => '5S',
