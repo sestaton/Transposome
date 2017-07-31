@@ -14,8 +14,6 @@ use Transposome::Annotation;
 use aliased 'Transposome::Test::TestFixture';
 use Test::Most tests => 56;
 
-#use Data::Dump;
-
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $outdir  = File::Spec->catdir('t', 'annotation_t');
 my $report  = 'cluster_test_rep.txt';
@@ -163,8 +161,7 @@ sub test_annotation {
     $annoct++ while (<$annorep>);
     close $annorep;
 
-    my @families = qw(RLG_wily RLG_teda RLG_rewu RLG_X);
-    @families = sort @families;
+    my @families = sort qw(RLG_wily RLG_teda RLG_rewu RLG_X);
     my @anno_fams;
     while (<$annosum>) {
 	$anno_sumct++;
