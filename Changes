@@ -1,6 +1,13 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.11.3	07/28/17	Vancouver, BC
+
+- Change family mapping procedure in Transposome::Annotation::Mapping class to be a single abstract
+  regex insted of trying to conditionally match names for each transposon type. 
+- Add 'TRIM' and 'LARD' LTR retrotransposon types to type map in Transposome::Annotation::Typemap
+  class.
+
 0.11.2	06/05/17	Vancouver, BC
 
 - Bug fix for transforming sequence IDs that appeared to be Illumina but are not (fixes #37).
