@@ -147,7 +147,8 @@ sub map_family_name {
     my ($family) = @_;
     my $family_name;
 
-    if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z]*(?:\d+)?)_/) { 
+    #if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z]*(?:\d+)?)_/) { 
+    if ($family =~ /(^[A-Z]{3}[_-](?:singleton_)?[a-zA-Z0-9\-\.]*)/) {
         $family_name = $1;
     }
     else {
