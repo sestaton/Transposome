@@ -101,12 +101,12 @@ You can also look for information at:
 
 Transposome is published in the journal *Bioinformatics*, and if you use this software in your work please use the following citation:
 
-    Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
+    Staton SE, and Burke JM. 2017. Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
         Bioinformatics, 31:1827-1829.
 
 **LICENSE AND COPYRIGHT**
 
-Copyright (C) 2013-2015 S. Evan Staton
+Copyright (C) 2013-2017 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: http://www.opensource.org/licenses/mit-license.php
