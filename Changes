@@ -1,12 +1,15 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.11.3	07/28/17	Vancouver, BC
+0.11.3	08/09/17	Vancouver, BC
 
 - Change family mapping procedure in Transposome::Annotation::Mapping class to be a single abstract
-  regex insted of trying to conditionally match names for each transposon type. 
+  regex insted of trying to conditionally match names for each transposon type. This method captures 
+  far more annotated families, so it is more reflective of the TE diversity in a sample.
 - Add 'TRIM' and 'LARD' LTR retrotransposon types to type map in Transposome::Annotation::Typemap
   class.
+- Reverse sort annotation summary file to show largest families (by genome abundance) first. 
+  This was the old behaviour but it appears to have been reverted to an ascending sort.
 
 0.11.2	06/05/17	Vancouver, BC
 
