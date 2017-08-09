@@ -137,7 +137,7 @@ sub clusters_annotation_to_summary {
     say $outsum join "\t", "ReadNum", "Order", "Superfamily", "Family", "GenomeFraction";
 
     for my $id ( map $_->[0],
-		 sort { $a->[1] <=> $b->[1] || $a->[3] cmp $b->[3] }
+		 reverse sort { $a->[1] <=> $b->[1] } 
 		 map [ $_, split /\~\~/ ],
 		 keys %summary_sort ) { 
 	my @summary = $self->mk_vec($id);
