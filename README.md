@@ -101,7 +101,7 @@ You can also look for information at:
 
 Transposome is published in the journal *Bioinformatics*, and if you use this software in your work please use the following citation:
 
-    Staton SE, and Burke JM. 2017. Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
+    Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element families from unassembled sequence reads
         Bioinformatics, 31:1827-1829.
 
 **LICENSE AND COPYRIGHT**
