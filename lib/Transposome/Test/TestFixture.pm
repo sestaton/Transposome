@@ -570,7 +570,7 @@ sub _build_blast_data {
 
 =head1 AUTHOR
 
-S. Evan Staton, C<< <statonse at gmail.com> >>
+S. Evan Staton, C<< <evan at evanstaton.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
