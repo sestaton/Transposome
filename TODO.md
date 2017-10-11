@@ -9,3 +9,4 @@ This file is for logging feature requests and bugs during development.
  - [ ] Write HTML output and upload to Heroku.
  - [ ] Automate filtering of organellar sequences to reduce the false inflation of repetitiveness in the nuclear
        genome. Or, document easy ways to accomplish this task.
+ - [ ] Change 1/0 boolean arguments in config file to yes/no for clarity.
