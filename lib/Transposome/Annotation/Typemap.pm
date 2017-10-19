@@ -216,7 +216,8 @@ sub _build_repeat_map {
 	   {'Ginger2/TDD' => []}, {'Academ' => []}, 
 	   {'Zisupton' => []}, {'IS3EU' => []}, 
 	   {'CACTA' => []}, {'Mutator' => []}, 
-	   {'PIF/Harbinger' => []}, {'unclassified' => []}];
+	   {'PIF/Harbinger' => []}, {'Unknown_TIR' => []},
+	   {'unclassified' => []}];
     
     $matches->{'transposable_element'}{'ltr_retrotransposon'} 
         = [{'Gypsy' => []}, {'Copia' => []}, 

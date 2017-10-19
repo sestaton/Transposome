@@ -383,7 +383,7 @@ Options:
     -h|help             :    Print a usage statement.
     -m|man              :    Print the full documentation.
 
-Citation: Staton SE, and Burke JM. 2017. Transposome: A toolkit for annotation of transposable element 
+Citation: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
           families from unassembled sequence reads. Bioinformatics, 31:1827-1829.
 
 END
