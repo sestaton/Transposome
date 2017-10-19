@@ -7,3 +7,5 @@ This file is for logging feature requests and bugs during development.
        the percent of diversity that is captured. This may be challenging given the variety of input formats,
        but it should be considered.
  - [ ] Write HTML output and upload to Heroku.
+ - [ ] Update Wiki, starting with: https://github.com/sestaton/Transposome/wiki/Specifications-and-example-usage
+ - [x] Document required sequence format and provide reference in warnings
