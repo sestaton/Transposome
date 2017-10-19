@@ -562,7 +562,9 @@ sub merge_clusters {
 		    }
 		    else {
 			$log->warn("$read not found. This indicates something went wrong processing the input. ".
-				   "Please check your input.")
+				   "Please check your input to ensure the correct format. ".
+			           "For more information, please see visit the following page (or file a bug report): ". 
+                                   "https://github.com/sestaton/Transposome/wiki/Preparing-sequence-data-for-Tranposome");
 		    }
 		}
 	    }
