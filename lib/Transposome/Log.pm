@@ -11,7 +11,7 @@ use Log::Any; #   qw($log);
 use POSIX       qw(); #qw(strftime);
 use Time::HiRes qw(); #qw(gettimeofday tv_interval);
 use Lingua::EN::Inflect;
-#use Try::Tiny;
+use Transposome;
 use namespace::autoclean;
 #use Data::Dump::Color;
 
@@ -30,7 +30,7 @@ Version 0.11.3
 =cut
 
 our $VERSION = '0.11.3';
-$VERSION = eval $VERSION;
+#$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
@@ -46,11 +46,14 @@ has 'init_config' => (
     default    => 0,
 );
 
-sub init_transposome {
-    my ($config) = @_;
+sub get_transposome_logger {
+    my $self = shift;
+    my ($config_file) = @_;
 
-    #load_classes('File::Spec', 'Log::Log4perl', 'Log::Any::Adapter', 'Time::HiRes', 'POSIX');
-
+    # Parse configuration                                   
+    my $trans_obj = Transposome->new( config => $config_file );
+    my $config = $trans_obj->get_configuration;
+    
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
     my $conf = qq{
     log4perl.category.Transposome      = INFO, Logfile, Screen
@@ -68,30 +71,40 @@ sub init_transposome {
     Log::Log4perl::init( \$conf );
     Log::Any::Adapter->set('Log4perl');
     my $log = Log::Any->get_logger( category => "Transposome" );
+
+    return $log;
+}
+
+sub init_transposome {
+    my $self = shift;
+    my ($config_file, $te_config_obj) = @_;
+    
+    my $log = $self->get_transposome_logger($config_file);
     
     my $t0 = [Time::HiRes::gettimeofday()];
     my $ts = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("======== Transposome version: $VERSION (started at: $ts) ========");
-    $log->info("Configuration - Log file for monitoring progress and errors: $config->{run_log_file}");
-    $log->info("Configuration - Sequence file:                               $config->{sequence_file}");
-    $log->info("Configuration - Sequence format:                             $config->{sequence_format}");
-    $log->info("Configuration - Sequence number for each BLAST process:      $config->{sequence_num}");
-    $log->info("Configuration - Number of CPUs per thread:                   $config->{cpu}");
-    $log->info("Configuration - Number of threads:                           $config->{thread}");
-    $log->info("Configuration - Output directory:                            $config->{output_directory}");
-    $log->info("Configuration - In-memory analysis:                          $config->{in_memory}");
-    $log->info("Configuration - Percent identity for matches:                $config->{percent_identity}");
-    $log->info("Configuration - Fraction coverage for pairwise matches:      $config->{fraction_coverage}");
-    $log->info("Configuration - Merge threshold for clusters:                $config->{merge_threshold}");
-    $log->info("Configuration - Minimum cluster size for annotation:         $config->{cluster_size}");
-    $log->info("Configuration - BLAST e-value threshold for annotation:      $config->{blast_evalue}"); 
-    $log->info("Configuration - Repeat database for annotation:              $config->{repeat_database}");
-    $log->info("Configuration - Log file for clustering/merging results:     $config->{cluster_log_file}");
+    $log->info("Configuration - Log file for monitoring progress and errors: $te_config_obj->{run_log_file}");
+    $log->info("Configuration - Sequence file:                               $te_config_obj->{sequence_file}");
+    $log->info("Configuration - Sequence format:                             $te_config_obj->{sequence_format}");
+    $log->info("Configuration - Sequence number for each BLAST process:      $te_config_obj->{sequence_num}");
+    $log->info("Configuration - Number of CPUs per thread:                   $te_config_obj->{cpu}");
+    $log->info("Configuration - Number of threads:                           $te_config_obj->{thread}");
+    $log->info("Configuration - Output directory:                            $te_config_obj->{output_directory}");
+    $log->info("Configuration - In-memory analysis:                          $te_config_obj->{in_memory}");
+    $log->info("Configuration - Percent identity for matches:                $te_config_obj->{percent_identity}");
+    $log->info("Configuration - Fraction coverage for pairwise matches:      $te_config_obj->{fraction_coverage}");
+    $log->info("Configuration - Merge threshold for clusters:                $te_config_obj->{merge_threshold}");
+    $log->info("Configuration - Minimum cluster size for annotation:         $te_config_obj->{cluster_size}");
+    $log->info("Configuration - BLAST e-value threshold for annotation:      $te_config_obj->{blast_evalue}"); 
+    $log->info("Configuration - Repeat database for annotation:              $te_config_obj->{repeat_database}");
+    $log->info("Configuration - Log file for clustering/merging results:     $te_config_obj->{cluster_log_file}");
 
     return ($t0, $log);
 }
 
 sub log_interval {
+    my $self = shift;
     my ($t0, $log) = @_;
     
     #load_classes('DateTime', 'Time::HiRes', 'Lingua::EN::Inflect', 'POSIX');
