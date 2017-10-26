@@ -30,6 +30,13 @@ $VERSION = eval $VERSION;
 
 =cut
 
+has 'configfile' => (
+      is       => 'ro',
+      isa      => 'Path::Class::File',
+      required => 0,
+      coerce   => 1,
+);
+
 has 'file' => (
       is       => 'ro',
       isa      => 'Path::Class::File',

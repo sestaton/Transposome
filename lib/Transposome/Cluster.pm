@@ -5,7 +5,7 @@ use Moose;
 use IPC::System::Simple  qw(system capture EXIT_ANY);
 use File::Path           qw(make_path);
 use POSIX                qw(strftime);
-use Log::Any             qw($log);
+#use Log::Any             qw($log);
 use DBI;
 use Tie::Hash::DBD;
 use Graph::UnionFind;
@@ -95,6 +95,7 @@ sub louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir  = $self->dir->relative;
     my $realbin  = $self->bin_dir->resolve;
+    my $config   = $self->configfile;
 
     my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
 
@@ -113,6 +114,8 @@ sub louvain_method {
     my $hierarchy_err_path    = File::Spec->catfile($out_dir, $hierarchy_err);
 
     # log results
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::louvain_method started at:         $st.");
 
@@ -194,6 +197,8 @@ sub louvain_method {
 
 sub find_pairs {
     my $self = shift;
+    my $config = $self->configfile;
+
     my ($cluster_data) = @_;
     my $cls_file     = $cluster_data->{cluster_file};
     my $cls_log_file = $cluster_data->{cluster_log_file};
@@ -211,6 +216,9 @@ sub find_pairs {
     open my $rep, '>', $cls_log_path 
 	or die "\n[ERROR]: Could not open file: $cls_log_path\n";
     say $rep "# Cluster connections above threshold";
+
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs started at:             $st.");
 
@@ -349,6 +357,11 @@ sub find_pairs {
 sub make_clusters {
     my $self = shift;
     my ($graph_comm, $idx_file) = @_;
+
+    my $config = $self->configfile;
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
+
     # set paths for make_clusters() method
     my $int_file             = $self->file->relative;
     my $out_dir              = $self->dir->relative;
@@ -494,6 +507,8 @@ sub make_clusters {
 sub merge_clusters {
     my $self = shift; 
     my ($cluster_data) = @_;
+    my $config = $self->configfile;
+
     my $vertex = $cluster_data->{graph_vertices};
     my $seqs   = $cluster_data->{sequence_hash};
     my $uf     = $cluster_data->{graph_unionfind_object};
@@ -524,6 +539,8 @@ sub merge_clusters {
     my $cls_tot = 0;
 
     # log results
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::merge_clusters started at:         $st.");
     
@@ -684,7 +701,7 @@ sub _find_community_exes {
 	}
     }
     else {
-	$log->error("Unable to find clusting executables. This is a bug, please report it. Exiting.");
+	say STDERR "\n[ERROR]: Unable to find clustering executables. This is a bug, please report it. Exiting.\n";
 	exit(1);
     }
 }

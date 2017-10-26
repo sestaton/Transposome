@@ -9,7 +9,7 @@ use File::Spec;
 use File::Basename;
 use File::Path qw(make_path);
 use POSIX      qw(strftime);
-use Log::Any   qw($log);
+#use Log::Any   qw($log);
 use namespace::autoclean;
 
 with 'Transposome::Role::File', 
@@ -70,7 +70,8 @@ sub BUILD {
 	die unless -s $self->file;
     }
     catch {
-	$log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
+	#$log->error("There seems to be no content in the input file. Check the blast results and try again. Exiting.");
+	say STDERR "\n[ERROR]: There seems to be no content in the input file. Check the blast results and try again. Exiting.\n";
 	exit(1);
     };
 }
@@ -99,6 +100,8 @@ sub BUILD {
 
 sub parse_blast {
     my $self = shift;
+    my $config = $self->configfile;
+
     my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
@@ -121,6 +124,8 @@ sub parse_blast {
     my $fh = $self->get_fh;
     
     # log results
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::PairFinder::parse_blast started at:   $st.");
     
@@ -285,7 +290,8 @@ sub _validate_format {
     my ($line) = @_;
     my @f = split /\t/, $line;
     unless (@f == 12) {
-	$log->error("'$line' is not the correct format in file: ".$self->file.". Exiting.");
+	#$log->error("'$line' is not the correct format in file: ".$self->file.". Exiting.");
+	say STDERR "\n[ERROR]: '$line' is not the correct format in file: ".$self->file.". Exiting.\n";
 	exit(1);
     }
 }

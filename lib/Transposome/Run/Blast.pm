@@ -8,13 +8,14 @@ use IPC::System::Simple qw(system capture EXIT_ANY);
 use Time::HiRes         qw(gettimeofday);
 use POSIX               qw(strftime);
 use File::Path          qw(make_path);
-use Log::Any            qw($log);
+#use Log::Any            qw($log);
 use File::Temp;
 use Path::Class::File;
 use File::Basename;
 use Parallel::ForkManager;
 use Try::Tiny;
 use Transposome::SeqFactory;
+use Transposome::Log;
 use namespace::autoclean;
 
 with 'Transposome::Role::File', 
@@ -154,6 +155,7 @@ sub run_allvall_blast {
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
     my $realbin = $self->bin_dir->resolve;
+    my $config  = $self->configfile;
 
     my ($formatdb, $mgblast) = $self->_find_mgblast_exes($realbin);
     $outfile =~ s/\.f.*//;
@@ -162,6 +164,8 @@ sub run_allvall_blast {
     my $out_path = Path::Class::File->new($dir, $outfile);
 
     # log results
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.");
 
@@ -257,7 +261,8 @@ sub _make_mgblastdb {
         system([0..5],"$formatdb -p F -i $tempdb -t $db -n $db_path 2>&1 > /dev/null");
     }
     catch {
-	$log->error("Unable to make mgblast database. Here is the exception: $_\nExiting.");
+	#$log->error("Unable to make mgblast database. Here is the exception: $_\nExiting.");
+	say STDERR "\n[ERROR]: Unable to make mgblast database. Here is the exception: $_\nExiting.\n";
         exit(1);
     };
     unlink $tempdb;
@@ -356,7 +361,8 @@ sub _run_blast {
         $exit_value = system([0..5], @blast_cmd);
     }
     catch {
-	$log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.");
+	#$log->error("BLAST exited with exit value $exit_value. Here is the exception: $_.");
+	say STDERR "\n[ERROR]: BLAST exited with exit value $exit_value. Here is the exception: $_\n.";
     };
 
     return $subseq_out;
@@ -480,7 +486,8 @@ sub _find_mgblast_exes {
 	}
     }
     else {
-	$log->error("Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.");
+	#$log->error("Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.");
+	say STDERR "\n[ERROR]: Unable to find mgblast executables ('formatdb' and 'mgblast'). This is a bug, please report it. Exiting.\n";
 	exit(1);
     }
 }

@@ -6,7 +6,7 @@ use List::Util qw(sum max);
 use File::Path qw(make_path);
 use Storable   qw(thaw);
 use POSIX      qw(strftime);
-use Log::Any   qw($log);
+#use Log::Any   qw($log);
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
@@ -115,7 +115,8 @@ sub BUILD {
         die unless $self->has_makeblastdb_exec;
     }
     catch {
-	$log->error("Unable to find makeblastdb. Check your PATH to see that it is installed. Exiting.");
+	#$log->error("Unable to find makeblastdb. Check your PATH to see that it is installed. Exiting.");
+	say STDERR "\n[ERROR]: Unable to find makeblastdb. Check your PATH to see that it is installed. Exiting.\n";
 	exit(1);
     };
 
@@ -123,7 +124,8 @@ sub BUILD {
         die unless $self->has_blastn_exec;
     }
     catch {
-	$log->error("Unable to find blastn. Check your PATH to see that it is installed. Exiting.");
+	#$log->error("Unable to find blastn. Check your PATH to see that it is installed. Exiting.");
+	say STDERR "\n[ERROR]: Unable to find blastn. Check your PATH to see that it is installed. Exiting.\n";
 	exit(1);
     };
 }
@@ -191,6 +193,8 @@ sub BUILD {
 sub annotate_clusters {
     my $self = shift;
     my ($cluster_data) = @_;
+    my $config = $self->configfile;
+
     my $cls_with_merges_dir  = $cluster_data->{cluster_directory};
     my $singletons_file_path = $cluster_data->{singletons_file};
     my $seqct   = $cluster_data->{total_sequence_num};
@@ -230,6 +234,8 @@ sub annotate_clusters {
     my $single_frac  = 1 - $rep_frac;
    
     # log results
+    my $log_obj = Transposome::Log->new;
+    my $log = $log_obj->get_transposome_logger($config);
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
 
