@@ -30,11 +30,11 @@ Transposome::Analysis::Pipeline - Run individual analysis steps of Transposome
 
 =head1 VERSION
 
-Version 0.11.3
+Version 0.12.0
 
 =cut
 
-our $VERSION = '0.11.3';
+our $VERSION = '0.12.0';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
