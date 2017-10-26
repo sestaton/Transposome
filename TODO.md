@@ -2,6 +2,10 @@
 
 This file is for logging feature requests and bugs during development.
 
+## `SeqIO` class
+
+- [ ] Fix issue with Illumina header not being parsed correctly when initializing from a config file
+
 ## Meta
  - [ ] It would be helpful to log the number of families relative to an input database to show
        the percent of diversity that is captured. This may be challenging given the variety of input formats,
