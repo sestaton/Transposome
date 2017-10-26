@@ -1,0 +1,273 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+use Transposome;
+#use Transposome::Log;
+use Transposome::Analysis::Pipeline;
+use File::Path qw(make_path remove_tree);
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+
+transposome - A toolkit for annotation of transposable element families from unassembled sequence reads 
+
+=head1 VERSION
+
+Version 0.11.3
+
+=cut
+
+our $VERSION = '0.11.3';
+#$VERSION = eval $VERSION;
+
+=head1 SYNOPSIS
+
+    transposome --config transposome_config.yml
+
+=cut 
+
+my %opts;
+my $script = basename($0, ());
+
+GetOptions(\%opts,
+	   'c|config=s'          => \$opts{config},
+	   'i|init_config=i'     => \$opts{init_config},
+	   'v|version'           => \$opts{version},
+	   'clsdir|clusterdir=s' => \$opts{cls_dir},
+	   'seqct|sequencect=i'  => \$opts{seqct},
+	   'clsct|clusteredct=i' => \$opts{cls_tot},
+	   'h|help'              => \$opts{help},
+	   'm|man'               => \$opts{man},
+	   ) or pod2usage( "Try '$0 --man' for more information." );
+
+# Get configuration using Transposome class
+usage() and exit(0) if $opts{help};
+pod2usage( -verbose => 2 ) if $opts{man};
+say $VERSION and exit(0) if $opts{version};
+
+if ( !$opts{config} ) {
+    say "\n[ERROR]: No arguments were given.\n";
+    usage();
+    exit(1);
+}
+
+# Parse configuration
+my $trans_obj = Transposome->new( config => $opts{config} );
+my $te_config_ojb = $trans_obj->get_configuration;
+
+unless ( -d $te_config_obj->{output_directory} ) {
+    make_path( $obj_config_obj->{output_directory}, {verbose => 0, mode => 0771,} );
+}
+
+annotate_clusters( $opts{config}, $te_config_obj, $opts{cls_dir}, $opts{seqct}, $opts{clsct} );
+
+exit;
+#
+# Methods
+#
+sub annotate_clusters {
+    my ($config_file, $te_config_obj, $cls_dir_path, $seqct, $clsct) = @_;
+
+    #my $init_config = defined $analysis && $analysis eq 'annotation' ? 1 : 0;
+    #my ( $t0, $log ) = init_transposome( $config )
+	#if defined $analysis && $analysis eq 'annotation';
+
+    #my $seqcts = get_clsct($config);
+    #dd $seqcts;
+    #say "====> running annotation...";
+
+    #my @out = capture([0..5], 'transposome-an', '--config', $conf, '-clsdir', $cls_dir_path, '-seqct', $seqct, '-clsct', $clsct);
+
+    #log_interval( $t0, $log ) 
+	#if defined $analysis && $analysis eq 'annotation';
+
+    my $tobj = Transposome::Analysis::Pipeline->new;
+    $tobj->annotate_clusters($config_file, $te_config_obj, $cls_dir_path, $seqct, $cls_tot);
+
+    return;
+}
+
+sub usage {
+    my $prog = basename($0);
+    print STDERR <<END
+Transposome version: $VERSION
+
+USAGE: $prog [-c] [-a] [-int] [-idx] [-edges] [-bdb] [-clsdir] [-v] [-h] [-m]
+
+Required:
+    -c|config           :    The Transposome configuration file. This is all that is required to run
+                             the full analysis. The options below are for individual analysis steps.
+
+Options:
+    -a|analysis         :    The type of analysis to perform (Default: all).
+    -int|intfile        :    The file containing an index of each sequence 
+                             (only required for the 'cluster' analysis).
+    -idx|idxfile        :    The file containing an index mapping the sequence ID and the
+                             ID used for clustering (only required for the 'cluster' analysis).
+    -edges|edgefile     :    The file containing the best pairwise matches and
+                             the score (only required for the 'cluster' analysis).
+    -bdb|blastdb        :    The all-vs-all BLAST file (only required for the 'findpairs' analysis).
+    -clsdir|clusterdir  :    The directory of FASTA files for each cluster 
+                             (only required for the 'annotation' analysis).
+    -seqct|sequencect   :    The total number of sequences used in the analysis.
+                             (only required for the 'annotation' analysis).
+    -clsct|clusteredct  :    The total number of clustered sequences.
+                             (only required for the 'annotation' analysis).
+    -v|version          :    Print the program version and exit.
+    -h|help             :    Print a usage statement.
+    -m|man              :    Print the full documentation.
+
+Citation: Staton SE, and Burke JM. 2015. Transposome: A toolkit for annotation of transposable element 
+          families from unassembled sequence reads. Bioinformatics, 31:1827-1829.
+
+END
+}
+
+=head1 REQUIRED ARGUMENTS
+
+=over 2
+
+=item -c, --config
+
+The Transposome configuration file.
+
+=back 
+
+=head1 OPTIONS
+
+=over 2
+
+=item -a, --analysis
+
+The type of analysis to perform. Options are 'all', 'blast', 'findpairs', 'cluster', and 'annotation'. Default: all.
+
+    Analysis type         Description
+
+    all                   Run the full analysis from beginning to end, logging progress of each step.
+    blast                 Run only the all-vs-all BLAST comparison.
+    findpairs             Parse the all-vs-all BLAST report and find best scoring pairwise matches (to be used in graph construction).
+    cluster               Perform the clustering step with the pairwise matches.
+    annotation            Run the annotation procedures on a directory cluster FASTA files.
+
+The BLAST step can be greatly accelerated by running on a machine with a large number of processors, but the 'findpairs' and 'cluster' steps often require a large amount of computer memory. For this reason, it is best to separate the steps so you can run the BLAST on a large cluster, then send the 'findpairs' and 'cluster' steps to a high memory machine.
+
+Examples:
+
+1) Run the full analysis. In this case, only the configuration file is required.
+
+    transposome --config transposome_config.yml
+
+2) Run just the BLAST step. Only the configuration file is required for this step.
+
+    transposome --analysis blast --config transposome_config.yml
+
+3) Run the 'findpairs' analysis step. For this analysis, the configuration file and an all-vs-all BLAST file is required.
+
+    transposome --analysis findpairs --config transposome_config.yml --blastdb seqs_allvall_blastdb.bln
+
+4) Run the 'cluster' analysis step. In addition to the configuration file, the three files generated by the 'findpairs' step are required. These files are explained in more detail below.
+
+    transposome --analysis cluster --config transposome_config.yml -int seqs_matches.int -idx seqs_matches.idx -edges seqs_matches.edges
+
+5) Run the 'annotation' analysis step. 
+
+    transposome --analysis annotation --config transposome_config.yml -clsdir seqs_clustered_fasta_files -seqct 100000 -clsct 73400
+
+=item -int, --intfile
+
+The file containing the index of each sequence and match score. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -idx, --idxfile
+
+The file containing an index mapping the sequence ID and the sequence index used for clustering. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -edges, --edgefile
+
+The file containg the pairwise information for each best scoring match. This is returned from the parse_blast method in the Transposome::Pairfinder class.
+
+=item -bdb, --blastdb
+
+The all-vs-all BLAST report generated from the unassembled sequenc reads. This file is returned from the run_allvall_blast method in the Transposome::Run::Blast class.
+
+=item -clsdir, --clusterdir
+
+A directory containing the FASTA files for each cluster. The PATH to this directory is returned from the merge_clusters method in the Transposome::Cluster class.
+
+=item -seqct, --sequencect
+
+The total number of sequences used in the analysis. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
+
+=item -clsct, --clusteredct
+
+The total number of clustered sequences. This is printed to STDERR and printed in the Results section of the log at the conclusion of the 'cluster' analysis. This option is only required for the separate 'annotation' analysis.
+
+=item -v, --version
+
+Print the Transposome version and exit.
+
+=item -h, --help
+
+Print a usage statement. 
+
+=item -m, --man
+
+Print the full documentation.
+
+=back
+
+=head1 AUTHOR
+
+S. Evan Staton, C<< <evan at evanstaton.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the project site at 
+L<https://github.com/sestaton/Transposome/issues>. I will be notified,
+and there will be a record of the issue. Alternatively, I can also be 
+reached at the email address listed above to resolve any questions.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc transposome
+
+=head1 CITATION
+
+ Staton SE, and Burke JM. 2017. Transposome: A toolkit for annotation of transposable element 
+           families from unassembled sequence reads, Bioinformatics, doi: 10.1093/bioinformatics/btv059
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013-2017 S. Evan Staton.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut
