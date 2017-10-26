@@ -1,12 +1,31 @@
 #!perl
 
+BEGIN { 
+    use Cwd;
+    if ($ENV{TRANSPOSOME_ENV} eq 'development') {
+	my $cwd = getcwd();
+	my $bin = File::Spec->catdir($cwd, 'blib', 'bin');
+	$ENV{PATH} = "$bin:$ENV{PATH}";
+	#$lib = File::Spec->catdir($cwd, 'blib', 'lib');
+        #push @PATH,$bin;                                                                                                                     
+        #push @INC, $lib;                                                                                                                     
+	#}
+	#else {
+	    #$bin = $Config{sitebin};
+        #push @PATH,$bin;                                                                                                                     
+	#}
+    }
+}
+
 use 5.010;
 use strict;
 use warnings;
+use Cwd;
 use Config;
 use Transposome;
 use Transposome::Log;
 use Transposome::Analysis::Pipeline;
+#use Env                 qw(@PATH @INC);
 use IPC::System::Simple qw(capture);
 use File::Path          qw(make_path remove_tree);
 use File::Basename;
@@ -150,11 +169,28 @@ sub run_blast {
     my $log_obj = Transposome::Log->new;
     my ( $t0, $log ) = $log_obj->init_transposome( $config_file, $te_config_obj );
 
-    my $bin = $Config{sitebin};
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    my ($bin, $lib);
+    #if ($ENV{TRANSPOSOME_ENV} eq 'development') {
+	#my $cwd = getcwd();
+	#$bin = File::Spec->catdir($cwd, 'blib', 'bin');
+	#$lib = File::Spec->catdir($cwd, 'blib', 'lib');
+	#push @PATH,$bin;
+	#push @INC, $lib;
+    #}
+    #else {
+	#$bin = $Config{sitebin};
+	#push @PATH,$bin;
+    #}
+
+    #push @PATH, $bin;
+    #push @INC, $lib;
+    #local $ENV{PATH} = "$bin:$ENV{PATH}";
+    #say STDERR join "\n", @PATH;
+    #say STDERR join "\n", @INC;
+
     my @out = capture([0..5], 'transposome-bl', '--config', $config_file);
 
-    my $tobj = Transposome::Annotation::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new;
     my $blastdb = $tobj->get_blastdb($te_config_obj);
 
     return ($blastdb, $t0, $log);
@@ -169,7 +205,7 @@ sub find_pairs {
 
     my @out = capture([0..5], 'transposome-pf', '--config', $config_file, '--blastdb', $blastdb);
 
-    my $tobj = Transposome::Annotation::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new;
     my $clsfiles = $tobj->get_cluster_files($te_config_obj);
     #log_interval( $t0, $log ) if $analysis eq 'findpairs';
 
@@ -188,7 +224,7 @@ sub make_clusters {
     my @out = capture([0..5], 'transposome-cl', '--config', $config_file, 
 		       '-int', $clsfiles->{int}, '-idx', $clsfiles->{idx}, '-edges', $clsfiles->{edges});
 
-    my $tobj = Transposome::Annotation::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new;
     my $cluster_data = $tobj->get_cluster_data($te_config_obj);
     #log_interval( $t0, $log ) if $analysis eq 'cluster';
 
