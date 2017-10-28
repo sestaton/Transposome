@@ -155,7 +155,6 @@ sub run_allvall_blast {
     my $numseqs = $self->seq_num;
     my $outfile = $self->file->basename;
     my $realbin = $self->bin_dir->resolve;
-    my $config  = $self->configfile;
 
     my ($formatdb, $mgblast) = $self->_find_mgblast_exes($realbin);
     $outfile =~ s/\.f.*//;
@@ -164,8 +163,8 @@ sub run_allvall_blast {
     my $out_path = Path::Class::File->new($dir, $outfile);
 
     # log results
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.");
 
@@ -292,7 +291,7 @@ sub _make_tempdb {
     my $self = shift; 
     my $file = $self->file;
     my $format = $self->format;
-    my $seqio  = Transposome::SeqFactory->new( file => $file, format => $format )->make_seqio_object;
+    my $seqio  = Transposome::SeqFactory->new( file => $file, format => $format, seqtype => 'illumina' )->make_seqio_object;
 
     my $tmpfasta = $self->file->basename."_tmp.fasta";
     my $fas_path = Path::Class::File->new($self->dir, $tmpfasta);
@@ -411,7 +410,7 @@ sub _split_reads {
     push @split_files, $fname;
     
     my $filename = $self->file->absolute;
-    my $seqio = Transposome::SeqFactory->new( file => $filename, format => $format )->make_seqio_object;
+    my $seqio = Transposome::SeqFactory->new( file => $filename, format => $format, seqtype => 'illumina' )->make_seqio_object;
 
     while (my $seq = $seqio->next_seq) {
 	
