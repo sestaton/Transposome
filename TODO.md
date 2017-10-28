@@ -2,9 +2,9 @@
 
 This file is for logging feature requests and bugs during development.
 
-## `SeqIO` class
+## `*Run::Blast` class
 
-- [ ] Fix issue with Illumina header not being parsed correctly when initializing from a config file
+- [x] Fix issue with Illumina header not being parsed correctly when initializing from a config file
 
 ## Meta
  - [ ] It would be helpful to log the number of families relative to an input database to show
