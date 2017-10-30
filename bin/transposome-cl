@@ -1,10 +1,16 @@
 #!perl
 
+BEGIN {
+    if (defined $ENV{TRANSPOSOME_ENV} && $ENV{TRANSPOSOME_ENV} eq 'development') {
+        use lib qw(blib/lib);
+    }
+}
+
 use 5.010;
 use strict;
 use warnings;
+#use lib qw(blib/lib);
 use Transposome;
-#use Transposome::Log;
 use Transposome::Analysis::Pipeline;
 use File::Path qw(make_path remove_tree);
 use File::Basename;
@@ -37,9 +43,9 @@ GetOptions(\%opts,
 	   'c|config=s'       => \$opts{config},
 	   'i|init_config=i'  => \$opts{init_config},
 	   'v|version'        => \$opts{version},
-	   'int|intfile=s'    => \$opts{int_file},
-	   'idx|idxfile=s'    => \$opts{idx_file},
-	   'edges|edgefile=s' => \$opts{edge_file},
+	   'int|intfile=s'    => \$opts{intfile},
+	   'idx|idxfile=s'    => \$opts{idxfile},
+	   'edges|edgefile=s' => \$opts{edgefile},
 	   'h|help'           => \$opts{help},
 	   'm|man'            => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
@@ -64,26 +70,17 @@ unless ( -d $te_config_obj->{output_directory} ) {
 }
 
 my $cluster_data =
-    make_clusters( $opts{config}, $te_config_obj, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
+    make_clusters( $opts{config}, $te_config_obj, $opts{idxfile}, $opts{intfile}, $opts{edgefile} );
 
 exit;
 #
 # Methods
 #
 sub make_clusters {
-    my ($config_file, $te_config_obj, $idx_file, $int_file, $hs_file) = @_;
+    my ($config_file, $te_config_obj, $idx_file, $int_file, $edge_file) = @_;
     
-    #my $init_config = defined $analysis && $analysis eq 'cluster' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-	#if defined $analysis && $analysis eq 'cluster';
-
-    #my @out3 = capture([0..5], 'transposome', '--analysis', 'cluster', '--config', $conf, 
-	#	       '-int', $clsfiles->{int}, '-idx', $clsfiles->{idx}, '-edges', $clsfiles->{edges});
-    #log_interval( $t0, $log ) if $analysis eq 'cluster';
-    my $tobj = Transposome::Analysis::Pipeline->new;
-    my $cluster_data = $tobj->make_clusters(($config_file, $te_config_obj, $idx_file, $int_file, $hs_file);
-
-    ##TODO: parse log to return the clustered sequence number required for annotation
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
+    my $cluster_data = $tobj->make_clusters($te_config_obj, $idx_file, $int_file, $edge_file);
 
     return $cluster_data;
 }

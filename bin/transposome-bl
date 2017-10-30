@@ -1,15 +1,22 @@
 #!perl
 
+BEGIN {
+    if (defined $ENV{TRANSPOSOME_ENV} && $ENV{TRANSPOSOME_ENV} eq 'development') {
+	use lib qw(blib/lib);
+    }
+}
+
 use 5.010;
 use strict;
 use warnings;
+#use lib qw(blib/lib);
 use Transposome;
-#use Transposome::Log;
 use Transposome::Analysis::Pipeline;
 use File::Path qw(make_path remove_tree);
 use File::Basename;
 use Getopt::Long;
 use Pod::Usage;
+#use Data::Dump::Color;
 
 =head1 NAME
 
@@ -74,20 +81,9 @@ exit;
 sub run_blast {
     my ($config_file, $te_config_obj) = @_;
 
-    #my $init_config = defined $analysis && $analysis eq 'blast' ? 1 : 0;
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
+    my $blastdb = $tobj->run_blast($te_config_obj);
 
-    #my $log_obj = Transposome::Log->new;
-    #my ( $t0, $log ) = $log_obj->init_transposome( $config );
-	#if $init_conig;
-	#if defined $analysis && $analysis eq 'blast';
-    
-    my $tobj = Transposome::Analysis::Pipeline->new;
-    my $blastdb = $tobj->run_blast($config_file, $te_config_obj);
-    #my @out = capture([0..5], 'transposome', '--analysis', 'blast', '--config', $conf);
-    #my $blastdb = get_blastdb($config);
-    #log_interval( $t0, $log ) if $analysis eq 'blast';
-
-    ##TODO: get blastdb somehow
     return $blastdb;
 }
 

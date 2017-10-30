@@ -1,10 +1,16 @@
 #!perl
 
+BEGIN {
+    if (defined $ENV{TRANSPOSOME_ENV} && $ENV{TRANSPOSOME_ENV} eq 'development') {
+        use lib qw(blib/lib);
+    }
+}
+
 use 5.010;
 use strict;
 use warnings;
+#use lib qw(blib/lib);
 use Transposome;
-#use Transposome::Log;
 use Transposome::Analysis::Pipeline;
 use File::Path qw(make_path remove_tree);
 use File::Basename;
@@ -37,9 +43,9 @@ GetOptions(\%opts,
 	   'c|config=s'          => \$opts{config},
 	   'i|init_config=i'     => \$opts{init_config},
 	   'v|version'           => \$opts{version},
-	   'clsdir|clusterdir=s' => \$opts{cls_dir},
+	   'clsdir|clusterdir=s' => \$opts{clsdir},
 	   'seqct|sequencect=i'  => \$opts{seqct},
-	   'clsct|clusteredct=i' => \$opts{cls_tot},
+	   'clsct|clusteredct=i' => \$opts{clsct},
 	   'h|help'              => \$opts{help},
 	   'm|man'               => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
@@ -57,13 +63,13 @@ if ( !$opts{config} ) {
 
 # Parse configuration
 my $trans_obj = Transposome->new( config => $opts{config} );
-my $te_config_ojb = $trans_obj->get_configuration;
+my $te_config_obj = $trans_obj->get_configuration;
 
 unless ( -d $te_config_obj->{output_directory} ) {
-    make_path( $obj_config_obj->{output_directory}, {verbose => 0, mode => 0771,} );
+    make_path( $te_config_obj->{output_directory}, {verbose => 0, mode => 0771,} );
 }
 
-annotate_clusters( $opts{config}, $te_config_obj, $opts{cls_dir}, $opts{seqct}, $opts{clsct} );
+annotate_clusters( $opts{config}, $te_config_obj, $opts{clsdir}, $opts{seqct}, $opts{clsct} );
 
 exit;
 #
@@ -72,21 +78,8 @@ exit;
 sub annotate_clusters {
     my ($config_file, $te_config_obj, $cls_dir_path, $seqct, $clsct) = @_;
 
-    #my $init_config = defined $analysis && $analysis eq 'annotation' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-	#if defined $analysis && $analysis eq 'annotation';
-
-    #my $seqcts = get_clsct($config);
-    #dd $seqcts;
-    #say "====> running annotation...";
-
-    #my @out = capture([0..5], 'transposome-an', '--config', $conf, '-clsdir', $cls_dir_path, '-seqct', $seqct, '-clsct', $clsct);
-
-    #log_interval( $t0, $log ) 
-	#if defined $analysis && $analysis eq 'annotation';
-
-    my $tobj = Transposome::Analysis::Pipeline->new;
-    $tobj->annotate_clusters($config_file, $te_config_obj, $cls_dir_path, $seqct, $cls_tot);
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
+    $tobj->annotate_clusters($te_config_obj, $cls_dir_path, $seqct, $clsct);
 
     return;
 }
