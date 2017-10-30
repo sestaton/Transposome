@@ -20,6 +20,18 @@ my $report  = 'cluster_test_rep.txt';
 my $db_fas  = File::Spec->catfile('t', 'test_data', 't_db.fas');
 my $db      = File::Spec->catfile('t', 'test_data', 't_db_blastdb');
 
+my $tf_obj_keep = TestFixture->new(
+    seq_file         => $seqfile,
+    seq_format       => 'fasta',
+    repeat_db        => $db_fas,
+    output_directory => $outdir,
+    destroy          => 0,
+    build_proper     => 1
+);
+
+my $keep_conf = $tf_obj_keep->config_constructor;
+my ($keep_conf_file) = @$keep_conf;
+
 my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
 my ($blfl) = @$blast;
@@ -28,24 +40,26 @@ my $test2   = TestFixture->new( build_proper => 1, destroy => 0, exclude => 'bla
 my $blast2  = $test2->blast_constructor;
 my ($blfl2) = @$blast2;
 
-test_annotation( $blfl );
+test_annotation( $blfl, $keep_conf_file );
 # remove results and test annotation without specifying evalue in configuration
 remove_tree( $outdir, { safe => 1} );
-test_annotation( $blfl2 );
+test_annotation( $blfl2, $keep_conf_file );
 
 #
 # methods
 #
 sub test_annotation {
-    my ($blfl) = @_;
+    my ($blfl, $keep_conf_file) = @_;
     my $blast_res = Transposome::PairFinder->new(
-						 file              => $blfl,
-						 dir               => $outdir,
-						 in_memory         => 1,
-						 percent_identity  => 90.0,
-						 fraction_coverage => 0.55,
-						 verbose           => 0,
-						 );
+       config            => $keep_conf_file,
+       file              => $blfl,
+       dir               => $outdir,
+       in_memory         => 1,
+       percent_identity  => 90.0,
+       fraction_coverage => 0.55,
+       verbose           => 0,
+       log_to_screen     => 0
+    );
 
     my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
     
@@ -56,13 +70,15 @@ sub test_annotation {
     my $realbin = $bdir->resolve;
     
     my $cluster = Transposome::Cluster->new(
-					file            => $int_file,
-					dir             => $outdir,
-					merge_threshold => 0.029,
-					cluster_size    => 1,
-					bin_dir         => $realbin,
-					verbose         => 0,
-					);
+       config          => $keep_conf_file,
+       file            => $int_file,
+       dir             => $outdir,
+       merge_threshold => 0.029,
+       cluster_size    => 1,
+       bin_dir         => $realbin,
+       verbose         => 0,
+       log_to_screen   => 0
+    );
 
     ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
     my $comm = $cluster->louvain_method;
@@ -97,13 +113,15 @@ sub test_annotation {
     is( $cluster_data->{total_cluster_num}, 46, 'The expected number of reads went into clusters' );
     
     my $annotation = Transposome::Annotation->new(
-						  database => $db_fas,
-						  dir      => $outdir,
-						  file     => $report,
-						  threads  => 1,
-						  cpus     => 1,
-						  verbose  => 0,
-						  );
+       config        => $keep_conf_file,
+       database      => $db_fas,
+       dir           => $outdir,
+       file          => $report,
+       threads       => 1,
+       cpus          => 1,
+       verbose       => 0,
+       log_to_screen => 0
+    );
 
     ok( defined($annotation), 'new() returned something correctly' );
     ok(
@@ -194,9 +212,9 @@ sub test_annotation {
 END {
     remove_tree( $outdir, { safe => 1 } );
     unlink glob("t/cluster_test_rep*");
-    unlink $blfl;
-    unlink $blfl2;
+    unlink glob("t/*.bln");
     unlink $db;
+    unlink $keep_conf_file;
 }
 
 done_testing();

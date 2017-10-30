@@ -11,7 +11,22 @@ use Transposome::PairFinder;
 use aliased 'Transposome::Test::TestFixture';
 use Test::Most tests => 505;
 
-my $outdir = File::Spec->catdir('t', 'transposome_pairfinder_t');
+my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
+my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
+my $outdir   = File::Spec->catdir('t', 'transposome_pairfinder_t');
+
+my $tf_obj_keep = TestFixture->new(
+    seq_file         => $seqfile,
+    seq_format       => 'fasta',
+    repeat_db        => $repeatdb,
+    output_directory => $outdir,
+    destroy          => 0,
+    build_proper     => 1
+);
+
+my $keep_conf = $tf_obj_keep->config_constructor;
+my ($keep_conf_file) = @$keep_conf;
+
 my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 ok( $test->blast_constructor, 'Can build proper mgblast data for testing' );
 unlink glob("t/transposome_mgblast_*");
@@ -27,24 +42,28 @@ my $tmpbln = File::Temp->new(
                              UNLINK   => 0
                              );
 
-dies_ok { Transposome::Pairfinder->new( file              => $tmpbln, 
-					dir               => $outdir, 
-					in_memory         => 1, 
-					percent_identity  => 90, 
-					fraction_coverage => 0.55,
-	                                verbose           => 0 ); } 
+dies_ok { Transposome::Pairfinder->new( 
+	config            => $keep_conf_file,
+	file              => $tmpbln, 
+	dir               => $outdir, 
+	in_memory         => 1, 
+	percent_identity  => 90, 
+	fraction_coverage => 0.55,
+	verbose           => 0 ); } 
 'Transpsome::Pairfinder dies as expected when given empty input file';
 
 unlink $tmpbln;
 
 ## test in-memory processing
 my $mem_test = Transposome::PairFinder->new(
+    config            => $keep_conf_file, 
     file              => $blfl,
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
     fraction_coverage => 0.55,
     verbose           => 0,
+    log_to_screen     => 0,
 );
 
 ok( $mem_test->parse_blast, 'Can build in memory database and parse blast' );
@@ -114,12 +133,14 @@ remove_tree($test_dir);
 
 ## test on-file processing
 my $file_test = Transposome::PairFinder->new(
+    config            => $keep_conf_file,
     file              => $blfl,
     dir               => $outdir,
     in_memory         => 0,
     percent_identity  => 90.0,
     fraction_coverage => 0.55,
     verbose           => 0,
+    log_to_screen     => 0
 );
 
 ok( $file_test->parse_blast, 'Can build database on file and parse blast' );
@@ -192,6 +213,7 @@ is( $mem_hs_recct, $file_hs_recct,
 );
 
 END {
+    unlink $keep_conf_file;
     remove_tree($outdir, $blfl);
 }
 

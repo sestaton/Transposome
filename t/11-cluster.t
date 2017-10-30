@@ -13,6 +13,7 @@ use aliased 'Transposome::Test::TestFixture';
 use Test::More 'no_plan';
 
 my $seqfile = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
+my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 my $outdir  = File::Spec->catdir('t', 'cluster_t');
 my $report  = 'cluster_test_rep.txt';
 
@@ -20,13 +21,27 @@ my $test   = TestFixture->new( build_proper => 1, destroy => 0 );
 my $blast  = $test->blast_constructor;
 my ($blfl) = @$blast;
 
+my $tf_obj_keep = TestFixture->new(
+    seq_file         => $seqfile,
+    seq_format       => 'fasta',
+    repeat_db        => $repeatdb,
+    output_directory => $outdir,
+    destroy          => 0,
+    build_proper     => 1
+);
+
+my $keep_conf = $tf_obj_keep->config_constructor;
+my ($keep_conf_file) = @$keep_conf;
+
 my $blast_res = Transposome::PairFinder->new(
+    config            => $keep_conf_file,
     file              => $blfl,
     dir               => $outdir,
     in_memory         => 1,
     percent_identity  => 90.0,
     fraction_coverage => 0.55,
     verbose           => 0,
+    log_to_screen     => 0
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -45,6 +60,7 @@ cluster_analysis($in_memory);
 sub cluster_analysis {
     my ($in_memory) = @_;
     my $cluster = Transposome::Cluster->new(
+        config          => $keep_conf_file,
 	file            => $int_file,
 	dir             => $outdir,
 	merge_threshold => 0.029,   # 70 * 0.029 = 2
@@ -52,6 +68,7 @@ sub cluster_analysis {
 	bin_dir         => $realbin,
 	verbose         => 0,
 	in_memory       => $in_memory,
+	log_to_screen   => 0
     );
     
     ok( $cluster->louvain_method, 'Can perform clustering with Louvain method' );
@@ -178,5 +195,6 @@ sub cluster_analysis {
 
 END {
     remove_tree( $outdir, { safe => 1 } );
-    unlink $blfl;
+    unlink glob("t/*.bln");
+    unlink $keep_conf_file;
 }
