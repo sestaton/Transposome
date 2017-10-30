@@ -13,11 +13,11 @@ use Transposome::Run::Blast;
 use aliased 'Transposome::Test::TestFixture';
 use Test::More tests => 17;
 
-my $program  = File::Spec->catfile('bin', 'transposome');
+my $program  = File::Spec->catfile('blib', 'bin', 'transposome');
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 my $outdir   = File::Spec->catdir('t', 'test_transposome_cli_out');
-my $script   = "perl -Iblib/lib $program";
+my $script   = "perl -Mblib $program";
 
 my $test = TestFixture->new(
     seq_file     => $seqfile,
@@ -37,12 +37,21 @@ my $cwd = getcwd();
 my $bin = File::Spec->catdir($cwd, 'bin');
 local $ENV{PATH} = "$bin:$ENV{PATH}";
 
-# run each analysis method
-my $allok = full_analysis($script, $conf_file);
-my $blastdb = blast_analysis($script, $conf_file, $outdir);
-my ($int_file, $idx_file, $edge_file) = findpairs_analysis($script, $conf_file, $outdir, $blastdb);
-my ($clsdir, $seqtot, $clstot) = cluster_analysis($script, $conf_file, $outdir, $int_file, $idx_file, $edge_file);
-my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir, $seqtot, $clstot);
+my $devtests = 0;
+if (defined $ENV{TRANSPOSOME_ENV} && $ENV{TRANSPOSOME_ENV} eq 'development') {
+    $devtests = 1;
+}
+
+SKIP: {
+    skip 'skip development tests', 16 unless $devtests;
+
+    # run each analysis method
+    my $allok = full_analysis($script, $conf_file);
+    my $blastdb = blast_analysis($script, $conf_file, $outdir);
+    my ($int_file, $idx_file, $edge_file) = findpairs_analysis($script, $conf_file, $outdir, $blastdb);
+    my ($clsdir, $seqtot, $clstot) = cluster_analysis($script, $conf_file, $outdir, $int_file, $idx_file, $edge_file);
+    my $annotok = annotation_analysis($script, $conf_file, $outdir, $clsdir, $seqtot, $clstot);
+}
 
 # clean up
 remove_tree( $outdir, { safe => 1 } );
@@ -70,7 +79,8 @@ sub full_analysis {
     my @results;
     find( sub { push @results, $File::Find::name if -f and /\.tgz$/ }, $outdir );
     is( scalar(@results), 2, 'Output directories compressed successfully' );
-    
+    #exit;
+
     remove_tree( $outdir, { safe => 1 } );
     unlink glob "t/transposome_mgblast*";
     return $stderr;
