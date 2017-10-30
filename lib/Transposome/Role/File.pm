@@ -30,12 +30,19 @@ $VERSION = eval $VERSION;
 
 =cut
 
-has 'configfile' => (
-      is       => 'ro',
-      isa      => 'Path::Class::File',
-      required => 0,
-      coerce   => 1,
+has 'config' => (
+    is            => 'ro',
+    isa           => 'Str',
+    required      => 0,
+    documentation => qq{The Transposome configuration file},
 );
+
+#has 'config' => (
+#      is       => 'ro',
+#      isa      => 'Path::Class::File',
+#      required => 0,
+#      coerce   => 1,
+#);
 
 has 'file' => (
       is       => 'ro',
