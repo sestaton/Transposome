@@ -2,9 +2,9 @@ package Transposome::Cluster;
 
 use 5.010;
 use Moose;
-use IPC::System::Simple  qw(system capture EXIT_ANY);
-use File::Path           qw(make_path);
-use POSIX                qw(strftime);
+use IPC::System::Simple qw(system capture EXIT_ANY);
+use File::Path          qw(make_path);
+use POSIX               qw(strftime);
 #use Log::Any             qw($log);
 use DBI;
 use Tie::Hash::DBD;
@@ -14,6 +14,7 @@ use File::Basename;
 use Try::Tiny;
 use Path::Class::File;
 use Config;
+use Transposome::Log;
 use namespace::autoclean;
 
 #use Data::Dump;
@@ -71,6 +72,14 @@ has 'bin_dir' => (
     },
 );
 
+has 'log_to_screen' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_log_to_screen',
+    lazy       => 1,
+    default    => 1,
+);
+
 =head1 METHODS
 
 =head2 louvain_method
@@ -95,7 +104,7 @@ sub louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir  = $self->dir->relative;
     my $realbin  = $self->bin_dir->resolve;
-    my $config   = $self->configfile;
+    #my $config   = $self->config;
 
     my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
 
@@ -114,8 +123,8 @@ sub louvain_method {
     my $hierarchy_err_path    = File::Spec->catfile($out_dir, $hierarchy_err);
 
     # log results
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::louvain_method started at:         $st.");
 
@@ -197,14 +206,14 @@ sub louvain_method {
 
 sub find_pairs {
     my $self = shift;
-    my $config = $self->configfile;
+    #my $config = $self->config;
 
     my ($cluster_data) = @_;
     my $cls_file     = $cluster_data->{cluster_file};
     my $cls_log_file = $cluster_data->{cluster_log_file};
     my $total_seq_num   = $cluster_data->{total_seq_num};
     my $merge_threshold = sprintf("%.0f", $total_seq_num * $self->merge_threshold);
- 
+
     my $out_dir                      = $self->dir->relative;
     my $cls_log_path                 = File::Spec->catfile($out_dir, $cls_log_file);
     my ($clname, $clpath, $clsuffix) = fileparse($cls_file, qr/\.[^.]*/);
@@ -217,8 +226,8 @@ sub find_pairs {
 	or die "\n[ERROR]: Could not open file: $cls_log_path\n";
     say $rep "# Cluster connections above threshold";
 
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs started at:             $st.");
 
@@ -358,9 +367,8 @@ sub make_clusters {
     my $self = shift;
     my ($graph_comm, $idx_file) = @_;
 
-    my $config = $self->configfile;
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
 
     # set paths for make_clusters() method
     my $int_file             = $self->file->relative;
@@ -507,7 +515,7 @@ sub make_clusters {
 sub merge_clusters {
     my $self = shift; 
     my ($cluster_data) = @_;
-    my $config = $self->configfile;
+    #my $config = $self->config;
 
     my $vertex = $cluster_data->{graph_vertices};
     my $seqs   = $cluster_data->{sequence_hash};
@@ -539,8 +547,8 @@ sub merge_clusters {
     my $cls_tot = 0;
 
     # log results
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::merge_clusters started at:         $st.");
     
