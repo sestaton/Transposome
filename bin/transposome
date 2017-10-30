@@ -1,22 +1,5 @@
 #!perl
 
-BEGIN { 
-    use Cwd;
-    if ($ENV{TRANSPOSOME_ENV} eq 'development') {
-	my $cwd = getcwd();
-	my $bin = File::Spec->catdir($cwd, 'blib', 'bin');
-	$ENV{PATH} = "$bin:$ENV{PATH}";
-	#$lib = File::Spec->catdir($cwd, 'blib', 'lib');
-        #push @PATH,$bin;                                                                                                                     
-        #push @INC, $lib;                                                                                                                     
-	#}
-	#else {
-	    #$bin = $Config{sitebin};
-        #push @PATH,$bin;                                                                                                                     
-	#}
-    }
-}
-
 use 5.010;
 use strict;
 use warnings;
@@ -25,13 +8,13 @@ use Config;
 use Transposome;
 use Transposome::Log;
 use Transposome::Analysis::Pipeline;
-#use Env                 qw(@PATH @INC);
 use IPC::System::Simple qw(capture);
 use File::Path          qw(make_path remove_tree);
 use File::Basename;
 use File::Spec;
 use Getopt::Long;
 use Pod::Usage;
+#use Data::Dump::Color;
 
 =head1 NAME
 
@@ -60,13 +43,13 @@ GetOptions(\%opts,
 	   'i|init_config=i'     => \$opts{init_config},
 	   'v|version'           => \$opts{version},
 	   'a|analysis=s'        => \$opts{analysis},
-	   'int|intfile=s'       => \$opts{int_file},
-	   'idx|idxfile=s'       => \$opts{idx_file},
+	   'int|intfile=s'       => \$opts{intfile},
+	   'idx|idxfile=s'       => \$opts{idxfile},
 	   'bdb|blastdb=s'       => \$opts{blastdb},
-	   'edges|edgefile=s'    => \$opts{edge_file},
-	   'clsdir|clusterdir=s' => \$opts{cls_dir},
+	   'edges|edgefile=s'    => \$opts{edgefile},
+	   'clsdir|clusterdir=s' => \$opts{clsdir},
 	   'seqct|sequencect=i'  => \$opts{seqct},
-	   'clsct|clusteredct=i' => \$opts{cls_tot},
+	   'clsct|clusteredct=i' => \$opts{clsct},
 	   'h|help'              => \$opts{help},
 	   'm|man'               => \$opts{man},
 	   ) or pod2usage( "Try '$0 --man' for more information." );
@@ -99,23 +82,17 @@ if ($opts{analysis} eq 'all') {
 	exit(1);
     }
 
-    #run_full_analysis($config);
-    run_full_analysis($opts{config}, $te_config_obj);
+    run_full_analysis( $opts{config}, $te_config_obj );
 }
 elsif ($opts{analysis} eq 'blast') {
-    my $blastdb = run_blast( $opts{config}, $te_config_obj );
-    unless (-s $blastdb) {
-	say STDERR "\n[ERROR]: Blast failed. Please check the input sequence file and logs and try again. ".
-	    "Report this issue if it persists. Exiting.";
-	exit(1);
-    }
+    my ($blastdb, $t0, $log) = run_blast( $opts{config}, $te_config_obj );
 }
 elsif ($opts{analysis} eq 'findpairs') {
     my ( $idx_file, $int_file, $edge_file ) = find_pairs( $opts{config}, $te_config_obj, $opts{blastdb} );
 }
 elsif ($opts{analysis} eq 'cluster') {
     my $cluster_data =
-	make_clusters( $opts{config}, $opts{idx_file}, $opts{int_file}, $opts{edge_file} );
+	make_clusters( $opts{config}, $te_config_obj, $opts{idxfile}, $opts{intfile}, $opts{edgefile} );
 }
 elsif ($opts{analysis} eq 'annotation') {
     annotate_clusters( $opts{config}, $te_config_obj, $opts{clsdir}, $opts{seqct}, $opts{clsct} );
@@ -133,31 +110,21 @@ exit;
 sub run_full_analysis {
     my ($config_file, $te_config_obj) = @_;
 
-    # Initialize log and timers
-    #my $log_obj = Transposome::Log->new;
-    #my ( $t0, $log ) = $log_obj->init_transposome( $config );
-
     # Perform the all vs. all blast
     my ($blastdb, $t0, $log) = run_blast( $config_file, $te_config_obj );
-
-    #unless (-s $blastdb) {
-        #say STDERR "\n[ERROR]: Blast failed. Please check the input sequence file and logs and try again. ".
-        #    "Report this issue if it persists. Exiting.";
-	#exit(1);
-    #}
 
     # parse mglblast results to find best scoring pairwise matches
     my $clsfiles = find_pairs( $config_file, $te_config_obj, $blastdb );
 
     # Cluster sequences and analyze groupings
-    my $cluster_data = make_clusters( $config_file, $te_config_obj, $clsfiles );
+     my $cluster_data = make_clusters( $config_file, $te_config_obj, $clsfiles->{idx}, $clsfiles->{int}, $clsfiles->{edges} );
 
     # Annotate clusters and generate whole-genome summary of results
-    # $opts{clsdir}, $opts{seqct}, $opts{clsct}
-    annotate_clusters( $config_file, $te_config_obj, $cluster_data->{cluster_dir}, $cluster_data->{total_ct}, $cluster_data->{clustered_ct} );
+    annotate_clusters( $config_file, $te_config_obj, 
+		       $cluster_data->{cluster_dir}, $cluster_data->{total_ct}, $cluster_data->{clustered_ct} );
 
     # Log summary of results
-    my $log_obj = Transposome::Log->new;
+    my $log_obj = Transposome::Log->new( config => $config_file );
     $log_obj->log_interval( $t0, $log );
 
     return;
@@ -166,31 +133,12 @@ sub run_full_analysis {
 sub run_blast {
     my ($config_file, $te_config_obj) = @_;
 
-    my $log_obj = Transposome::Log->new;
-    my ( $t0, $log ) = $log_obj->init_transposome( $config_file, $te_config_obj );
-
-    my ($bin, $lib);
-    #if ($ENV{TRANSPOSOME_ENV} eq 'development') {
-	#my $cwd = getcwd();
-	#$bin = File::Spec->catdir($cwd, 'blib', 'bin');
-	#$lib = File::Spec->catdir($cwd, 'blib', 'lib');
-	#push @PATH,$bin;
-	#push @INC, $lib;
-    #}
-    #else {
-	#$bin = $Config{sitebin};
-	#push @PATH,$bin;
-    #}
-
-    #push @PATH, $bin;
-    #push @INC, $lib;
-    #local $ENV{PATH} = "$bin:$ENV{PATH}";
-    #say STDERR join "\n", @PATH;
-    #say STDERR join "\n", @INC;
+    my $log_obj = Transposome::Log->new( config => $config_file );
+    my ( $t0, $log ) = $log_obj->init_transposome( $te_config_obj );
 
     my @out = capture([0..5], 'transposome-bl', '--config', $config_file);
 
-    my $tobj = Transposome::Analysis::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
     my $blastdb = $tobj->get_blastdb($te_config_obj);
 
     return ($blastdb, $t0, $log);
@@ -199,56 +147,31 @@ sub run_blast {
 sub find_pairs {
     my ($config_file, $te_config_obj, $blastdb) = @_;
 
-    #my $init_config = defined $analysis && $analysis eq 'findpairs' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-	#if defined $analysis && $analysis eq 'findpairs';
-
     my @out = capture([0..5], 'transposome-pf', '--config', $config_file, '--blastdb', $blastdb);
 
-    my $tobj = Transposome::Analysis::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
     my $clsfiles = $tobj->get_cluster_files($te_config_obj);
-    #log_interval( $t0, $log ) if $analysis eq 'findpairs';
 
-
-    ##TODO: use find() to return the files below from the output dir
     return $clsfiles;
 }
 
 sub make_clusters {
-    my ($config_file, $te_config_obj, $clsfiles) = @_;
-    
-    #my $init_config = defined $analysis && $analysis eq 'cluster' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-	#if defined $analysis && $analysis eq 'cluster';
+    my ($config_file, $te_config_obj, $idx, $int, $edges) = @_;
 
-    my @out = capture([0..5], 'transposome-cl', '--config', $config_file, 
-		       '-int', $clsfiles->{int}, '-idx', $clsfiles->{idx}, '-edges', $clsfiles->{edges});
+    my @out = capture([0..5], 'transposome-cl', '--config', $config_file, '-int', $int, '-idx', $idx, '-edges', $edges);
 
-    my $tobj = Transposome::Analysis::Pipeline->new;
+    my $tobj = Transposome::Analysis::Pipeline->new( config => $config_file );
     my $cluster_data = $tobj->get_cluster_data($te_config_obj);
-    #log_interval( $t0, $log ) if $analysis eq 'cluster';
-
-    ##TODO: parse log to return the clustered sequence number required for annotation
 
     return $cluster_data;
 }
 
 sub annotate_clusters {
     my ($config_file, $te_config_obj, $clsdir, $seqct, $clsct) = @_;
-
-    #my $init_config = defined $analysis && $analysis eq 'annotation' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-	#if defined $analysis && $analysis eq 'annotation';
-
-    #my $tobj = Transposome::Annotation::Pipeline->new;
-    #my $seqcts = $tobj->get_clsct($config);
-    #dd $seqcts;
-    #say "====> running annotation...";
-
+    
+    $clsdir =~ s/\/$//;
     my @out = capture([0..5], 'transposome-an', '--config', $config_file, '-clsdir', $clsdir, '-seqct', $seqct, '-clsct', $clsct);
 
-    #log_interval( $t0, $log ) 
-	#if defined $analysis && $analysis eq 'annotation';
     return;
 }
 
