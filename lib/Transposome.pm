@@ -6,7 +6,8 @@ use YAML::Tiny;
 use Log::Any qw($log);
 use namespace::autoclean;
 
-with 'Transposome::Role::Config';
+with 'Transposome::Role::Config',
+     'Transposome::Role::File';
 
 =head1 NAME
 
@@ -27,17 +28,10 @@ our $VERSION = '0.12.0';
 
 =cut
 
-has 'config' => (
-    is            => 'ro',
-    isa           => 'Str',
-    required      => 0,
-    documentation => qq{The Transposome configuration file},
-);
-
 sub get_configuration {
     my $self = shift;
-    my $configfile   = YAML::Tiny->read( $self->config );
-    my $valid_config = $self->parse_configuration( $configfile );
+    my $config_file   = YAML::Tiny->read( $self->config );
+    my $valid_config = $self->parse_configuration( $config_file );
     return $valid_config;
 }
 
