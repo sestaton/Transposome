@@ -122,6 +122,14 @@ has 'bin_dir' => (
     },
 );
 
+has 'log_to_screen' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_log_to_screen',
+    lazy       => 1,
+    default    => 1,
+);
+
 =head1 METHODS
 
 =cut
@@ -163,7 +171,7 @@ sub run_allvall_blast {
     my $out_path = Path::Class::File->new($dir, $outfile);
 
     # log results
-    my $log_obj = Transposome::Log->new( config => $self->config );
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
     my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Run::Blast::run_allvall_blast started at:   $st.");
