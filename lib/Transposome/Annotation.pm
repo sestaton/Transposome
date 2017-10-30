@@ -11,6 +11,7 @@ use Path::Class::File;
 use File::Basename;
 use File::Spec;
 use Try::Tiny;
+use Transposome::Log;
 use namespace::autoclean;
 #use Data::Dump::Color;
 
@@ -95,6 +96,14 @@ has 'debug' => (
     predicate  => 'has_debug',
     lazy       => 1,
     default    => 0,
+);
+
+has 'log_to_screen' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_log_to_screen',
+    lazy       => 1,
+    default    => 1,
 );
 
 sub BUILD {
@@ -193,18 +202,18 @@ sub BUILD {
 sub annotate_clusters {
     my $self = shift;
     my ($cluster_data) = @_;
-    my $config = $self->configfile;
+    #my $config = $self->config;
 
     my $cls_with_merges_dir  = $cluster_data->{cluster_directory};
     my $singletons_file_path = $cluster_data->{singletons_file};
-    my $seqct   = $cluster_data->{total_sequence_num};
-    my $cls_tot = $cluster_data->{total_cluster_num};
+    my $seqct = $cluster_data->{total_sequence_num};
+    my $clsct = $cluster_data->{total_cluster_num};
 
     unless (defined $seqct) {
 	die "\n[ERROR]: 'total_sequence_num' value is not set. Exiting.";
     }
 
-    unless (defined $cls_tot) {
+    unless (defined $clsct) {
 	die "\n[ERROR]: 'total_cluster_num' value is not set. Exiting.";
     }
 
@@ -229,13 +238,13 @@ sub annotate_clusters {
     my $thread_range = sprintf("%.0f", $self->threads * $self->cpus);
     my $total_readct = 0;
     my $evalue       = $self->evalue;
-    my $rep_frac     = $cls_tot / $seqct;
-    my $single_tot   = $seqct - $cls_tot;
+    my $rep_frac     = $clsct / $seqct;
+    my $single_tot   = $seqct - $clsct;
     my $single_frac  = 1 - $rep_frac;
    
     # log results
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Annotation::annotate_clusters started at:   $st.");
 
@@ -349,7 +358,7 @@ sub annotate_clusters {
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Annotation::annotate_clusters completed at: $ft.");
     $log->info("Results - Total sequences:                        $seqct");
-    $log->info("Results - Total sequences clustered:              $cls_tot");
+    $log->info("Results - Total sequences clustered:              $clsct");
     $log->info("Results - Total sequences unclustered:            $single_tot");
     $log->info("Results - Repeat fraction from clusters:          $rep_frac");
     $log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
