@@ -10,6 +10,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use POSIX      qw(strftime);
 #use Log::Any   qw($log);
+use Transposome::Log;
 use namespace::autoclean;
 
 with 'Transposome::Role::File', 
@@ -64,6 +65,14 @@ has 'fraction_coverage' => (
     default   => 0.55,
 );
 
+has 'log_to_screen' => (
+    is         => 'ro',
+    isa        => 'Bool',
+    predicate  => 'has_log_to_screen',
+    lazy       => 1,
+    default    => 1,
+);
+
 sub BUILD {
     my $self = shift;
     try {
@@ -100,8 +109,8 @@ sub BUILD {
 
 sub parse_blast {
     my $self = shift;
-    my $config = $self->configfile;
-
+    #my $config = $self->config;
+    
     my ($iname, $ipath, $isuffix) = fileparse($self->file, qr/\.[^.]*/);
     unless (-d $self->dir) {
 	make_path($self->dir, {verbose => 0, mode => 0771,});
@@ -124,8 +133,8 @@ sub parse_blast {
     my $fh = $self->get_fh;
     
     # log results
-    my $log_obj = Transposome::Log->new;
-    my $log = $log_obj->get_transposome_logger($config);
+    my $log_obj = Transposome::Log->new( config => $self->config, log_to_screen => $self->log_to_screen );
+    my $log = $log_obj->get_transposome_logger;
     my $st = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::PairFinder::parse_blast started at:   $st.");
     
