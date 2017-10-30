@@ -22,6 +22,17 @@ use Test::More tests => 34;
 my $seqfile  = File::Spec->catfile('t', 'test_data', 't_reads.fas.gz');
 my $repeatdb = File::Spec->catfile('t', 'test_data', 't_db.fas');
 
+my $tf_obj_keep = TestFixture->new(
+    seq_file         => $seqfile,
+    seq_format       => 'fasta',
+    repeat_db        => $repeatdb,
+    destroy          => 0,
+    build_proper     => 1
+);
+
+my $keep_conf = $tf_obj_keep->config_constructor;
+my ($keep_conf_file) = @$keep_conf;
+
 my $test = TestFixture->new(
     seq_file     => $seqfile,
     seq_format   => 'fasta',
@@ -119,6 +130,7 @@ my $mgblast  = File::Spec->catfile($bin, 'mgblast');
 my $formatdb = File::Spec->catfile($bin, 'formatdb');
 
 my $blast = Transposome::Run::Blast->new(
+    config        => $keep_conf_file,
     file          => $config->{sequence_file},
     format        => $config->{sequence_format},
     dir           => $config->{output_directory},
@@ -126,19 +138,22 @@ my $blast = Transposome::Run::Blast->new(
     cpus          => 1,
     seq_num       => $config->{sequence_num},
     mgblast_exec  => $mgblast,
-    formatdb_exec => $formatdb
+    formatdb_exec => $formatdb,
+    log_to_screen => 0
 );
 
 my $blastdb = $blast->run_allvall_blast;
 ok( defined($blastdb), 'Can run all vs. all blast correctly' );
 
 my $blast_res = Transposome::PairFinder->new(
+    config            => $keep_conf_file,
     file              => $blastdb,
     dir               => $config->{output_directory},
     in_memory         => $config->{in_memory},
     percent_identity  => $config->{percent_identity},
     fraction_coverage => $config->{fraction_coverage},
     verbose           => 0,
+    log_to_screen     => 0
 );
 
 my ( $idx_file, $int_file, $hs_file ) = $blast_res->parse_blast;
@@ -153,12 +168,14 @@ my $bdir    = Path::Class::Dir->new("$pdir/../../bin");
 my $realbin = $bdir->resolve;
 
 my $cluster = Transposome::Cluster->new(
+    config          => $keep_conf_file,
     file            => $int_file,
     dir             => $config->{output_directory},
     merge_threshold => $config->{merge_threshold},
     cluster_size    => $config->{cluster_size},
     bin_dir         => $realbin,
     verbose         => 0,
+    log_to_screen   => 0
 );
 
 my $comm = $cluster->louvain_method;
@@ -199,12 +216,14 @@ ok( defined($cluster_data->{cluster_directory}),
 is( $cluster_data->{total_cluster_num}, 48, 'The expected number of reads went into clusters' );
 
 my $annotation = Transposome::Annotation->new(
-    database => $config->{repeat_database},
-    dir      => $config->{output_directory},
-    file     => $config->{cluster_log_file},
-    threads  => 1,
-    cpus     => 1,
-    verbose  => 0,
+    config        => $keep_conf_file,
+    database      => $config->{repeat_database},
+    dir           => $config->{output_directory},
+    file          => $config->{cluster_log_file},
+    threads       => 1,
+    cpus          => 1,
+    verbose       => 0,
+    log_to_screen => 0
 );
 
 my $annotation_results = $annotation->annotate_clusters( $cluster_data );
@@ -224,4 +243,5 @@ unlink glob("t/transposome_mgblast*");
 unlink glob("t_rep*");
 remove_tree( $config->{output_directory}, { safe => 1 } );
 unlink "t/$config->{run_log_file}";
+unlink $keep_conf_file;
 unlink $conf_file;
