@@ -16,7 +16,7 @@ use namespace::autoclean;
 #use Data::Dump::Color;
 
 #with 'Transposome::Annotation::Methods', 
-#     'Transposome::Role::File', 
+with 'Transposome::Role::File'; #, 
 #     'Transposome::Role::Util';
 
 =head1 NAME
@@ -38,35 +38,64 @@ our $VERSION = '0.12.0';
 
 =cut
 
-has 'init_config' => (
+#has 'init_config' => (
+#    is         => 'ro',
+#    isa        => 'Bool',
+#    predicate  => 'has_init_config',
+#    lazy       => 1,
+#    default    => 0,
+#);
+has 'log_to_screen' => (
     is         => 'ro',
     isa        => 'Bool',
-    predicate  => 'has_init_config',
+    predicate  => 'has_log_to_screen',
     lazy       => 1,
-    default    => 0,
+    default    => 1,
 );
 
 sub get_transposome_logger {
     my $self = shift;
-    my ($config_file) = @_;
+    #my ($config_file) = @_;
+    my $config_file = $self->config;
+    my $to_screen   = $self->log_to_screen;
 
     # Parse configuration                                   
     my $trans_obj = Transposome->new( config => $config_file );
     my $config = $trans_obj->get_configuration;
     
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
+    my $category = 'log4perl.category.Transposome      = INFO, Logfile';
+    $category = $to_screen ? $category.', Screen' : $category;
+
+    #my $conf = qq{
+    #log4perl.category.Transposome      = INFO, Logfile, Screen
+
+    #log4perl.appender.Logfile          = Log::Log4perl::Appender::File
+    #log4perl.appender.Logfile.filename = $log_file
+    #log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
+    #log4perl.appender.Logfile.layout.ConversionPattern = %m%n
+
+    #log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+    #log4perl.appender.Screen.stderr  = 1
+    #log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
+    #};
+
     my $conf = qq{
-    log4perl.category.Transposome      = INFO, Logfile, Screen
+    $category
 
     log4perl.appender.Logfile          = Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename = $log_file
     log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
     log4perl.appender.Logfile.layout.ConversionPattern = %m%n
-
-    log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-    log4perl.appender.Screen.stderr  = 1
-    log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
     };
+
+    if ($to_screen) {
+	$conf .= qq{
+        log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.stderr  = 1
+        log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
+        };
+    }
 
     Log::Log4perl::init( \$conf );
     Log::Any::Adapter->set('Log4perl');
@@ -77,8 +106,9 @@ sub get_transposome_logger {
 
 sub init_transposome {
     my $self = shift;
-    my ($config_file, $te_config_obj) = @_;
-    
+    my ($te_config_obj) = @_;
+    my $config_file = $self->config;
+
     my $log = $self->get_transposome_logger($config_file);
     
     my $t0 = [Time::HiRes::gettimeofday()];
