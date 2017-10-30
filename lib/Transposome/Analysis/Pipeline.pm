@@ -21,7 +21,7 @@ use Transposome::Annotation;
 use namespace::autoclean;
 #use Data::Dump::Color;
 
-#with 'Transposome::Role::File', 
+with 'Transposome::Role::File'; #, 
 #     'Transposome::Role::Util';
 
 =head1 NAME
@@ -83,14 +83,15 @@ has 'debug' => (
 
 sub run_blast {
     my $self = shift;
-    my ($config_file, $te_config_obj) = @_;
+    my ($te_config_obj) = @_;
+    my $config_file = $self->config;
 
     #my $init_config = defined $analysis && $analysis eq 'blast' ? 1 : 0;
     #my ( $t0, $log ) = init_transposome( $config )
         #if defined $analysis && $analysis eq 'blast';
     
     my $blast = Transposome::Run::Blast->new( 
-	configfile => $config_file,
+	config => $config_file,
 	file       => $te_config_obj->{sequence_file},
 	format     => $te_config_obj->{sequence_format},                                     
         dir        => $te_config_obj->{output_directory},                                      
@@ -110,14 +111,15 @@ sub run_blast {
 
 sub find_pairs {
     my $self = shift;
-    my ($config_file, $te_config_obj, $blastdb) = @_;
+    my ($te_config_obj, $blastdb) = @_;
+    my $config_file = $self->config;
 
     #my $init_config = defined $analysis && $analysis eq 'findpairs' ? 1 : 0;
     #my ( $t0, $log ) = init_transposome( $config )
         #if defined $analysis && $analysis eq 'findpairs';
 
     my $blast_res = Transposome::PairFinder->new( 
-	configfile       => $config_file,
+	config       => $config_file,
 	file             => $blastdb,  
 	dir              => $te_config_obj->{output_directory},
 	in_memory        => $te_config_obj->{in_memory},
@@ -126,19 +128,21 @@ sub find_pairs {
 	verbose          => 1 
     );
     
-    my ($idx_file, $int_file, $hs_file) = $blast_res->parse_blast;
+    my ($idx_file, $int_file, $edge_file) = $blast_res->parse_blast;
     unlink $blastdb;
     #log_interval( $t0, $log ) if $analysis eq 'findpairs';
 
 
     ##TODO: use find() to return the files below from the output dir
-    return ($idx_file, $int_file, $hs_file);
+    return ($idx_file, $int_file, $edge_file);
 }
 
 sub make_clusters {
     my $self = shift;
-    my ($config_file, $te_config_obj, $idx_file, $int_file, $hs_file) = @_;
-    
+    my ($te_config_obj, $idx_file, $int_file, $edge_file) = @_;
+    my $config_file = $self->config;
+
+    #$te_config_obj, $idx_file, $int_file, $edge_file);
     #my $init_config = defined $analysis && $analysis eq 'cluster' ? 1 : 0;
     #my ( $t0, $log ) = init_transposome( $config )
         #if defined $analysis && $analysis eq 'cluster';
@@ -153,7 +157,7 @@ sub make_clusters {
     my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
 
     my $cluster = Transposome::Cluster->new( 
-        configfile      => $config_file,
+        config          => $config_file,
         file            => $int_file,
         dir             => $te_config_obj->{output_directory},
         merge_threshold => $te_config_obj->{merge_threshold},
@@ -178,7 +182,7 @@ sub make_clusters {
                                     dbm_file               => $dbm });
 
     $cluster_data->{total_sequence_num} = $seqct;
-    unlink $idx_file, $int_file, $hs_file;
+    unlink $idx_file, $int_file, $edge_file;
     untie %$seqs unless $te_config_obj->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
 
@@ -190,7 +194,9 @@ sub make_clusters {
 }
 
 sub annotate_clusters {
-    my ($config_file, $te_config_obj, $cls_dir_path, $seqct, $cls_tot) = @_;
+    my $self = shift;
+    my ($te_config_obj, $cls_dir_path, $seqct, $clsct) = @_;
+    my $config_file = $self->config;
 
     #my $init_config = defined $analysis && $analysis eq 'annotation' ? 1 : 0;
     #my ( $t0, $log ) = init_transposome( $config )
@@ -202,7 +208,7 @@ sub annotate_clusters {
     my ($singletons_file_path) = grep { /singletons/ } @clsfastas;
 
     my $annotation = Transposome::Annotation->new( 
-	configfile => $config_file,
+	config => $config_file,
 	database => $te_config_obj->{repeat_database},
 	dir      => $te_config_obj->{output_directory},
 	file     => $te_config_obj->{cluster_log_file},
@@ -215,7 +221,7 @@ sub annotate_clusters {
             cluster_directory  => $cls_dir_path, 
             singletons_file    => $singletons_file_path, 
             total_sequence_num => $seqct, 
-            total_cluster_num  => $cls_tot });
+            total_cluster_num  => $clsct });
 
     $annotation->clusters_annotation_to_summary( $annotation_results );
 
@@ -233,6 +239,7 @@ sub annotate_clusters {
 
     my $ctar = Archive::Tar->new;
     $ctar->add_files(@clusters);
+    $ctar->write($cls_tar_file, &COMPRESS_GZIP);
 
     my $atar = Archive::Tar->new;
     $atar->add_files(@annotations);
@@ -316,8 +323,6 @@ sub get_cluster_data {
 
     return \%cluster_data;
 }
-
-
 
 =head1 AUTHOR
 
