@@ -66,6 +66,7 @@ sub mgblast_fasta {
 	Log::Log4perl::init( \$log_conf );
 			 
 	my $blast = Transposome::Run::Blast->new(
+	            config        => $config_file,
 		    file          => $config->{sequence_file},
 		    format        => $config->{sequence_format},
 		    dir           => $config->{output_directory},
@@ -73,8 +74,9 @@ sub mgblast_fasta {
 		    cpus          => 1,
 		    seq_num       => $config->{sequence_num},
 		    mgblast_exec  => $mgblast,
-		    formatdb_exec => $formatdb
-	            );
+		    formatdb_exec => $formatdb,
+		    log_to_screen => 0
+        );
     
         my $blastdb = $blast->run_allvall_blast;
         ok( defined($blastdb), 'Can execute all vs. all blast correctly' );
@@ -138,15 +140,17 @@ sub mgblast_fastq {
 	Log::Log4perl::init( \$log_conf );
     
 	my $blast = Transposome::Run::Blast->new(
-                                             file          => $config->{sequence_file},
-					     format        => $config->{sequence_format},
-                                             dir           => $config->{output_directory},
-                                             threads       => 1,
-                                             cpus          => 1,
-                                             seq_num       => $config->{sequence_num},
-					     mgblast_exec  => $mgblast,
-					     formatdb_exec => $formatdb
-                                             );
+	             config        => $config_file,	                    
+                     file          => $config->{sequence_file},
+	 	     format        => $config->{sequence_format},
+                     dir           => $config->{output_directory},
+                     threads       => 1,
+                     cpus          => 1,
+                     seq_num       => $config->{sequence_num},
+		     blast_exec    => $mgblast,
+		     formatdb_exec => $formatdb,
+		     log_to_screen => 0
+       );
     
        my $blastdb = $blast->run_allvall_blast;
        ok( defined($blastdb), 'Can execute all vs. all blast correctly' );
