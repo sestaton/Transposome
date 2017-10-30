@@ -4,6 +4,7 @@ use 5.010;
 use Moose::Role;
 use MooseX::Types::Path::Class;
 use File::Temp;
+use File::Spec;
 use aliased 'Transposome::Test::TestFixture';
 use namespace::autoclean;
 
@@ -49,6 +50,13 @@ has 'seq_format' => (
 );
 
 has 'repeat_db' => (
+    is       => 'ro',
+    isa      => 'Path::Class::File',
+    required => 0,
+    coerce   => 1,
+);
+
+has 'output_directory' => (
     is       => 'ro',
     isa      => 'Path::Class::File',
     required => 0,
@@ -115,6 +123,7 @@ sub _build_config_data {
     my $seq_file   = $self->seq_file;
     my $seq_format = $self->seq_format;
     my $repeat_db  = $self->repeat_db;
+    my $output_dir = $self->output_directory // File::Spec->catdir('t', 'test_transposome_cli_out');
     my $test       = TestFixture->new( build_proper => 1, destroy => 0 );
     my $blast      = $test->blast_constructor;
     my ($blfl)     = @$blast;
@@ -125,7 +134,7 @@ sub _build_config_data {
     say $tmpyml "  - sequence_num:      1_0" unless defined $exclude && $exclude eq 'sequence_num';
     say $tmpyml "  - cpu:               1" unless defined $exclude && $exclude eq 'cpu';
     say $tmpyml "  - thread:            1";
-    say $tmpyml "  - output_directory:  t/test_transposome_cli_out";
+    say $tmpyml "  - output_directory:  $output_dir";
     say $tmpyml "clustering_options:";
     say $tmpyml "  - in_memory:         1";
     say $tmpyml "  - percent_identity:  90";
