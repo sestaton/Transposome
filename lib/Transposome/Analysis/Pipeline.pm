@@ -21,8 +21,7 @@ use Transposome::Annotation;
 use namespace::autoclean;
 #use Data::Dump::Color;
 
-with 'Transposome::Role::File'; #, 
-#     'Transposome::Role::Util';
+with 'Transposome::Role::File'; 
 
 =head1 NAME
 
@@ -42,7 +41,6 @@ $VERSION = eval $VERSION;
     use Transposome::Analysis::Pipeline;
 
 
-
 =cut
 
 has 'debug' => (
@@ -55,29 +53,22 @@ has 'debug' => (
 
 =head1 METHODS
 
-=head2 annotate_clusters
+=head2 run_blast
 
- Title   : annotation_clusters
+ Title   : run_blast
 
- Usage   : $annotation->annotate_clusters();
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
            
- Function: Runs the annotation pipeline within Transposome.
+ Function: Run the all vs. all BLAST for determining pairwise similarity 
+           between WGS reads.
 
-                                                                           
- Returns : A Perl hash containing the cluster annotation results.
+                                                                     Return_type
+ Returns : The resulting BLAST database                              Scalar
 
- Args    : A Perl hash containing data for annotation.
-
-           A description of the hash values taken:
-                                                                            Arg_type
-           cluster_directory - the directory of cluster FASTA files         Scalar
-           singletons_file - the FASTA file of singleton sequences          Scalar
-           total_sequence_num - the number of sequences that went into      Scalar
-                                the clustering (returned from store_seq() 
-                                from Transposome::SeqStore), 
-           total_cluster_num - the total number of clusters (also           Scalar 
-                               returned from make_clusters() from 
-                               Transposome::Cluster).
+                                                                     Arg_type
+ Args    : Hash of configuration values for Transposome the          HashRef
+           analysis
 
 =cut
 
@@ -86,12 +77,8 @@ sub run_blast {
     my ($te_config_obj) = @_;
     my $config_file = $self->config;
 
-    #my $init_config = defined $analysis && $analysis eq 'blast' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-        #if defined $analysis && $analysis eq 'blast';
-    
     my $blast = Transposome::Run::Blast->new( 
-	config => $config_file,
+	config     => $config_file,
 	file       => $te_config_obj->{sequence_file},
 	format     => $te_config_obj->{sequence_format},                                     
         dir        => $te_config_obj->{output_directory},                                      
@@ -103,23 +90,41 @@ sub run_blast {
     
     my $blastdb = $blast->run_allvall_blast;
 
-    #log_interval( $t0, $log ) if $analysis eq 'blast';
-
-    ##TODO: get blastdb somehow
     return $blastdb;
 }
+
+=head2 find_pairs
+
+ Title   : find_pairs
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Find high-scoring pairs of reads to form edges for graph-based
+           clustering.
+
+                                                                     Return_type
+ Returns : In order, 1) an index mapping the sequence ID and the     Scalar
+                        sequence index used for clustering
+                     2) a file containing the index of each sequence Scalar
+                        and match score
+                     3) a file containg the pairwise information     Scalar
+                        for each best scoring match
+
+                                                                     Arg_type
+ Args    : In order, 1) a hash of configuration values for the       HashRef
+                        Transposome analysis
+                     2) the BLAST database                           Scalar
+
+=cut
 
 sub find_pairs {
     my $self = shift;
     my ($te_config_obj, $blastdb) = @_;
     my $config_file = $self->config;
 
-    #my $init_config = defined $analysis && $analysis eq 'findpairs' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-        #if defined $analysis && $analysis eq 'findpairs';
-
     my $blast_res = Transposome::PairFinder->new( 
-	config       => $config_file,
+	config           => $config_file,
 	file             => $blastdb,  
 	dir              => $te_config_obj->{output_directory},
 	in_memory        => $te_config_obj->{in_memory},
@@ -130,22 +135,39 @@ sub find_pairs {
     
     my ($idx_file, $int_file, $edge_file) = $blast_res->parse_blast;
     unlink $blastdb;
-    #log_interval( $t0, $log ) if $analysis eq 'findpairs';
 
-
-    ##TODO: use find() to return the files below from the output dir
     return ($idx_file, $int_file, $edge_file);
 }
+
+=head2 make_clusters
+
+ Title   : make_clusters
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Construct clusters in FASTA format based on high-scoring pairs 
+           and split paired-end reads.
+
+                                                                     Return_type
+ Returns : An object with summary statistics of clustering           HashRef
+
+                                                                     Arg_type
+ Args    : In order, 1) a hash of configuration values for the       HashRef
+                        Transposome analysis 
+                     2) an index mapping the sequence ID and the     Scalar
+                        sequence index used for clustering
+                     3) a file containing the index of each          Scalar 
+                        sequence and match score
+                     4) a file containg the pairwise information     Scalar
+                        for each best scoring match
+
+=cut
 
 sub make_clusters {
     my $self = shift;
     my ($te_config_obj, $idx_file, $int_file, $edge_file) = @_;
     my $config_file = $self->config;
-
-    #$te_config_obj, $idx_file, $int_file, $edge_file);
-    #my $init_config = defined $analysis && $analysis eq 'cluster' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-        #if defined $analysis && $analysis eq 'cluster';
 
     my $memstore = Transposome::SeqUtil->new( 
 	file      => $te_config_obj->{sequence_file}, 
@@ -186,21 +208,34 @@ sub make_clusters {
     untie %$seqs unless $te_config_obj->{in_memory};
     unlink $seq_dbm if defined $seq_dbm && -e $seq_dbm;
 
-    #log_interval( $t0, $log ) if $analysis eq 'cluster';
-
-    ##TODO: parse log to return the clustered sequence number required for annotation
-
     return $cluster_data;
 }
+
+=head2 annotate_clusters
+
+ Title   : annotate_clusters
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Assign transposon annotations to each FASTA cluster and singleton.
+
+ Returns : None. This is a class method of Transposome::Analysis::Pipeline.
+
+                                                                     Arg_type
+ Args    : In order, 1) a hash of configuration values for the       HashRef 
+                        Transposome analysis 
+                     2) the full PATH to the directory of clusters   Scalar
+                        in FASTA that will be annotated
+                     3) the total sequence number in the analysis    Scalar
+                     4) the total number of clustered sequences      Scalar
+
+=cut
 
 sub annotate_clusters {
     my $self = shift;
     my ($te_config_obj, $cls_dir_path, $seqct, $clsct) = @_;
     my $config_file = $self->config;
-
-    #my $init_config = defined $analysis && $analysis eq 'annotation' ? 1 : 0;
-    #my ( $t0, $log ) = init_transposome( $config )
-        #if defined $analysis && $analysis eq 'annotation';
 
     my @clsfastas;
     find( sub { push @clsfastas, $File::Find::name if -f and /\.fas$/ }, $cls_dir_path );
@@ -208,7 +243,7 @@ sub annotate_clusters {
     my ($singletons_file_path) = grep { /singletons/ } @clsfastas;
 
     my $annotation = Transposome::Annotation->new( 
-	config => $config_file,
+	config   => $config_file,
 	database => $te_config_obj->{repeat_database},
 	dir      => $te_config_obj->{output_directory},
 	file     => $te_config_obj->{cluster_log_file},
@@ -248,11 +283,27 @@ sub annotate_clusters {
     remove_tree( $cls_res_dir,  { safe => 1 } );
     remove_tree( $anno_res_dir, { safe => 1 } );
     
-    #log_interval( $t0, $log ) 
-        #if defined $analysis && $analysis eq 'annotation';
-
     return;
 }
+
+=head2 get_blastdb
+
+ Title   : get_blastdb
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Find a BLAST database generated by the 'blast' analysis
+           for finding high-scoring pairs.
+
+                                                                     Return_type
+ Returns : The BLAST database for finding graph edges                Scalar
+
+                                                                     Arg_type
+ Args    : Hash of configuration values for the Transposome          HashRef 
+           analysis
+
+=cut
 
 sub get_blastdb {
     my $self = shift;
@@ -263,6 +314,26 @@ sub get_blastdb {
 
     return $blastdb;
 }
+
+=head2 get_cluster_files
+
+ Title   : get_cluster_files
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Find a integer, index and edge files generated by the 'findpairs' 
+           analysis for clustering.
+
+                                                                     Return_type
+ Returns : Hash of integer, index and edge file PATHs used           HashRef
+           for clustering 
+
+                                                                     Arg_type
+ Args    : Hash of configuration values for the Transposome          HashRef 
+           analysis
+
+=cut
 
 sub get_cluster_files {
     my $self = shift;
@@ -286,6 +357,27 @@ sub get_cluster_files {
 
     return \%clsfiles;
 }
+
+=head2 get_cluster_data
+
+ Title   : get_cluster_data
+
+ Usage   : Do not use directly. This is a class method for running parts of
+           the Transposome analysis.
+           
+ Function: Get clustering statistics from the Transposome log for calculating 
+           annotation summary information.
+
+                                                                     Return_type
+ Returns : Hash of the total sequence number in the analysis,        HashRef
+           the total clustered number, and the PATH to the
+           clusters that will be used for annotation
+
+                                                                     Arg_type
+ Args    : Hash of configuration values for the Transposome          HashRef
+           analysis
+
+=cut
 
 sub get_cluster_data {
     my $self = shift;
@@ -339,7 +431,7 @@ reached at the email address listed above to resolve any questions.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Transposome::Annotation
+    perldoc Transposome::Analysis::Pipeline
 
 
 =head1 LICENSE AND COPYRIGHT
