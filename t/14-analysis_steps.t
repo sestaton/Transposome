@@ -34,8 +34,8 @@ ok( $trans_obj->get_configuration, 'Configuration data loaded from file correctl
 my $config = $trans_obj->get_configuration;
 
 my $cwd = getcwd();
-my $bin = File::Spec->catdir($cwd, 'bin');
-local $ENV{PATH} = "$bin:$ENV{PATH}";
+my $bin = File::Spec->catdir($cwd, 'blib', 'bin');
+$ENV{PATH} = "$bin:$ENV{PATH}";
 
 my $devtests = 0;
 if (defined $ENV{TRANSPOSOME_ENV} && $ENV{TRANSPOSOME_ENV} eq 'development') {
@@ -79,7 +79,6 @@ sub full_analysis {
     my @results;
     find( sub { push @results, $File::Find::name if -f and /\.tgz$/ }, $outdir );
     is( scalar(@results), 2, 'Output directories compressed successfully' );
-    #exit;
 
     remove_tree( $outdir, { safe => 1 } );
     unlink glob "t/transposome_mgblast*";
@@ -90,7 +89,7 @@ sub blast_analysis {
     my ($script, $conf_file, $outdir) = @_;
 
     $script .= " --analysis blast --config $conf_file";
-    my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    my ($stdout, $stderr, @res) = capture { system([0..5], $script); };
     say $stdout;
 
     my @files;
@@ -100,6 +99,7 @@ sub blast_analysis {
 
     my $blastdb = shift @files;
     ok( -s $blastdb, 'Can run BLAST analysis' );
+
     return $blastdb;
 }
 
@@ -107,7 +107,7 @@ sub findpairs_analysis {
     my ($script, $conf_file, $outdir, $blastdb) = @_;
 
     $script .= " --analysis findpairs --config $conf_file --blastdb $blastdb";
-    my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    my ($stdout, $stderr, @res) = capture { system([0..5], $script); };
     say $stdout;
 
     my @files;
@@ -131,7 +131,7 @@ sub cluster_analysis {
 
     $script .= " --analysis cluster --config $conf_file";
     $script .= " -int $int_file -idx $idx_file -edges $edge_file";
-    my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    my ($stdout, $stderr, @res) = capture { system([0..5], $script); };
     say $stdout;
 
     my (@files, @dirs, @fastas);
@@ -168,7 +168,7 @@ sub annotation_analysis {
 
     $script .= " --analysis annotation --config $conf_file --clsdir $clsdir -seqct $seqct -clsct $cls_tot";
 
-    my ($stdout, $stderr, @res) = capture { system([0..5], "$script"); };
+    my ($stdout, $stderr, @res) = capture { system([0..5], $script); };
     say $stdout;
     
     my @files;
