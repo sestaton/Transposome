@@ -345,8 +345,6 @@ sub _run_blast {
     my $desc_num     = $self->desc_num;
     my $aln_num      = $self->aln_num;
 
-    say STDERR "mgblast: $mgblast";
-
     my $exit_value;
     my @blast_cmd = "$mgblast ".           # program
                     "-i $subseq_file ".    # query
