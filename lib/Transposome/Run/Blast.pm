@@ -257,7 +257,7 @@ sub _make_mgblastdb {
 
     my $fdblog = "formatdb.log";
     $fname =~ s/\.f.*//;
-    my $db    = $fname."_allvall_mgblastdb";
+    my $db = $fname."_allvall_mgblastdb";
     my $db_path = Path::Class::File->new($dir, $db);
     unlink $db_path if -e $db_path;
 
@@ -344,6 +344,8 @@ sub _run_blast {
     my $pid          = $self->percent_identity;
     my $desc_num     = $self->desc_num;
     my $aln_num      = $self->aln_num;
+
+    say STDERR "mgblast: $mgblast";
 
     my $exit_value;
     my @blast_cmd = "$mgblast ".           # program
