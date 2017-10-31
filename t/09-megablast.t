@@ -44,7 +44,7 @@ sub mgblast_fasta {
     my ($conf_file2) = @$conf2;
 
     my $cwd      = getcwd();
-    my $bin      = File::Spec->catdir($cwd, 'bin');
+    my $bin      = File::Spec->catdir($cwd, 'blib', 'bin');
     my $mgblast  = File::Spec->catfile($bin, 'mgblast');
     my $formatdb = File::Spec->catfile($bin, 'formatdb');
 
@@ -118,7 +118,7 @@ sub mgblast_fastq {
     my ($conf_file2) = @$conf2;
 
     my $cwd      = getcwd();
-    my $bin      = File::Spec->catdir($cwd, 'bin');
+    my $bin      = File::Spec->catdir($cwd, 'blib', 'bin');
     my $mgblast  = File::Spec->catfile($bin, 'mgblast');
     my $formatdb = File::Spec->catfile($bin, 'formatdb');
 
@@ -147,7 +147,7 @@ sub mgblast_fastq {
                      threads       => 1,
                      cpus          => 1,
                      seq_num       => $config->{sequence_num},
-		     blast_exec    => $mgblast,
+		     mgblast_exec  => $mgblast,
 		     formatdb_exec => $formatdb,
 		     log_to_screen => 0
        );
