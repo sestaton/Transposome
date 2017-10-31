@@ -1,4 +1,8 @@
 bin/transposome
+bin/transposome-bl
+bin/transposome-pf
+bin/transposome-cl
+bin/transposome-an
 build/ci/bin/formatdb
 build/ci/bin/mgblast
 build/ci/run_tests.sh
@@ -6,6 +10,7 @@ cpanfile
 Changes
 README.md
 lib/Transposome.pm
+lib/Transposome/Analysis/Pipeline.pm
 lib/Transposome/Annotation.pm
 lib/Transposome/Annotation/Mapping.pm
 lib/Transposome/Annotation/Methods.pm
@@ -13,6 +18,7 @@ lib/Transposome/Annotation/Search.pm
 lib/Transposome/Annotation/Summary.pm
 lib/Transposome/Annotation/Typemap.pm
 lib/Transposome/Cluster.pm
+lib/Transposome/Log.pm
 lib/Transposome/PairFinder.pm
 lib/Transposome/SeqFactory.pm
 lib/Transposome/SeqIO.pm
@@ -42,7 +48,6 @@ t/11-cluster.t
 t/12-annotation.t
 t/13-allmethods.t
 t/14-analysis_steps.t
-t/15-transposome_app.t
 xt/00-pod.t
 xt/01-pod-coverage.t
 src/Makefile
