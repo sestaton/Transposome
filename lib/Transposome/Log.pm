@@ -7,17 +7,15 @@ use File::Spec;
 use DateTime;
 use Log::Log4perl;
 use Log::Any::Adapter;
-use Log::Any; #   qw($log);
-use POSIX       qw(); #qw(strftime);
-use Time::HiRes qw(); #qw(gettimeofday tv_interval);
+use Log::Any;
+use POSIX       qw();
+use Time::HiRes qw();
 use Lingua::EN::Inflect;
 use Transposome;
 use namespace::autoclean;
 #use Data::Dump::Color;
 
-#with 'Transposome::Annotation::Methods', 
-with 'Transposome::Role::File'; #, 
-#     'Transposome::Role::Util';
+with 'Transposome::Role::File'; 
 
 =head1 NAME
 
@@ -38,13 +36,6 @@ our $VERSION = '0.12.0';
 
 =cut
 
-#has 'init_config' => (
-#    is         => 'ro',
-#    isa        => 'Bool',
-#    predicate  => 'has_init_config',
-#    lazy       => 1,
-#    default    => 0,
-#);
 has 'log_to_screen' => (
     is         => 'ro',
     isa        => 'Bool',
@@ -53,9 +44,27 @@ has 'log_to_screen' => (
     default    => 1,
 );
 
+=head1 METHODS
+
+=head2 get_transposome_logger
+
+ Title   : get_transposome_logger
+
+ Usage   : my $conf_file = 'transposome_config.yml';
+           my $log_obj = Tranposome::Log->new( config => $conf_file );
+           my $logger = $log_obj->get_transposome_logger;
+           
+ Function: Returns a logging object to be used with any Transposome class methods
+
+                                                                     Return_type
+ Returns : Log4perl object of the 'Transposome' category             Object
+
+ Args    : None. This is class method of Transposome::Log.        
+
+=cut
+
 sub get_transposome_logger {
     my $self = shift;
-    #my ($config_file) = @_;
     my $config_file = $self->config;
     my $to_screen   = $self->log_to_screen;
 
@@ -66,19 +75,6 @@ sub get_transposome_logger {
     my $log_file = File::Spec->catfile($config->{output_directory}, $config->{run_log_file});
     my $category = 'log4perl.category.Transposome      = INFO, Logfile';
     $category = $to_screen ? $category.', Screen' : $category;
-
-    #my $conf = qq{
-    #log4perl.category.Transposome      = INFO, Logfile, Screen
-
-    #log4perl.appender.Logfile          = Log::Log4perl::Appender::File
-    #log4perl.appender.Logfile.filename = $log_file
-    #log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
-    #log4perl.appender.Logfile.layout.ConversionPattern = %m%n
-
-    #log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-    #log4perl.appender.Screen.stderr  = 1
-    #log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
-    #};
 
     my $conf = qq{
     $category
@@ -103,6 +99,29 @@ sub get_transposome_logger {
 
     return $log;
 }
+
+=head2 init_transposome
+
+ Title   : init_transposome
+
+ Usage   : my $conf_file = 'transposome_config.yml';
+           my $log_obj = Tranposome::Log->new( config => $conf_file );
+   
+           my $te_conf_obj = Transposome->new( config => $conf_file)->parse_configuration;
+           my ($t0, $logger) = $log_obj->init_transposome($te_config_obj);
+           
+ Function: Returns a logging object to be used with any Transposome class methods and the 
+           time the object was initialized.
+
+                                                                     Return_type
+ Returns : In order, 1) the time the object was initializedLog4perl  Object
+                        object of the 'Transposome' category        
+                     2) the time the object was initialized          Scalar
+
+                                                                     Arg_type
+ Args    : Hash of configuration values for Transposome analysis     HashRef
+
+=cut
 
 sub init_transposome {
     my $self = shift;
@@ -133,12 +152,31 @@ sub init_transposome {
     return ($t0, $log);
 }
 
+=head2 log_interval
+
+ Title   : log_interval
+
+ Usage   : my $conf_file = 'transposome_config.yml';
+           my $log_obj = Tranposome::Log->new( config => $conf_file );
+   
+           $log_obj->log_interval($t0, $log);
+           
+ Function: Given a start time and a log object, this method will log the interval
+           of time that has passed from beginning to end in a human-readable format.
+
+ Returns : None. This is class method of Transposome::Log.
+
+                                                                     Arg_type
+ Args    : In order, 1) a starting time for calculating the          Scalar
+                        time interval
+                     2) a logging object for writing the results     Object
+
+=cut
+
 sub log_interval {
     my $self = shift;
     my ($t0, $log) = @_;
     
-    #load_classes('DateTime', 'Time::HiRes', 'Lingua::EN::Inflect', 'POSIX');
-
     my $t1    = [Time::HiRes::gettimeofday()];
     my $t0_t1 = Time::HiRes::tv_interval($t0, $t1);
     my $dt    = DateTime->from_epoch( epoch => 0 );
