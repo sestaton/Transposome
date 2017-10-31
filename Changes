@@ -1,7 +1,23 @@
 Revision history for Transposome
 
 Version	Date	Location
-0.11.4
+0.12.0	10/31/17	Vancouver, BC
+
+- Refactor the complete analysis procedure to run individual analysis steps sequentially.
+- Add Transposome::Analysis::Pipeline class for controlling analysis steps rather than having
+  the code in one script.
+- Add Transposome::Log class for getting/setting logging properties. This was previously all
+  rolled into one script and now the methods and code are shared across numerous classes.
+- Add execution scripts for running analysis steps instead of controlling the program flow from
+  a single command script. This greatly reduces the memory usage of the full analysis, it improves
+  the efficiency for large data sets, and delivers the same biological results.
+- Remove redundant test script ('15-transposome_app.t') for running the full pipeline. The individual 
+  steps were already tested thoroughly so this set of tests became completely redundant. The full
+  pipeline is also tested in the '14-analysis_steps.t' script.
+- Fix bug with Illumina sequence format not being parsed correctly when the command line analysis
+  was done. 
+
+0.11.4	10/31/17	Vancouver, BC  
 
 - Update typemap to include 'Unknown_TIR' type.
 
