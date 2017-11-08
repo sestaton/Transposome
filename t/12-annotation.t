@@ -93,20 +93,23 @@ sub test_annotation {
     is( $seqct, 70, 'Correct number of sequences stored' );
     ok( ref($seqs) eq 'HASH', 'Correct data structure for sequence store' );
 
-    my ( $read_pairs, $vertex, $uf, $dbm ) =
-	$cluster->find_pairs({ cluster_file     => $cluster_file, 
-			       cluster_log_file => $report,
-			       total_seq_num    => $seqct });
-    ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
+    my $pair_data =
+        $cluster->find_pairs({ cluster_file     => $cluster_file, 
+                               cluster_log_file => $report,
+                               total_seq_num    => $seqct });
     
-
+    ok( defined($pair_data->{read_pairs}), 'Can find split paired reads for merging clusters' );
+    
+    my %merge_args = (
+        graph_vertices         => $pair_data->{graph_vertices},
+        sequence_hash          => $seqs,
+        read_pairs             => $pair_data->{read_pairs},
+        cluster_log_file       => $report,
+        graph_unionfind_object => $pair_data->{graph_unionfind_object},
+    );
+    
     my $cluster_data =
-	$cluster->merge_clusters({ graph_vertices         => $vertex,
-				   sequence_hash          => $seqs,
-				   read_pairs             => $read_pairs,
-				   cluster_log_file       => $report,
-				   graph_unionfind_object => $uf,
-				   dbm_file               => $dbm });
+        $cluster->merge_clusters(\%merge_args);
     
     ok( defined($cluster_data->{cluster_directory}),
 	'Can successfully merge communities based on paired-end information' );

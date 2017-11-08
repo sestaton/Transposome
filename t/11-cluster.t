@@ -103,20 +103,27 @@ sub cluster_analysis {
     my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
     my ( $seqs, $seqct ) = $memstore->store_seq;
     
-    my ( $read_pairs, $vertex, $uf, $dbm ) =
+    my $pair_data =
 	$cluster->find_pairs({ cluster_file     => $cluster_file, 
 			       cluster_log_file => $report,
 			       total_seq_num    => $seqct });
     
-    ok( defined($read_pairs), 'Can find split paired reads for merging clusters' );
+    ok( defined($pair_data->{read_pairs}), 'Can find split paired reads for merging clusters' );
     
+    my %merge_args = (
+        graph_vertices         => $pair_data->{graph_vertices},
+        sequence_hash          => $seqs,
+        read_pairs             => $pair_data->{read_pairs},
+        cluster_log_file       => $report,
+        graph_unionfind_object => $pair_data->{graph_unionfind_object},
+    );
+    
+    if ($in_memory) {
+        $merge_args{dbm_file} = $pair_data->{dbm_file};
+    }  
+
     my $cluster_data =
-	$cluster->merge_clusters({ graph_vertices         => $vertex,
-				   sequence_hash          => $seqs,
-				   read_pairs             => $read_pairs,
-				   cluster_log_file       => $report,
-				   graph_unionfind_object => $uf,
-				   dbm_file               => $dbm });
+	$cluster->merge_clusters(\%merge_args);
     
     {
 	local $/ = '>';
