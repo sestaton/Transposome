@@ -327,7 +327,22 @@ sub find_pairs {
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
     $log->info("Transposome::Cluster::find_pairs completed at:           $ft.");
 
-    return (\%read_pairs, \%vertex, \$uf, $dbm);
+    my %pair_data = (
+	read_pairs             => \%read_pairs,
+	graph_vertices         => \%vertex,
+	graph_unionfind_object => \$uf,
+    );
+
+    if ($self->in_memory) {
+	unlink $dbm if -e $dbm;
+	
+	return \%pair_data;
+    }
+    else {
+	$pair_data{dbm_file} = $dbm;
+
+	return \%pair_data;
+    }
 }
 
 =head2 make_clusters
@@ -509,7 +524,7 @@ sub merge_clusters {
     my $uf     = $cluster_data->{graph_unionfind_object};
     my $read_pairs   = $cluster_data->{read_pairs};
     my $cls_log_file = $cluster_data->{cluster_log_file};
-    my $dbm_file     = $cluster_data->{dbm_file};
+    #my $dbm_file     = $cluster_data->{dbm_file};
 
     my $infile = $self->file->relative;
     my ($iname, $ipath, $isuffix) = fileparse($infile, qr/\.[^.]*/);
@@ -620,8 +635,10 @@ sub merge_clusters {
     close $rep;
     close $clsnew;
 
-    untie %$read_pairs unless $self->in_memory;
-    unlink $dbm_file if -e $dbm_file;
+    unless ($self->in_memory) {
+	untie %$read_pairs;
+	unlink $cluster_data->{dbm_file} if -e $cluster_data->{dbm_file};
+    }
 
     # write out singletons for rarefaction
     my $singletons_num = scalar keys %$seqs;
@@ -630,8 +647,8 @@ sub merge_clusters {
     open my $singlesout, '>', $singletons_file_path 
 	or die "\n[ERROR]: Could not open file: $singletons_file_path\n";
 
-    while (my ($seqid, $seq) = each %$seqs) {
-	say $singlesout join "\n", ">".$seqid, $seq;
+    for my $seqid (keys %$seqs) {
+	say $singlesout join "\n", ">".$seqid, $seqs->{$seqid};
     }
     close $singlesout;
 
