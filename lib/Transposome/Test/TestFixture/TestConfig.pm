@@ -66,8 +66,7 @@ has 'output_directory' => (
 =head2 config_constructor
 
  Title   : config_constructor
-
- Usage   : my $test = Transposome::Test::TestFixture->new( build_proper => 1, destroy => 0 );                                                                                                         
+ Usage   : my $test = Transposome::Test::TestFixture->new( build_proper => 1, destroy => 0 );                                  
            my $fa_arr = $test->config_constructor; 
            
  Function: Create temporary configuration files for testing Transposome.
@@ -136,7 +135,7 @@ sub _build_config_data {
     say $tmpyml "  - thread:            1";
     say $tmpyml "  - output_directory:  $output_dir";
     say $tmpyml "clustering_options:";
-    say $tmpyml "  - in_memory:         1";
+    say $tmpyml "  - in_memory:         YES";
     say $tmpyml "  - percent_identity:  90";
     say $tmpyml "  - fraction_coverage: 0.55";
     say $tmpyml "  - merge_threshold:   0.029" unless defined $exclude && $exclude eq 'merge_threshold';
