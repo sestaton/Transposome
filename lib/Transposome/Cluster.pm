@@ -4,8 +4,7 @@ use 5.010;
 use Moose;
 use IPC::System::Simple qw(system capture EXIT_ANY);
 use File::Path          qw(make_path);
-use POSIX               qw(strftime);
-#use Log::Any             qw($log);
+use POSIX               qw();
 use DBI;
 use Tie::Hash::DBD;
 use Graph::UnionFind;
@@ -16,8 +15,7 @@ use Path::Class::File;
 use Config;
 use Transposome::Log;
 use namespace::autoclean;
-
-#use Data::Dump;
+#use Data::Dump::Color;
 
 with 'Transposome::Role::File', 
      'Transposome::Role::Util';
@@ -104,8 +102,7 @@ sub louvain_method {
     my $int_file = $self->file->relative;
     my $out_dir  = $self->dir->relative;
     my $realbin  = $self->bin_dir->resolve;
-    #my $config   = $self->config;
-
+ 
     my ($lconvert, $lcommunity, $lhierarchy) = $self->_find_community_exes($realbin);
 
     my ($iname, $ipath, $isuffix) = fileparse($int_file, qr/\.[^.]*/);
@@ -206,7 +203,6 @@ sub louvain_method {
 
 sub find_pairs {
     my $self = shift;
-    #my $config = $self->config;
 
     my ($cluster_data) = @_;
     my $cls_file     = $cluster_data->{cluster_file};
@@ -281,10 +277,8 @@ sub find_pairs {
         close $in;
     }
 
-    #dd \%read_pairs;
-
-    while (my ($cls, $reads) = each %read_pairs) {
-	my @read_ids = $self->mk_vec($reads);
+    for my $cls (keys %read_pairs) { 
+	my @read_ids = $self->mk_vec($read_pairs{$cls});
         for my $read (@read_ids) {
             my $readbase = $read;
             $readbase =~ s/\/\d$//;
@@ -298,17 +292,14 @@ sub find_pairs {
     my ($cls_i, $cls_j);
     my @sep_reads;
 
-    while (my ($allpairs, $reads) = each %mapped_pairs) {
-	if (@$reads < 2) {                         # if no pair is found in another cluster,
-            delete $mapped_pairs{$allpairs};       # remove this pair
-        }
-        else {
-            push @sep_reads, values %$_ for @$reads;
+    for my $allpairs (keys %mapped_pairs) { 
+	# if no pair is found in another cluster, skip this pair
+	if (@{$mapped_pairs{$allpairs}} >= 2) { 
+	    push @sep_reads, values %$_ for @{$mapped_pairs{$allpairs}};
 	    ($cls_i, $cls_j) = sort @sep_reads;
-            if ($cls_i =~ /$cls_j/) {              # remove reads that have pairs in the same cluster       
-                delete $mapped_pairs{$allpairs};   # which is uninformative for merging clusters
-            }
-            else {
+	    # skip reads that have pairs in the same cluster 
+	    # which is uninformative for merging clusters 
+	    unless ($cls_i =~ /$cls_j/) { 
 		my $k = $self->mk_key($cls_i, $cls_j);
                 $cls_conn_ct{$k}++;
             }
@@ -316,12 +307,12 @@ sub find_pairs {
         @sep_reads = ();
     }
 
-    while (my ($pk, $pv) = each %cls_conn_ct) {
+    for my $pk (keys  %cls_conn_ct) { 
 	my ($i, $j) = $self->mk_vec($pk);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
         my $j_noct = $j; $j_noct =~ s/\_.*//;
-        if ($pv >= $merge_threshold) {   
-	    say $rep join "\t", $i_noct, $j_noct, $pv;
+	if ($cls_conn_ct{$pk} >= $merge_threshold) {
+            say $rep join "\t", $i_noct, $j_noct, $cls_conn_ct{$pk};
             ++$vertex{$_} for $i, $j;
             $uf->union($i, $j);
         }
@@ -409,21 +400,18 @@ sub make_clusters {
     }
     close $in;
 
-    #dd \%clus;
-
     my $cls_ct = 0;
-    while (my ($cls, $cls_ids) = each %clus) {
+    for my $cls (keys %clus) { 
 	$cls_ct++;
-	my $clus_size = @$cls_ids;
         my @clus_members;
-	for my $cls_member (@$cls_ids) {
+	for my $cls_member (@{$clus{$cls}}) { 
             say $mem "$cls_member $cls_ct";
             if (exists $index{$cls_member}) {
                 push @clus_members, $index{$cls_member};
             }
         }
 	if (@clus_members) {
-	    say $cls_out ">CL$cls_ct $clus_size";
+	    say $cls_out join q{ }, ">CL$cls_ct", scalar(@{$clus{$cls}});
 	    say $cls_out join q{ }, @clus_members;
 	}
     }
@@ -515,7 +503,6 @@ sub make_clusters {
 sub merge_clusters {
     my $self = shift; 
     my ($cluster_data) = @_;
-    #my $config = $self->config;
 
     my $vertex = $cluster_data->{graph_vertices};
     my $seqs   = $cluster_data->{sequence_hash};
@@ -535,6 +522,7 @@ sub merge_clusters {
     $cls_with_merges    .= "_merged_$str.cls";
     my $cls_dir_path    = $ipath.$cls_dir;
     make_path($cls_dir_path, {verbose => 0, mode => 0711,});
+
     my $cls_with_merges_path = File::Spec->catfile($out_dir, $cls_with_merges);
     open my $clsnew, '>', $cls_with_merges_path 
 	or die "\n[ERROR]: Could not open file: $cls_with_merges_path\n";
