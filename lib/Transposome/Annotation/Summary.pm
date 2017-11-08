@@ -2,7 +2,7 @@ package Transposome::Annotation::Summary;
 
 use 5.010;
 use Moose::Role;
-use POSIX    qw(strftime);
+use POSIX    qw();
 use Log::Any qw($log);
 #use Data::Dump::Color;
 
@@ -145,8 +145,8 @@ sub clusters_annotation_to_summary {
 	say $outsum join "\t", @summary, $gperc;
     }
     close $outsum;
-    
-    $log->info("Results - Total repeat fraction from annotations: $total_gcov");
+
+    $log->info("Results - Total repeat fraction from annotations (biological): $total_gcov");
 
     # log results
     my $ft = POSIX::strftime('%d-%m-%Y %H:%M:%S', localtime);
