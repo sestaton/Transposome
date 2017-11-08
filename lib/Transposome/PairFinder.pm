@@ -238,7 +238,7 @@ sub parse_blast {
     open my $edge,  '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
 
     for my $match (keys %match_pairs) { 
-	my $match_score = $match_pairs{$match} # assignment simply to document algorithm
+	my $match_score = $match_pairs{$match}; # assignment simply to document algorithm
 	my ($qry, $sbj) = $self->mk_vec($match);
 	my $revmatch    = $self->mk_key($sbj, $qry);
 	if (exists $match_pairs{$revmatch}) {
