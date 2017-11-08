@@ -6,7 +6,6 @@ use List::Util qw(sum max);
 use File::Path qw(make_path remove_tree);
 use Storable   qw(thaw);
 use POSIX      qw(strftime);
-use Log::Any   qw($log);
 use Path::Class::File;
 use File::Basename;
 use File::Spec;
@@ -169,11 +168,13 @@ sub make_clusters {
     my ($te_config_obj, $idx_file, $int_file, $edge_file) = @_;
     my $config_file = $self->config;
 
+    # we set the 'seqtype' explicitly to ensure Casava 1.8+ headers are parsed correctly
     my $memstore = Transposome::SeqUtil->new( 
 	file      => $te_config_obj->{sequence_file}, 
 	in_memory => $te_config_obj->{in_memory},
 	format    => $te_config_obj->{sequence_format},
-        dir       => $te_config_obj->{output_directory} 
+        dir       => $te_config_obj->{output_directory},
+        seqtype   => 'illumina',
     );
 
     my ($seqs, $seqct, $seq_dbm) = $memstore->store_seq;
