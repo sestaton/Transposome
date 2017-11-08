@@ -655,7 +655,8 @@ sub merge_clusters {
 
     unless ($self->in_memory) {
 	untie %$read_pairs;
-	unlink $cluster_data->{dbm_file} if -e $cluster_data->{dbm_file};
+	unlink $cluster_data->{dbm_file} 
+	    if (defined $cluster_data->{dbm_file} && -e $cluster_data->{dbm_file});
     }
 
     # write out singletons for rarefaction
