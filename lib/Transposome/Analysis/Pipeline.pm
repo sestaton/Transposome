@@ -191,18 +191,24 @@ sub make_clusters {
     
     my $comm = $cluster->louvain_method;
     my $cluster_file = $cluster->make_clusters($comm, $idx_file);
-    my ($read_pairs, $vertex, $uf, $dbm) 
+    my $pair_data
         = $cluster->find_pairs({ cluster_file     => $cluster_file, 
                                  cluster_log_file => $te_config_obj->{cluster_log_file},
                                  total_seq_num    => $seqct });
  
-    my $cluster_data
-       = $cluster->merge_clusters({ graph_vertices         => $vertex,
-                                    sequence_hash          => $seqs,
-                                    read_pairs             => $read_pairs,
-                                    cluster_log_file       => $te_config_obj->{cluster_log_file},
-                                    graph_unionfind_object => $uf,
-                                    dbm_file               => $dbm });
+    my %merge_args = (
+        graph_vertices         => $pair_data->{graph_vertices},
+        sequence_hash          => $seqs,
+        read_pairs             => $pair_data->{read_pairs},
+        cluster_log_file       => $te_config_obj->{cluster_log_file},
+        graph_unionfind_object => $uf,
+    );
+
+    if ($te_config_obj->{in_memory}) {
+        $merge_args{dbm_file} => $pair_data->{dbm_file};
+    }
+
+    my $cluster_data = $cluster->merge_clusters(\%merge_args);
 
     $cluster_data->{total_sequence_num} = $seqct;
     unlink $idx_file, $int_file, $edge_file;
