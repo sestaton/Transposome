@@ -81,6 +81,16 @@ has 'no_store' => (
     default   => 0,
 );
 
+# this attribute is for dealing with IDs from different platforms (e.g., Illumina, Roche, etc.)
+has 'seqtype' => (
+    is        => 'ro',
+    isa       => 'Str',
+    lazy      => 1,
+    default   => undef,
+    reader    => 'get_seqtype',
+    predicate => 'has_seqtype',
+);
+
 =head1 METHODS
 
 =head2 store_seq
@@ -129,9 +139,16 @@ sub store_seq {
 	tie %seqhash, "Tie::Hash::DBD", $dbh;
     }
 
-    my $filename = $self->file->relative;
-    my $format   = $self->format;
-    my $seqio    = Transposome::SeqFactory->new( file => $filename, format => $format )->make_seqio_object;
+    my %args = (
+	file   => $self->file->relative,
+	format => $self->format, 
+    );
+
+   if ($self->has_seqtype && $self->get_seqtype =~ /illumina/i) {
+       $args{seqtype} = $self->get_seqtype;
+   }
+
+    my $seqio = Transposome::SeqFactory->new( %args )->make_seqio_object;
 
     while (my $seq = $seqio->next_seq) {
 	$self->inc_counter if $seq->has_seq;
