@@ -201,7 +201,7 @@ sub make_clusters {
         sequence_hash          => $seqs,
         read_pairs             => $pair_data->{read_pairs},
         cluster_log_file       => $te_config_obj->{cluster_log_file},
-        graph_unionfind_object => $uf,
+        graph_unionfind_object => $pair_data->{graph_unionfind_object},
     );
 
     if ($te_config_obj->{in_memory}) {
