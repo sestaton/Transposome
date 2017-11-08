@@ -74,6 +74,12 @@ sub parse_configuration {
     $index = 0;
     $config{in_memory}         = $yaml->[0]->{clustering_options}->[$index]->{in_memory};
     $index++;
+    if ($config{in_memory} =~ /1|yes/i) {
+	$config{in_memory} = 1;
+    }
+    elsif ($config{in_memory} =~ /0|no/i) {
+	$config{in_memory} = 0;
+    }
     $config{percent_identity}  = $yaml->[0]->{clustering_options}->[$index]->{percent_identity};
     $index++;
     $config{fraction_coverage} = $yaml->[0]->{clustering_options}->[$index]->{fraction_coverage};
