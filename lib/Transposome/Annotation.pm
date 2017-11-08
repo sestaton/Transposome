@@ -362,7 +362,7 @@ sub annotate_clusters {
     $log->info("Results - Total sequences unclustered:            $single_tot");
     $log->info("Results - Repeat fraction from clusters:          $rep_frac");
     $log->info("Results - Singleton repeat fraction:              $singleton_rep_frac");
-    $log->info("Results - Total repeat fraction:                  $total_rep_frac");
+    $log->info("Results - Total repeat fraction (theoretical):                 $total_rep_frac");
 
     return ({
 	annotation_report     => $anno_rp_path, 
