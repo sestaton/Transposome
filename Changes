@@ -1,6 +1,20 @@
 Revision history for Transposome
 
 Version	Date	Location
+0.12.1	11/08/17	Vancouver, BC
+
+- Fix for #40 with reads not being found in cluster merging step. This was due to how different
+  Casava versions are handled. The original routine was correct but an issue lingered due to
+  this not always being invoked.
+- The above fixes an secondary issue that was causing the annotated repeat fraction to be reported
+  as being lower than in reality, though this has been resolved.
+- Add YES/NO boolean for setting in-memory analysis in configuration. This should be more intuitive
+  than the 1/0 form (which will still work).
+- Remove the 'each' hash loop syntax from all classes. This is known to cause some issues, especially
+  when adding/removing keys so we changed all methods to use 'keys' instead.
+- Label repeat summaries in log as either theoretical or biological if they are from just clustering or 
+  clustering + annotated repeats, respectively.
+
 0.12.0	10/31/17	Vancouver, BC
 
 - Refactor the complete analysis procedure to run individual analysis steps sequentially.
