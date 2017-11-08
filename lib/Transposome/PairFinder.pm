@@ -229,15 +229,16 @@ sub parse_blast {
     
     open my $idx, '>', $idx_path or die "\n[ERROR]: Could not open file: $idx_path\n";
 
-    while (my ($idx_mem, $idx_val) = each %match_index) {
-	say $idx join q{ }, $idx_mem, $idx_val;
+    for my $idx_mem (keys %match_index) {
+	say $idx join q{ }, $idx_mem, $match_index{$idx_mem};
     }
     close $idx;
 
     open my $int, '>', $int_path or die "\n[ERROR]: Could not open file: $int_path\n";
     open my $edge,  '>', $edge_path  or die "\n[ERROR]: Could not open file: $edge_path\n";
 
-    while (my ($match, $match_score) = each %match_pairs) {
+    for my $match (keys %match_pairs) { 
+	my $match_score = $match_pairs{$match} # assignment simply to document algorithm
 	my ($qry, $sbj) = $self->mk_vec($match);
 	my $revmatch    = $self->mk_key($sbj, $qry);
 	if (exists $match_pairs{$revmatch}) {
