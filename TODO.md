@@ -17,4 +17,4 @@ This file is for logging feature requests and bugs during development.
  - [x] Change full pipeline approach to run subcommands. This would greatly reduce memory usage.
  - [ ] Update Wiki, starting with: https://github.com/sestaton/Transposome/wiki/Specifications-and-example-usage
  - [x] Document required sequence format and provide reference in warnings
- - [ ] Test Transposome::Analysis::Pipeline methods
+ - [x] Test Transposome::Analysis::Pipeline methods
