@@ -204,8 +204,8 @@ sub make_clusters {
         graph_unionfind_object => $pair_data->{graph_unionfind_object},
     );
 
-    if ($te_config_obj->{in_memory}) {
-        $merge_args{dbm_file} => $pair_data->{dbm_file};
+    unless ($te_config_obj->{in_memory}) {
+        $merge_args{dbm_file} = $pair_data->{dbm_file};
     }
 
     my $cluster_data = $cluster->merge_clusters(\%merge_args);
