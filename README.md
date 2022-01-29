@@ -5,7 +5,9 @@ Annotation of transposable element families from unassembled sequence reads
 
 Build|Coverage|Github Version|Docker Version|Docker Image
 ---|---|---|---|---
-[![Build Status](https://travis-ci.org/sestaton/Transposome.svg?branch=master)](https://travis-ci.org/sestaton/Transposome) | [![Coverage Status](https://coveralls.io/repos/github/sestaton/Transposome/badge.svg?branch=master)](https://coveralls.io/github/sestaton/Transposome?branch=master) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) | [![(https://images.microbadger.com/badges/version/sestaton/transposome.svg)](https://microbadger.com/images/sestaton/transposome) | [![(https://images.microbadger.com/badges/image/sestaton/transposome.svg)](https://microbadger.com/images/sestaton/transposome)
+[![Build Status](https://travis-ci.org/sestaton/Transposome.svg?branch=master)](https://travis-ci.org/sestaton/Transposome) | [![Coverage Status](https://coveralls.io/repos/github/sestaton/Transposome/badge.svg?branch=master)](https://coveralls.io/github/sestaton/Transposome?branch=master) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) | 
+[![Docker Version](https://images.microbadger.com/badges/version/sestaton/transposome.svg)](https://microbadger.com/images/sestaton/transposome) | 
+[![Docker Image](https://images.microbadger.com/badges/image/sestaton/transposome.svg)](https://microbadger.com/images/sestaton/transposome)
 
 ### What is Transposome?
 
