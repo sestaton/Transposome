@@ -205,37 +205,38 @@ sub sample_seq {
     }
 
     srand($seed);
-    while (my $seq = $seqio_fa->next_seq) {
+    while (my $seqio = $seqio_fa->next_seq) {
 	$n++;
-	push @sample, { $seq->get_id => $seq->get_seq };
+	push @sample, { $seqio->get_id => $seqio->get_seq };
 	last if $n == $k;
     }
 
     if ($k > $n) {
 	warn "\n[ERROR]: Sample size $k is larger than the number of sequences ($n).";  
-	warn "Pick a smaller sample size. Exiting.\n";
+	warn "Pick a smaller sample size and try again. Will not write any output.\n";
+	return ({}, 0) unless $self->no_store;
     }
-    else {
-        while (my $seq = $seqio_fa->next_seq) {
-	    my $i = int rand $n++;
-	    if ($i < @sample) {
-		$sample[$i] = { $seq->get_id => $seq->get_seq };
+
+    while (my $seqio = $seqio_fa->next_seq) {
+	my $i = int rand $n++;
+	if ($i < @sample) {
+	    $sample[$i] = { $seqio->get_id => $seqio->get_seq };
+	}
+    }
+    
+    for my $seqobj (@sample) {
+	for my $id (keys %$seqobj) {
+	    if ($self->no_store) {
+		say join "\n", ">".$id, $seqobj->{$id};
+	    }
+	    else {
+		$self->inc_counter if $seqobj->{$id};
+		$seqhash{$id} = $seqobj->{$id};
 	    }
 	}
-
-        for my $seq (@sample) {
-	    for my $h (keys %$seq) {
-		if ($self->no_store) {
-		    say join "\n", ">".$h, $seq->{$h};
-		}
-		else {
-		    $self->inc_counter if $seq->{$h};
-		    $seqhash{$h} = $seq->{$h};
-		}
-	    }
-	}   
-        return (\%seqhash, $self->counter) unless $self->no_store;
-    }   
+    }
+    
+    return (\%seqhash, $self->counter) unless $self->no_store;
 }   
 
 =head1 AUTHOR
