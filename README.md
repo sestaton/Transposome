@@ -81,7 +81,7 @@ Transposome is published in the journal *Bioinformatics*, and if you use this so
 
 **LICENSE AND COPYRIGHT**
 
-Copyright (C) 2013-2022 S. Evan Staton
+Copyright (C) 2013-2023 S. Evan Staton
 
 This program is distributed under the MIT (X11) License, which should be distributed with the package. 
 If not, it can be found here: http://www.opensource.org/licenses/mit-license.php
