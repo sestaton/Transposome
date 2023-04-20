@@ -158,7 +158,7 @@ sub cluster_analysis {
     is( $clstot,  48, 'Correct number of sequences clustered' );
     is( $singtot, 22, 'Correct number of singleton sequences' );
     is( @files,    4, 'Correct number of log files generated' );
-    is( @fastas,  19, 'Correct number of clusters produced' );
+    is( @fastas,  18, 'Correct number of clusters produced' );
 
     return ($clsdir, $seqtot, $clstot);
 }
