@@ -12,23 +12,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up perl
+        env:
+	  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
       - run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
       - run: perl -V
+      - run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecovbash
       - run: cpanm --installdeps .
       - run: perl Makefile.PL && make
       - run: prove -lv t
-  codecov:
-     runs-on: ubuntu-latest
-     container: perl:latest
-     steps:
-       - uses: actions/checkout@v2
-       - name: Run codecov GitHub Action
-         env:
-           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-         run: |
-           cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecovbash
-           cover -test -report codecov
+      - run: cover -test -report codecov
+
 
