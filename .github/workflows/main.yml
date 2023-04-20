@@ -20,7 +20,7 @@ jobs:
       - run: cpanm --installdeps .
       - run: perl Makefile.PL && make
       - run: prove -lv t
-   codecov:
+  codecov:
      runs-on: ubuntu-latest
      container: perl:latest
      steps:
