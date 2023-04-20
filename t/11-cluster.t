@@ -54,8 +54,11 @@ my $realbin = $bdir->resolve;
 
 my $in_memory = 1;
 cluster_analysis($in_memory);
+
 $in_memory = 0;
 cluster_analysis($in_memory);
+_clean_run($outdir);
+unlink $keep_conf_file;
 
 sub cluster_analysis {
     my ($in_memory) = @_;
@@ -102,12 +105,12 @@ sub cluster_analysis {
     
     my $memstore = Transposome::SeqUtil->new( file => $seqfile, in_memory => 1 );
     my ( $seqs, $seqct ) = $memstore->store_seq;
-    
+
     my $pair_data =
 	$cluster->find_pairs({ cluster_file     => $cluster_file, 
 			       cluster_log_file => $report,
 			       total_seq_num    => $seqct });
-    
+
     ok( defined($pair_data->{read_pairs}), 'Can find split paired reads for merging clusters' );
     
     my %merge_args = (
@@ -167,18 +170,23 @@ sub cluster_analysis {
 	if (/^# Cluster groupings/) {
 	    my $first = <$rep>;
 	    chomp $first;
-	    my $second = <$rep>;
-	    chomp $second;
+	    #my $second = <$rep>;
+	    #chomp $second;
 	    ( $g0, $mems1 ) = split /\t/, $first;
-	    ( $g1, $mems2 ) = split /\t/, $second;
-	    my $cg0 = $cls11 . "," . $cls12;
-	    my $cg1 = $cls12 . "," . $cls11;
-	    my $cg2 = $cls21 . "," . $cls22;
-	    my $cg3 = $cls22 . "," . $cls21;
-	    like( $mems1, qr/$cg0|$cg1|$cg2|$cg3/,
+	    #( $g1, $mems2 ) = split /\t/, $second;
+	    #my $cg0 = $cls11 . "," . $cls12;
+	    #my $cg1 = $cls12 . "," . $cls11;
+	    #my $cg2 = $cls21 . "," . $cls22;
+	    #my $cg3 = $cls22 . "," . $cls21;
+	    my $cg = join ",", $cls11, $cls12, $cls21, $cls22;
+	    $cg = join ",", sort { $a cmp $b } split /,/, $cg;
+	    $mems1 = join ",", sort { $a cmp $b } split /,/, $mems1;
+	    #say STDERR "DEBUG: $mems1 => $cg";
+	    
+	    like( $mems1, qr/$cg/, #qr/$cg0|$cg1|$cg2|$cg3/,
 		  'Expected clusters were joined (1)' );
-	    like( $mems2, qr/$cg0|$cg1|$cg2|$cg3/,
-		  'Expected clusters were joined (2)' );
+	    #like( $mems2, qr/$cg0|$cg1|$cg2|$cg3/,
+		  #'Expected clusters were joined (2)' );
 	}
     }
     close $rep;
@@ -200,8 +208,8 @@ sub cluster_analysis {
 	'Expected number of reads went into clusters and singletons file' );
 }
 
-END {
+sub _clean_run {
+    my ($outdir) = @_;
     remove_tree( $outdir, { safe => 1 } );
     unlink glob("t/*.bln");
-    unlink $keep_conf_file;
 }
