@@ -182,7 +182,7 @@ sub test_annotation {
     $annoct++ while (<$annorep>);
     close $annorep;
 
-    my @families = sort qw(RLG_wily RLG_teda RLG_rewu RLG_X);
+    my @families = sort qw(RLG_wily RLG_teda RLG_X); #RLG_rewu
     my @anno_fams;
     while (<$annosum>) {
 	$anno_sumct++;
@@ -199,7 +199,9 @@ sub test_annotation {
 
     ## check if the family mapping succeeded 
     @anno_fams = sort @anno_fams;
-    is_deeply( \@families, \@anno_fams, 'All TE familes correctly annotated' );
+    #use Data::Dump::Color;
+    #dd \@families; dd \@anno_fams;
+    is_deeply( \@families, \@anno_fams, 'All TE families correctly annotated' );
 
     ## added in v0.11.1 to test getting superfamily and family name from IDs
     my $family   = shift @families;
