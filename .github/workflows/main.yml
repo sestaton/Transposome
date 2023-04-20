@@ -11,7 +11,7 @@ jobs:
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up perl
+      - name: Run Codecov GitHub Action
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: shogo82148/actions-setup-perl@v1

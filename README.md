@@ -3,9 +3,11 @@ Transposome
 
 Annotation of transposable element families from unassembled sequence reads
 
+<!--
 Build|Coverage|Github Version
 ---|---|---
 [![Build Status](https://travis-ci.org/sestaton/Transposome.svg?branch=master)](https://travis-ci.org/sestaton/Transposome) | [![Coverage Status](https://coveralls.io/repos/github/sestaton/Transposome/badge.svg?branch=master)](https://coveralls.io/github/sestaton/Transposome?branch=master) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) 
+-->
 
 ### What is Transposome?
 
