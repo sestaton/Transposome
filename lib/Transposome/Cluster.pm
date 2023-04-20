@@ -66,7 +66,7 @@ has 'bin_dir' => (
     is       => 'rw',
     isa      => 'Path::Class::Dir',
     default  => sub {
-	return Path::Class::Dir->new($Config{sitebin})
+	return Path::Class::Dir->new($Config{sitebinexp})
     },
 );
 
@@ -302,7 +302,7 @@ sub find_pairs {
 	    push @{$mapped_pairs{$readbase}}, {$read => $cls};
         }
     }
-
+    
     #untie %read_pairs unless $self->in_memory;
     #unlink $dbm if -e $dbm;
 
@@ -323,7 +323,8 @@ sub find_pairs {
         }
         @sep_reads = ();
     }
-
+    #dd \%cls_conn_ct;
+    
     for my $pk (keys  %cls_conn_ct) { 
 	my ($i, $j) = $self->mk_vec($pk);
         my $i_noct = $i; $i_noct =~ s/\_.*//;
@@ -331,12 +332,13 @@ sub find_pairs {
 	if ($cls_conn_ct{$pk} >= $merge_threshold) {
             say $rep join "\t", $i_noct, $j_noct, $cls_conn_ct{$pk};
             ++$vertex{$_} for $i, $j;
-            $uf->union($i, $j);
+            $uf->union([$i, $j]);
         }
     }
     close $rep;
     unlink $cls_file_path;
-
+    #dd \%vertex;
+    
     untie %cls_conn_ct unless $self->in_memory;
     unlink $dbc if -e $dbc;
 
