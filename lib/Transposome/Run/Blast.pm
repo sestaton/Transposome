@@ -118,7 +118,7 @@ has 'bin_dir' => (
     is       => 'rw',
     isa      => 'Path::Class::Dir',
     default  => sub {
-        return Path::Class::Dir->new($Config{sitebin})
+        return Path::Class::Dir->new($Config{sitebinexp})
     },
 );
 
