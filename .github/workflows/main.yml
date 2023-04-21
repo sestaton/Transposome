@@ -27,8 +27,7 @@ jobs:
 
       - name: Build and test Transposome
         run: cpanm --installdeps .
-        run: perl Makefile.PL && make
-        run: prove -lv t
+        run: perl Makefile.PL && make && prove -lv t
 	run: cover -test
 
       - name: Generate coverage report and upload to Codecov
