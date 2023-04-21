@@ -26,19 +26,21 @@ jobs:
         run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
 
       - name: Build and test Transposome
-        run: |
-         cpanm --installdeps .
-         perl Makefile.PL && make
-         prove -lv t
-	 cover -test
+        with:
+          run: |
+            cpanm --installdeps .
+            perl Makefile.PL && make
+            prove -lv t
+	    cover -test
 
 
       - name: Generate coverage report and upload to Codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-	 curl -Os https://uploader.codecov.io/latest/linux/codecov
-	 find . -iregex "codecov.*"
-	 chmod +x codecov
-         ./codecov -t ${CODECOV_TOKEN}
+        with:
+          run: |
+	    curl -Os https://uploader.codecov.io/latest/linux/codecov
+	    find . -iregex "codecov.*"
+	    chmod +x codecov
+            ./codecov -t ${CODECOV_TOKEN}
       
