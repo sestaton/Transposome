@@ -29,7 +29,9 @@ jobs:
       run: cpanm --installdeps .
 
     - name: Build and test Transposome
-      run: perl Makefile.PL && make && prove -lv t && cover -test
+      env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: perl Makefile.PL && make && cover -test -report codecov
     
     - name: Upload cov report to Codecov
       env:
