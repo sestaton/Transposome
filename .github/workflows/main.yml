@@ -11,17 +11,28 @@ jobs:
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: Run Codecov GitHub Action
+      - name: Set up GitHub Action
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
+
+      - name: Install core dependencies
       - run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
+
+      - name: Get Perl version
       - run: perl -V
+
+      - name: Install Perl deps for Codecov
       - run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
-      - run: cpanm --installdeps .
-      - run: perl Makefile.PL && make
-      - run: prove -lv t
+
+      - name: Build and test Transposome
+      - run: |
+          cpanm --installdeps .
+          perl Makefile.PL && make
+          prove -lv t
+
+      - name: Generate coverage report and upload to Codecov
       - run: cover -test -report codecov
       
