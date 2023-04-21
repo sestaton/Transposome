@@ -10,34 +10,29 @@ jobs:
         perl: [ '5.30' ]
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up GitHub Action
-        uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: ${{ matrix.perl }}
+    - uses: actions/checkout@v3
+    - name: Set up GitHub Action
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: ${{ matrix.perl }}
 
-      - name: Install core dependencies
-        run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
+    - name: Install core dependencies
+      run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
 
-      - name: Get Perl version
-        run: perl -V
+    - name: Get Perl version
+      run: perl -V
 
-      - name: Install Perl deps for Codecov
-        run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
+    - name: Install Perl deps for Codecov
+      run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
 
-      - name: Build and test Transposome
-        run: |
-          cpanm --installdeps .
-          perl Makefile.PL && make
-	  prove -lv t
-	  cover -test
-
-      - name: Generate coverage report and upload to Codecov
-        env:
+    - name: Install Transposome deps
+      run: cpanm --installdeps .
+	
+    - name: Build and test Transposome
+      run: perl Makefile.PL && make && prove -lv t && cover -test
+    
+    - name: Upload cov report to Codecov
+      env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-	  curl -Os https://uploader.codecov.io/latest/linux/codecov
-	  find . -iregex "codecov.*"
-	  chmod +x codecov
-          ./codecov -t ${CODECOV_TOKEN}
+      run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
       
