@@ -27,7 +27,7 @@ jobs:
 
     - name: Install Transposome deps
       run: cpanm --installdeps .
-	
+
     - name: Build and test Transposome
       run: perl Makefile.PL && make && prove -lv t && cover -test
     
@@ -35,4 +35,3 @@ jobs:
       env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
-      
