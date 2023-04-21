@@ -5,7 +5,7 @@ Annotation of transposable element families from unassembled sequence reads
 
 Build|Coverage|Github Version
 ---|---|---
-[![CI](https://github.com/sestaton/Transposome/actions/workflows/main.yml/badge.svg)] | [![codecov](https://codecov.io/gh/sestaton/Transposome/branch/master/graph/badge.svg?token=SVO175KAI1)](https://codecov.io/gh/sestaton/Transposome) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) 
+[![CI](https://github.com/sestaton/Transposome/actions/workflows/main.yml/badge.svg)](https://github.com/sestaton/Transposome/actions/workflows/main.yml) | [![codecov](https://codecov.io/gh/sestaton/Transposome/branch/master/graph/badge.svg?token=SVO175KAI1)](https://codecov.io/gh/sestaton/Transposome) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) 
 
 ### What is Transposome?
 
