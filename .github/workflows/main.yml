@@ -10,7 +10,7 @@ jobs:
         perl: [ '5.30' ]
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up GitHub Action
         uses: shogo82148/actions-setup-perl@v1
         with:
@@ -26,15 +26,18 @@ jobs:
         run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
 
       - name: Build and test Transposome
-        run: cpanm --installdeps .
-        run: perl Makefile.PL && make && prove -lv t
-	run: cover -test
+        run: |
+          cpanm --installdeps .
+          perl Makefile.PL && make
+	  prove -lv t
+	  cover -test
 
       - name: Generate coverage report and upload to Codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: curl -Os https://uploader.codecov.io/latest/linux/codecov
-	run: find . -iregex "codecov.*"
-	run: chmod +x codecov
-        run: ./codecov -t ${CODECOV_TOKEN}
+        run: |
+	  curl -Os https://uploader.codecov.io/latest/linux/codecov
+	  find . -iregex "codecov.*"
+	  chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
       
