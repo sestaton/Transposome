@@ -19,20 +19,20 @@ jobs:
           perl-version: ${{ matrix.perl }}
 
       - name: Install core dependencies
-      - run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
+        run: sudo apt install -y build-essential lib32z1 git ncbi-blast+ curl
 
       - name: Get Perl version
-      - run: perl -V
+        run: perl -V
 
       - name: Install Perl deps for Codecov
-      - run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
+        run: cpanm --quiet --notest Module::Build Devel::Cover Devel::Cover::Report::Codecov
 
       - name: Build and test Transposome
-      - run: |
+        run: |
           cpanm --installdeps .
           perl Makefile.PL && make
           prove -lv t
 
       - name: Generate coverage report and upload to Codecov
-      - run: cover -test -report codecov
+        run: cover -test -report codecov
       
