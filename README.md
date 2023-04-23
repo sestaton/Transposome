@@ -5,7 +5,7 @@ Annotation of transposable element families from unassembled sequence reads
 
 Build|Coverage|Github Version|Docker Image Size|Docker Pulls
 ---|---|---|---|---
-[![CI](https://github.com/sestaton/Transposome/actions/workflows/main.yml/badge.svg)](https://github.com/sestaton/Transposome/actions/workflows/main.yml) | [![codecov](https://codecov.io/gh/sestaton/Transposome/branch/master/graph/badge.svg?token=SVO175KAI1)](https://codecov.io/gh/sestaton/Transposome) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) | ![Docker Image Size](https://badgen.net/docker/size/sestaton/tephra?icon=docker&label=image%20size) | ![Pulls](https://img.shields.io/docker/pulls/sestaton/tephra.svg)
+[![CI](https://github.com/sestaton/Transposome/actions/workflows/main.yml/badge.svg)](https://github.com/sestaton/Transposome/actions/workflows/main.yml) | [![codecov](https://codecov.io/gh/sestaton/Transposome/branch/master/graph/badge.svg?token=SVO175KAI1)](https://codecov.io/gh/sestaton/Transposome) | [![GitHub version](https://badge.fury.io/gh/sestaton%2FTransposome.svg)](https://badge.fury.io/gh/sestaton%2FTransposome) | ![Docker Image Size](https://badgen.net/docker/size/sestaton/transposome?icon=docker&label=image%20size) | ![Pulls](https://img.shields.io/docker/pulls/sestaton/transposome.svg)
 
 ### What is Transposome?
 
